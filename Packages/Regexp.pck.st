@@ -1,57 +1,47 @@
-'From Cuis7.3 [latest update: #6907] on 10 December 2024 at 10:40:43 am'!
+'From Cuis7.5 [latest update: #7259] on 5 June 2025 at 2:00:07 pm'!
 'Description '!
-!provides: 'Regexp' 1 69!
-!requires: 'Unicode' 1 67 nil!
+!provides: 'Regexp' 1 1!
+!requires: 'Cuis-Base' 75 7259 nil!
+!requires: 'Unicode' 1 1 nil!
 SystemOrganization addCategory: #Regexp!
-SystemOrganization addCategory: #'Regexp-Parsing'!
 SystemOrganization addCategory: #'Regexp-Private'!
 SystemOrganization addCategory: #'Regexp-Public'!
 SystemOrganization addCategory: #'Regexp-Tests'!
 
 
-!classDefinition: #ParseError category: #'Regexp-Parsing'!
-Error subclass: #ParseError
+!classDefinition: #RegexpError category: #'Regexp-Public'!
+Error subclass: #RegexpError
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
-	category: 'Regexp-Parsing'!
-!classDefinition: 'ParseError class' category: #'Regexp-Parsing'!
-ParseError class
+	category: 'Regexp-Public'!
+!classDefinition: 'RegexpError class' category: #'Regexp-Public'!
+RegexpError class
 	instanceVariableNames: ''!
 
-!classDefinition: #BaseParser category: #'Regexp-Parsing'!
-Object subclass: #BaseParser
-	instanceVariableNames: 'input lookahead shift'
+!classDefinition: #RegexpSyntaxError category: #'Regexp-Public'!
+RegexpError subclass: #RegexpSyntaxError
+	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
-	category: 'Regexp-Parsing'!
-!classDefinition: 'BaseParser class' category: #'Regexp-Parsing'!
-BaseParser class
-	instanceVariableNames: ''!
-
-!classDefinition: #ReCompiler category: #'Regexp-Private'!
-BaseParser subclass: #ReCompiler
-	instanceVariableNames: 'flags slotsUsed'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Regexp-Private'!
-!classDefinition: 'ReCompiler class' category: #'Regexp-Private'!
-ReCompiler class
+	category: 'Regexp-Public'!
+!classDefinition: 'RegexpSyntaxError class' category: #'Regexp-Public'!
+RegexpSyntaxError class
 	instanceVariableNames: ''!
 
 !classDefinition: #ReAnchor category: #'Regexp-Private'!
 Object subclass: #ReAnchor
-	instanceVariableNames: 'predicate'
+	instanceVariableNames: 'predicate debugString'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Regexp-Private'!
 !classDefinition: 'ReAnchor class' category: #'Regexp-Private'!
 ReAnchor class
-	instanceVariableNames: ''!
+	instanceVariableNames: 'beginningOfInput beginningOfLine beginningOfWord endOfInput endOfLine endOfWord notWordBoundary wordBoundary'!
 
 !classDefinition: #ReCharacterClass category: #'Regexp-Private'!
 Object subclass: #ReCharacterClass
-	instanceVariableNames: 'property'
+	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Regexp-Private'!
@@ -59,35 +49,15 @@ Object subclass: #ReCharacterClass
 ReCharacterClass class
 	instanceVariableNames: ''!
 
-!classDefinition: #ReCharacterSet category: #'Regexp-Private'!
-ReCharacterClass subclass: #ReCharacterSet
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Regexp-Private'!
-!classDefinition: 'ReCharacterSet class' category: #'Regexp-Private'!
-ReCharacterSet class
-	instanceVariableNames: ''!
-
-!classDefinition: #ReBitmapCharacterSet category: #'Regexp-Private'!
-ReCharacterSet subclass: #ReBitmapCharacterSet
+!classDefinition: #ReBitmapClass category: #'Regexp-Private'!
+ReCharacterClass subclass: #ReBitmapClass
 	instanceVariableNames: 'bitmap'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Regexp-Private'!
-!classDefinition: 'ReBitmapCharacterSet class' category: #'Regexp-Private'!
-ReBitmapCharacterSet class
+!classDefinition: 'ReBitmapClass class' category: #'Regexp-Private'!
+ReBitmapClass class
 	instanceVariableNames: 'blank decimal space word'!
-
-!classDefinition: #ReEnumeratedCharacterSet category: #'Regexp-Private'!
-ReCharacterSet subclass: #ReEnumeratedCharacterSet
-	instanceVariableNames: 'characters'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Regexp-Private'!
-!classDefinition: 'ReEnumeratedCharacterSet class' category: #'Regexp-Private'!
-ReEnumeratedCharacterSet class
-	instanceVariableNames: ''!
 
 !classDefinition: #ReComplementClass category: #'Regexp-Private'!
 ReCharacterClass subclass: #ReComplementClass
@@ -109,6 +79,26 @@ ReCharacterClass subclass: #ReDifferenceClass
 ReDifferenceClass class
 	instanceVariableNames: ''!
 
+!classDefinition: #ReEnumeratedClass category: #'Regexp-Private'!
+ReCharacterClass subclass: #ReEnumeratedClass
+	instanceVariableNames: 'characters'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Regexp-Private'!
+!classDefinition: 'ReEnumeratedClass class' category: #'Regexp-Private'!
+ReEnumeratedClass class
+	instanceVariableNames: ''!
+
+!classDefinition: #ReCaseInsensitiveEnumeratedClass category: #'Regexp-Private'!
+ReEnumeratedClass subclass: #ReCaseInsensitiveEnumeratedClass
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Regexp-Private'!
+!classDefinition: 'ReCaseInsensitiveEnumeratedClass class' category: #'Regexp-Private'!
+ReCaseInsensitiveEnumeratedClass class
+	instanceVariableNames: ''!
+
 !classDefinition: #ReIntersectionClass category: #'Regexp-Private'!
 ReCharacterClass subclass: #ReIntersectionClass
 	instanceVariableNames: 'operand1 operand2'
@@ -119,14 +109,14 @@ ReCharacterClass subclass: #ReIntersectionClass
 ReIntersectionClass class
 	instanceVariableNames: ''!
 
-!classDefinition: #RePropertyClass category: #'Regexp-Private'!
-ReCharacterClass subclass: #RePropertyClass
-	instanceVariableNames: ''
+!classDefinition: #RePredicateClass category: #'Regexp-Private'!
+ReCharacterClass subclass: #RePredicateClass
+	instanceVariableNames: 'predicate'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Regexp-Private'!
-!classDefinition: 'RePropertyClass class' category: #'Regexp-Private'!
-RePropertyClass class
+!classDefinition: 'RePredicateClass class' category: #'Regexp-Private'!
+RePredicateClass class
 	instanceVariableNames: ''!
 
 !classDefinition: #ReUnionClass category: #'Regexp-Private'!
@@ -139,6 +129,16 @@ ReCharacterClass subclass: #ReUnionClass
 ReUnionClass class
 	instanceVariableNames: ''!
 
+!classDefinition: #ReCompiler category: #'Regexp-Private'!
+Object subclass: #ReCompiler
+	instanceVariableNames: 'input lookahead shift flags slotsUsed'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Regexp-Private'!
+!classDefinition: 'ReCompiler class' category: #'Regexp-Private'!
+ReCompiler class
+	instanceVariableNames: ''!
+
 !classDefinition: #ReFlags category: #'Regexp-Private'!
 Object subclass: #ReFlags
 	instanceVariableNames: 'ignoreCase multiLine'
@@ -147,7 +147,7 @@ Object subclass: #ReFlags
 	category: 'Regexp-Private'!
 !classDefinition: 'ReFlags class' category: #'Regexp-Private'!
 ReFlags class
-	instanceVariableNames: ''!
+	instanceVariableNames: 'default'!
 
 !classDefinition: #ReInstruction category: #'Regexp-Private'!
 Object subclass: #ReInstruction
@@ -207,6 +207,16 @@ ReInstruction subclass: #ReMatchInstruction
 	category: 'Regexp-Private'!
 !classDefinition: 'ReMatchInstruction class' category: #'Regexp-Private'!
 ReMatchInstruction class
+	instanceVariableNames: ''!
+
+!classDefinition: #ReNoopInstruction category: #'Regexp-Private'!
+ReInstruction subclass: #ReNoopInstruction
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Regexp-Private'!
+!classDefinition: 'ReNoopInstruction class' category: #'Regexp-Private'!
+ReNoopInstruction class
 	instanceVariableNames: ''!
 
 !classDefinition: #ReSaveInstruction category: #'Regexp-Private'!
@@ -297,7 +307,7 @@ ReNode subclass: #ReNullNode
 	category: 'Regexp-Private'!
 !classDefinition: 'ReNullNode class' category: #'Regexp-Private'!
 ReNullNode class
-	instanceVariableNames: 'instance'!
+	instanceVariableNames: ''!
 
 !classDefinition: #ReRepetitionNode category: #'Regexp-Private'!
 ReNode subclass: #ReRepetitionNode
@@ -321,7 +331,7 @@ ReSequenceNode class
 
 !classDefinition: #ReAlternationNode category: #'Regexp-Private'!
 ReSequenceNode subclass: #ReAlternationNode
-	instanceVariableNames: 'left right'
+	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Regexp-Private'!
@@ -331,7 +341,7 @@ ReAlternationNode class
 
 !classDefinition: #ReConcatenationNode category: #'Regexp-Private'!
 ReSequenceNode subclass: #ReConcatenationNode
-	instanceVariableNames: 'left right'
+	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Regexp-Private'!
@@ -351,7 +361,7 @@ ReProcess class
 
 !classDefinition: #ReProgram category: #'Regexp-Private'!
 Object subclass: #ReProgram
-	instanceVariableNames: 'slotsNeeded instructions'
+	instanceVariableNames: 'slotsNeeded instructions findLabel matchLabel'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Regexp-Private'!
@@ -371,7 +381,7 @@ ReRegister class
 
 !classDefinition: #ReThread category: #'Regexp-Private'!
 Object subclass: #ReThread
-	instanceVariableNames: 'process counter result executed'
+	instanceVariableNames: 'process counter instruction shouldSuspend executed result'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Regexp-Private'!
@@ -379,64 +389,36 @@ Object subclass: #ReThread
 ReThread class
 	instanceVariableNames: ''!
 
-!classDefinition: #ReMatch category: #'Regexp-Public'!
-Object subclass: #ReMatch
+!classDefinition: #RegexpMatch category: #'Regexp-Public'!
+Object subclass: #RegexpMatch
 	instanceVariableNames: 'pattern string startingAt endingAt register0 registers'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Regexp-Public'!
-!classDefinition: 'ReMatch class' category: #'Regexp-Public'!
-ReMatch class
+!classDefinition: 'RegexpMatch class' category: #'Regexp-Public'!
+RegexpMatch class
 	instanceVariableNames: ''!
 
-!classDefinition: #RePattern category: #'Regexp-Public'!
-Object subclass: #RePattern
+!classDefinition: #RegexpPattern category: #'Regexp-Public'!
+Object subclass: #RegexpPattern
 	instanceVariableNames: 'program'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Regexp-Public'!
-!classDefinition: 'RePattern class' category: #'Regexp-Public'!
-RePattern class
-	instanceVariableNames: 'cache'!
+!classDefinition: 'RegexpPattern class' category: #'Regexp-Public'!
+RegexpPattern class
+	instanceVariableNames: ''!
 
-!classDefinition: #RePatternTests category: #'Regexp-Tests'!
-TestCase subclass: #RePatternTests
+!classDefinition: #RegexpPatternTests category: #'Regexp-Tests'!
+TestCase subclass: #RegexpPatternTests
 	instanceVariableNames: 'pattern'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Regexp-Tests'!
-!classDefinition: 'RePatternTests class' category: #'Regexp-Tests'!
-RePatternTests class
+!classDefinition: 'RegexpPatternTests class' category: #'Regexp-Tests'!
+RegexpPatternTests class
 	instanceVariableNames: ''!
 
-
-!ParseError commentStamp: 'ess 11/19/2024 09:53:48' prior: 0!
-I am a class for errors generated by BaseParser.!
-
-!BaseParser commentStamp: 'ess 11/19/2024 10:23:00' prior: 0!
-I am a utility for writing recursive-descent parsers.
-
-I have a single-token lookahead, but I also support backtracking.  I differ from Parser in not being specific to Smalltalk.
-
-I am little more than a thin wrapper around a PositionableStream, i.e., my #lookahead equates to a stream's #peek and my #consume equates to a stream's #next.
-
-My main differenece from a stream is my #step method, which supports mapping one or more items from the underlying collection as a single token.  For many uses, this allows you to write parsers without having separate tokenization and parsing stages.  (This is sometimes convenient, and sometimes necessary.)  To do the same using only a stream can require distracting bookkeeping of the stream's underlying position.
-
-To avoid that bookkeeping, I provide the methods #save and #restore to save and restore, respectively, the stream's position.  Saved positions can be nested.  To implement backtracking or multi-token lookahead, use #withSaveDo: to manage all this.
-
-I also provide a number of convenience methods that map directly to tests of the #lookahead token, but check for end-of-input, i.e., #isDigit is equivalent to `lookahead notNil and: [ lookahead isDigit ]`.!
-
-!ReCompiler commentStamp: '<historical>' prior: 0!
-https://tc39.es/ecma262/multipage/text-processing.html#sec-regexp-regular-expression-objects
-
-https://perldoc.perl.org/perlre
-!
-
-!ReCharacterClass commentStamp: '<historical>' prior: 0!
-Match characters by property, where "property" is any test block that can be evaluated against a character.!
-
-!ReEnumeratedCharacterSet commentStamp: '<historical>' prior: 0!
-Match characters by the property of being "included in this enumerated set".!
 
 !ReInstruction commentStamp: '<historical>' prior: 0!
 An "opcode", of sorts, for the regular expression matching virtual machine.!
@@ -450,978 +432,305 @@ Look for a character matching some criteria.  Progress the thread when we find a
 !ReNode commentStamp: '<historical>' prior: 0!
 A part of the intermediate syntax tree constructed during compilation.!
 
-!ReNullNode commentStamp: '<historical>' prior: 0!
-Null object!
-
-!BaseParser methodsFor: 'accessing' stamp: 'ess 11/3/2024 08:41:05'!
-input: aStringOrStream
-
-	input := aStringOrStream readStream.
-	self step! !
-
-!BaseParser methodsFor: 'backtracking' stamp: 'ess 11/27/2024 10:52:49'!
-reset: streamPosition
-
-	self restore.
-	^nil! !
-
-!BaseParser methodsFor: 'backtracking' stamp: 'ess 11/19/2024 10:17:08'!
-restore
-
-	| saved |
-	saved := self unsave.
-	input position: saved key.
-	lookahead := saved value! !
-
-!BaseParser methodsFor: 'backtracking' stamp: 'ess 11/27/2024 10:53:02'!
-save
-
-	shift addLast: input position -> lookahead.
-	^input position! !
-
-!BaseParser methodsFor: 'backtracking' stamp: 'ess 11/27/2024 10:53:07'!
-shift
-
-	^self save! !
-
-!BaseParser methodsFor: 'backtracking' stamp: 'ess 11/27/2024 10:54:07'!
-unsave
-
-	shift isEmpty ifTrue: [^self error: 'BaseParser internal error: restore without save'].
-	^shift removeLast! !
-
-!BaseParser methodsFor: 'backtracking' stamp: 'ess 11/27/2024 10:54:12'!
-withResetDo: aBlock
-
-	^self withSaveDo: aBlock! !
-
-!BaseParser methodsFor: 'backtracking' stamp: 'ess 11/27/2024 10:54:42'!
-withSaveDo: aUnaryBlock
-
-	| didRestore restore |
-	didRestore := false.
-	restore :=
-		[self restore.
-		didRestore := true].
-	self save.
-	^[aUnaryBlock value: restore] ensure:
-		[didRestore ifFalse: [self unsave]]! !
-
-!BaseParser methodsFor: 'initialization' stamp: 'ess 11/1/2024 19:26:09'!
-initialize
-
-	shift := OrderedCollection new! !
-
-!BaseParser methodsFor: 'initialization' stamp: 'ess 11/7/2024 15:27:22'!
-parseError: aMessageString
-
-	^ ParseError signal: aMessageString! !
-
-!BaseParser methodsFor: 'parsing' stamp: 'ess 11/18/2024 03:42:10'!
-consume
-	"Update lookahead to the next character of the input, or nil.  Answer the old value of the lookahead."
-
-	| la |
-	la := lookahead ifNil: [ ^ self parseError: 'Unexpected end of input' ].
-	self step.
-	^ la! !
-
-!BaseParser methodsFor: 'parsing' stamp: 'ess 11/28/2024 09:36:22'!
-expect: aCharacter
-
-	(self match: aCharacter) ifFalse:
-		[^self parseError: 'Expected ', aCharacter asString]! !
-
-!BaseParser methodsFor: 'parsing' stamp: 'ess 11/28/2024 09:36:28'!
-expectAll: aSequence
-
-	(self matchAll: aSequence) ifFalse:
-		[^self parseError: 'Expected ', aSequence asString]! !
-
-!BaseParser methodsFor: 'parsing' stamp: 'ess 11/14/2024 09:09:30'!
-lookahead
-
-	^ lookahead! !
-
-!BaseParser methodsFor: 'parsing' stamp: 'ess 11/28/2024 09:57:26'!
-match: aCharacter
-	"Consume the next character only if it matches aCharacter.  Answer true if the match succeeded."
-
-	| isMatch |
-	isMatch := lookahead == aCharacter.
-	isMatch ifTrue: [self consume].
-	^isMatch! !
-
-!BaseParser methodsFor: 'parsing' stamp: 'ess 11/28/2024 09:35:18'!
-matchAll: aSequence
-
-	^self withSaveDo:
-		[:restore | | isMatch |
-		isMatch := aSequence
-			inject: true
-			into: [:sum :each | sum and: [self match: each]].
-		isMatch ifFalse: [restore value].
-		^isMatch]! !
-
-!BaseParser methodsFor: 'parsing' stamp: 'ess 11/28/2024 09:40:53'!
-matchAllIgnoringCase: aSequence
-
-	^self withSaveDo:
-		[:restore | | isMatch |
-		isMatch := aSequence
-			inject: true
-			into: [:sum :each | sum and: [self matchIgnoringCase: each]].
-		isMatch ifFalse: [restore value].
-		^isMatch]! !
-
-!BaseParser methodsFor: 'parsing' stamp: 'ess 11/28/2024 09:57:20'!
-matchIgnoringCase: aCharacter
-	"Consume the next character only if it matches aCharacter.  Answer true if the match succeeded."
-
-	| isMatch |
-	isMatch := lookahead asLowercase == aCharacter asLowercase.
-	isMatch ifTrue: [self consume].
-	^isMatch! !
-
-!BaseParser methodsFor: 'parsing' stamp: 'ess 11/26/2024 15:43:36'!
-next
-
-	^input next! !
-
-!BaseParser methodsFor: 'parsing' stamp: 'ess 11/2/2024 03:23:33'!
-parse
-
-	^ self subclassResponsibility! !
-
-!BaseParser methodsFor: 'parsing' stamp: 'ess 11/26/2024 07:41:44'!
-parse: aStringOrStream
-
-	self input: aStringOrStream.
-	^self parse! !
-
-!BaseParser methodsFor: 'parsing' stamp: 'ess 11/27/2024 10:53:23'!
-skipBlanks
-
-	[self isBlank] whileTrue: [self consume]! !
-
-!BaseParser methodsFor: 'parsing' stamp: 'ess 11/27/2024 10:53:36'!
-skipSpaces
-
-	[self isSpace] whileTrue: [self consume]! !
-
-!BaseParser methodsFor: 'parsing' stamp: 'ess 11/18/2024 03:56:43'!
-skipWhitespace
-
-	self skipBlanks! !
-
-!BaseParser methodsFor: 'parsing' stamp: 'ess 11/27/2024 10:53:55'!
-step
-	"Move to next character of input."
-
-	lookahead := input atEnd
-		ifFalse: [self next]
-		ifTrue: [nil]! !
-
-!BaseParser methodsFor: 'testing' stamp: 'ess 11/2/2024 05:15:43'!
-atEnd
-
-	^ lookahead isNil! !
-
-!BaseParser methodsFor: 'testing' stamp: 'ess 11/3/2024 09:04:24'!
-didSucceed
-	"We succeeded if we parsed all the input."
-
-	^ self atEnd! !
-
-!BaseParser methodsFor: 'testing' stamp: 'ess 11/17/2024 19:13:23'!
-isAlnum
-
-	^ lookahead notNil
-		and: [ lookahead isPosixAlnum ]! !
-
-!BaseParser methodsFor: 'testing' stamp: 'ess 11/17/2024 19:13:39'!
-isAlpha
-
-	^ lookahead notNil
-		and: [ lookahead isPosixAlpha ]! !
-
-!BaseParser methodsFor: 'testing' stamp: 'ess 11/17/2024 19:15:29'!
-isAlphaNumeric
-
-	^ self isAlnum! !
-
-!BaseParser methodsFor: 'testing' stamp: 'ess 11/17/2024 19:16:01'!
-isAscii
-
-	^ lookahead notNil
-		and: [ lookahead codePoint <= 127 ]! !
-
-!BaseParser methodsFor: 'testing' stamp: 'ess 11/17/2024 19:13:49'!
-isBlank
-
-	^ lookahead notNil
-		and: [ lookahead isPosixBlank ]! !
-
-!BaseParser methodsFor: 'testing' stamp: 'ess 11/17/2024 19:14:01'!
-isCntrl
-
-	^ lookahead notNil
-		and: [ lookahead isPosixCntrl ]! !
-
-!BaseParser methodsFor: 'testing' stamp: 'ess 11/17/2024 19:14:12'!
-isDigit
-
-	^ lookahead notNil
-		and: [ lookahead isPosixDigit ]! !
-
-!BaseParser methodsFor: 'testing' stamp: 'ess 11/17/2024 19:14:22'!
-isGraph
-
-	^ lookahead notNil
-		and: [ lookahead isPosixGraph ]! !
-
-!BaseParser methodsFor: 'testing' stamp: 'ess 11/17/2024 19:16:26'!
-isHexDigit
-
-	^ self isXDigit! !
-
-!BaseParser methodsFor: 'testing' stamp: 'ess 11/17/2024 19:16:46'!
-isLetter
-
-	^ self isAlpha! !
-
-!BaseParser methodsFor: 'testing' stamp: 'ess 11/17/2024 19:14:31'!
-isLower
-
-	^ lookahead notNil
-		and: [ lookahead isPosixLower ]! !
-
-!BaseParser methodsFor: 'testing' stamp: 'ess 11/17/2024 19:14:40'!
-isPrint
-
-	^ lookahead notNil
-		and: [ lookahead isPosixPrint ]! !
-
-!BaseParser methodsFor: 'testing' stamp: 'ess 11/17/2024 19:14:49'!
-isPunct
-
-	^ lookahead notNil
-		and: [ lookahead isPosixPunct ]! !
-
-!BaseParser methodsFor: 'testing' stamp: 'ess 11/17/2024 19:14:58'!
-isSpace
-
-	^ lookahead notNil
-		and: [ lookahead isPosixSpace ]! !
-
-!BaseParser methodsFor: 'testing' stamp: 'ess 11/17/2024 19:15:09'!
-isUpper
-
-	^ lookahead notNil
-		and: [ lookahead isPosixUpper ]! !
-
-!BaseParser methodsFor: 'testing' stamp: 'ess 11/17/2024 19:22:42'!
-isWord
-
-	^ lookahead notNil
-		and: [ lookahead isPosixWord ]! !
-
-!BaseParser methodsFor: 'testing' stamp: 'ess 11/17/2024 19:17:04'!
-isXDigit
-
-	^ lookahead notNil
-		and: [ lookahead isPosixXDigit ]! !
-
-!BaseParser methodsFor: 'private' stamp: 'ess 11/18/2024 03:42:20'!
-consumeDigit
-
-	self isDigit ifFalse: [ ^ self parseError: 'Expected decimal digit' ].
-	^ self consume xDigitValue! !
-
-!BaseParser methodsFor: 'private' stamp: 'ess 11/18/2024 03:42:25'!
-consumeXDigit
-
-	self isXDigit ifFalse: [ ^ self parseError: 'Expected hexadecimal digit' ].
-	^ self consume xDigitValue! !
-
-!BaseParser methodsFor: 'private' stamp: 'ess 11/18/2024 03:53:57'!
-readInteger
-
-	^ self readDigits! !
-
-!BaseParser methodsFor: 'parsing-characters' stamp: 'ess 11/18/2024 03:55:49'!
-readDigits
-
-	| result |
-	self isDigit ifFalse: [ ^ ParseError signal: 'Expected decimal number' ].
-	result := 0.
-	[ self isDigit ]
-		whileTrue: [ result := result * 10 + self consumeDigit ].
-	^ result! !
-
-!BaseParser methodsFor: 'parsing-characters' stamp: 'ess 11/18/2024 03:50:20'!
-readDigits: expectedCount
-
-	^ self
-		readDigitsFrom: expectedCount
-		to: expectedCount! !
-
-!BaseParser methodsFor: 'parsing-characters' stamp: 'ess 11/18/2024 03:58:08'!
-readDigitsFrom: minCount to: maxCount
-
-	| result count |
-	result := 0.
-	count := 0.
-	[ count < maxCount and: [ self isDigit ] ]
-		whileTrue:
-			[ result := result * 10 + self consumeDigit.
-			count := count + 1 ].
-	count < minCount
-		ifTrue: [ ^ self parseError: 'Expected decimal number' ].
-	^ result! !
-
-!BaseParser methodsFor: 'parsing-characters' stamp: 'ess 11/18/2024 03:50:08'!
-readHexDigits: expectedCount
-
-	^ self
-		readXDigitsFrom: expectedCount
-		to: expectedCount! !
-
-!BaseParser methodsFor: 'parsing-characters' stamp: 'ess 11/18/2024 03:49:24'!
-readHexDigitsFrom: minCount to: maxCount
-
-	^ self
-		readXDigitsFrom: minCount
-		to: maxCount! !
-
-!BaseParser methodsFor: 'parsing-characters' stamp: 'ess 11/18/2024 03:56:06'!
-readXDigits
-
-	| result |
-	self isXDigit ifFalse: [ ^ ParseError signal: 'Expected hexadecimal number' ].
-	result := 0.
-	[ self isXDigit ]
-		whileTrue: [ result := result * 16 + self consumeXDigit ].
-	^ result! !
-
-!BaseParser methodsFor: 'parsing-characters' stamp: 'ess 11/18/2024 03:49:51'!
-readXDigits: expectedCount
-
-	^ self
-		readXDigitsFrom: expectedCount
-		to: expectedCount! !
-
-!BaseParser methodsFor: 'parsing-characters' stamp: 'ess 11/18/2024 03:58:21'!
-readXDigitsFrom: minCount to: maxCount
-
-	| result count |
-	result := 0.
-	count := 0.
-	[ count < maxCount and: [ self isXDigit ] ]
-		whileTrue:
-			[ result := result * 16 + self consumeXDigit.
-			count := count + 1 ].
-	count < minCount
-		ifTrue: [ ^ self parseError: 'Expected hexadecimal number' ].
-	^ result! !
-
-!BaseParser class methodsFor: 'parsing' stamp: 'ess 11/26/2024 07:41:34'!
-parse: aStringOrStream
-
-	^self new parse: aStringOrStream! !
-
-!ReCompiler methodsFor: 'accessing' stamp: 'ess 11/6/2024 12:54:13'!
-nextSlot
-
-	| result |
-	
-	result := slotsUsed.
-	slotsUsed := slotsUsed + 1.
-	^ result! !
-
-!ReCompiler methodsFor: 'initialization' stamp: 'ess 11/17/2024 13:51:16'!
-initialize
-
-	super initialize.
-	ignoreCase := false.
-	multiLine := false.
-	slotsUsed := 0! !
-
-!ReCompiler methodsFor: 'parsing' stamp: 'ess 11/16/2024 08:17:38'!
-compile: aStringOrStream
-
-	| node |
-	
-	node := self parse: aStringOrStream.
-	^ RePattern
-		compileNode: node
-		slotsNeeded: slotsUsed! !
-
-!ReCompiler methodsFor: 'parsing' stamp: 'ess 11/16/2024 09:47:52'!
-parse
-
-	| slot node |
-	
-	slot := self nextSlot.
-	node := self readExpression.
-	^ ReGroupNode
-		with: node
-		slot: slot! !
-
-!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 11/18/2024 04:33:43'!
-readCharacter
-
-	| character |
-
-	self skipSpaces.
-	(self match: $()
-		ifTrue: [ ^ self readGroup ].
-
-	character := self consume.
-	character = $\
-		ifTrue: [ ^ self readCharacterEscape ].
-	character = $$ ifTrue: [ ^ ReAnchorNode endOfLine ].
-	character = $. ifTrue: [ ^ ReCharacterNode wildcard ].
-	character = $[ ifTrue: [ ^ self readCharacterClass ].
-	character = $^ ifTrue: [ ^ ReAnchorNode beginningOfLine ].
-	^ ReCharacterNode character: character! !
-
-!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 11/21/2024 07:09:27'!
-readCharacterEscape
-
-	| escape |
-
-	"\0 \a \e \f \n \r \t \v"
-	escape := self characterEscapes
-					at: lookahead
-					ifAbsent: [ nil ].
-	escape ifNotNil: [ ^ ReCharacterNode character: escape ].
-
-	"\A \B \Z \b"
-	escape := self anchorEscapes
-					at: lookahead
-					ifAbsent: [ nil ].
-	escape ifNotNil: [ ^ escape value ].
-
-	"\D \S \W \d \s \w"
-	(ReCharacterClass
-		namedClass: lookahead
-		flags: flags)
-			ifNotNil: [ :namedClass |
-					self consume.
-					^ ReCharacterNode class: namedClass ].
-
-	"\cX control character"
-	(self match: $c)
-		ifTrue: [ | control character |
-				control := self consume codePoint \\ 32.
-				character := Character codePoint: control.
-				^ ReCharacterNode character: character ].
-			
-	"\p{ unicode property name or value}"
-	((lookahead == $P)  or: [ lookahead = $p ])
-		ifTrue: [ | p class |
-				p := self consume.
-				(self match: ${)
-					ifFalse: [ ^ ReCharacterNode character: p ].
-				class := self readPropertyEscape.
-				p == $P ifTrue: [ class := class complement ].
-				^ ReCharacterNode characterClass: class ].
-
-	"\uXXXX or \u{X[1-6]} unicode escape"
-	(self match: $u)
-		ifTrue: [ ^ ReCharacterNode character: self readUnicodeEscape ].
-			
-	"\xXX \x{X[1-2]} hexadecimal escape"
-	(self match: $x)
-		ifTrue: [ ^ ReCharacterNode character: self readHexEscape ].
-
-	"Handles \\ along with unnecessary escapes"
-	^ ReCharacterNode character: self consume! !
-
-!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 11/18/2024 04:36:40'!
-readHexEscape
-
-	| codepoint |
-	(self match: ${)
-		ifFalse: [ codepoint := self readXDigits: 2 ]
-		ifTrue: [ codepoint := self readXDigitsFrom: 1 to: 2.
-				self expect: $} ].
-	^ Character codePoint: codepoint! !
-
-!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 12/6/2024 16:03:43'!
-readPropertyEscape
-
-	| name |
-	name := self readWord.
-	name isEmptyOrNil ifTrue: [^ self parseError: 'Expected Unicode property name or value'].
-	self skipWhitespace.
-	self expect: $}.
-	^ReCharacterClass
-		unicodeProperty: name
-		flags: flags! !
-
-!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 11/18/2024 04:38:01'!
-readUnicodeEscape
-
-	| codepoint |
-	(self match: ${)
-		ifFalse: [ codepoint := self readXDigits: 4 ]
-		ifTrue: [ 	codepoint := self readXDigitsFrom: 1 to: 6.
-				self expect: $} ].
-	^ Character codePoint: codepoint! !
-
-!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 11/18/2024 04:39:37'!
-readWord
-
-	self skipSpaces.
-	^ String streamContents:
-		[ :out |
-		[ self isWord ]
-			whileTrue: [ out nextPut: self consume ] ]! !
-
-!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 11/17/2024 15:46:16'!
-readCharacterClass
-
-	^ ReCharacterNode class: self readClassExpression! !
-
-!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 11/17/2024 16:08:30'!
-readClassCharacter
-
-	| character1 character2 |
-	
-	character1 := self consume.
-	self skipWhitespace.
-	character1 == $- ifTrue: [ ^ ReCharacterSet character: $- ].
-	character1 == $\ ifTrue: [ character1 := self readClassEscape ].
-	character1 isCharacter ifFalse: [ ^ character1 ].
-	self skipWhitespace.
-	lookahead == $-
-		ifFalse: [ ^ character1 ].
-	self withResetDo:
-			[ :reset |
-			self consume.
-			lookahead == $-
-				ifTrue: [ reset value.
-						^ ReCharacterSet character: character1 ].
-			character2 := self readClassCharacter.
-			character2 isCharacter
-				ifFalse: [ reset value.
-						^ ReCharacterSet character: character1 ].
-			^ ReCharacterClass
-				from: character1
-				to: character2 ]! !
-
-!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 11/21/2024 07:10:38'!
-readClassEscape
-
-	| escape |
-
-	"\0 \a \e \f \n \r \t \v"
-	escape := self characterEscapes
-					at: lookahead
-					ifAbsent: [ nil ].
-	escape ifNotNil: [ ^ escape ].
-
-	"\D \S \W \d \s \w"
-	(ReCharacterClass
-		namedClass: lookahead
-		flags: flags)
-			ifNotNil: [ :namedClass |
-					self consume.
-					^ namedClass ].
-
-	"\cX control character"
-	(self match: $c)
-		ifTrue: [ | control |
-				control := self consume codePoint \\ 32.
-				^ Character codePoint: control ].
-
-	"\p{ unicode property name or value}"
-	((lookahead == $P)  or: [ lookahead = $p ])
-		ifTrue: [ | p class |
-				p := self consume.
-				(self match: ${)
-					ifFalse: [ ^ p ].
-				class := self readPropertyEscape.
-				p == $P ifTrue: [ class := class complement ].
-				^ class ].
-
-	"\uXXXX or \u{X[1-6]} unicode escape"
-	(self match: $u)
-		ifTrue: [ ^ self readUnicodeEscape ].
-			
-	"\xXX \x{X[1-2]} hexadecimal escape"
-	(self match: $x)
-		ifTrue: [ ^ self readHexEscape ].
-
-	"Handles \\ along with unnecessary escapes"
-	^ self consume! !
-
-!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 11/17/2024 15:46:40'!
-readClassExpression
-
-	| isComplement class |
-
-	self skipWhitespace.
-	isComplement := self match: $^.
-	class := self readClassSubtraction.
-	self skipWhitespace.
-	self expect: $].
-	^ isComplement
-		ifTrue: [ class complement ]
-		ifFalse: [ class ]! !
-
-!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 11/17/2024 15:50:27'!
-readClassIntersection
-
-	| result |
-
-	result := self readClassUnion.
-	self skipWhitespace.
-	[ self match: $$ ]
-		whileTrue:
-			[ | operand |
-			self expect: $$.
-			operand := self readClassUnion.
-			result := result & operand.
-			self skipWhitespace ].
-	^ result! !
-
-!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 11/17/2024 12:18:49'!
-readClassName
-
-	self isLetter ifFalse: [ ^ ParseError signal: 'Expected character class' ].
-
-	^ String streamContents:
-		[ :out |
-		[ self isLetter ]
-			whileTrue: [ out nextPut: self consume ] ]! !
-
-!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 11/17/2024 15:49:57'!
-readClassSubtraction
-
-	| result |
-
-	result := self readClassIntersection.
-	self skipWhitespace.
-	[ self match: $- ]
-		whileTrue:
-			[ | operand |
-			self expect: $-.
-			operand := self readClassIntersection.
-			result := result - operand.
-			self skipWhitespace ].
-	^ result! !
-
-!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 11/17/2024 15:57:39'!
-readClassUnion
-
-	| result done |
-
-	result := ReCharacterClass empty.
-	done := false.
-	self skipWhitespace.
-	[ done or: [ lookahead == $] ] ]
-		whileFalse:
-			[ | operand |
-			done := (self matchAll: '&&') or: [ self matchAll: '--' ].
-			done ifFalse:
-				[ (self match: $[)
-					ifTrue: [ operand := self readNestedClass ]
-					ifFalse: [ operand := self readClassCharacter ].
-				result := result | operand.
-				self skipWhitespace ] ].
-	^ result! !
-
-!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 11/17/2024 15:51:19'!
-readNestedClass
-
-	self skipWhitespace.
-	^ (self match: $:)
-		ifTrue: [ ^ self readPosixClass ]
-		ifFalse: [ ^ self readClassExpression ]! !
-
-!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 11/17/2024 15:13:16'!
-readPosixClass
-
-	| name |
-	
-	self skipWhitespace.
-	name := self readClassName.
-	self skipWhitespace.
-	self expect: $:.
-	self skipWhitespace.
-	self expect: $].
-	^ ReCharacterClass posixClass: name! !
-
-!ReCompiler methodsFor: 'private' stamp: 'ess 11/17/2024 07:28:54'!
-readAlternatives
-
-	| result |
-	
-	result := self readConcatenation.
-	self skipWhitespace.
-	[ self match: $| ]
-		whileTrue:
-			[ result := result or: self readConcatenation.
-			self skipWhitespace ].
-			
-	^ result! !
-
-!ReCompiler methodsFor: 'private' stamp: 'ess 11/17/2024 07:28:41'!
-readConcatenation
-
-	| result |
-	
-	result := self readRepetition..
-	self skipWhitespace.
-	[ lookahead notNil and: [ ('|)' includes: lookahead) not ] ]
-		whileTrue:
-			[ result := result and: self readRepetition.
-			self skipWhitespace ].
-			
-	^ result! !
-
-!ReCompiler methodsFor: 'private' stamp: 'ess 11/6/2024 06:07:21'!
-readExpression
-
-	^ self readAlternatives! !
-
-!ReCompiler methodsFor: 'private' stamp: 'ess 11/17/2024 08:36:10'!
-readGroup
-
-	| capturing slot node |
-
-	capturing := true.
-	(self match: $?)
-		ifTrue: [ (self match: $# )
-					ifTrue: [ self skipBlockComment.
-							^ ReNullNode new ].
-				(self match: $: )
-					ifTrue: [ capturing := false ] ].
-
-	capturing ifTrue: [ slot := self nextSlot ].
-	node := self readExpression.
-	self expect: $).
-	^ ReGroupNode
-		with: node
-		slot: slot! !
-
-!ReCompiler methodsFor: 'private' stamp: 'ess 11/16/2024 09:48:59'!
-readRepetition
-
-	| node |
-
-	node := self readCharacter.
-	(node isKindOf: ReAnchorNode) ifTrue: [ ^ node ].
-	('*+?{' includes: lookahead)
-		ifTrue:
-			[ | char |
-			char := self consume.
-			char = $*
-				ifTrue: [ node := node repeatMin: 0 ].
-			char = $+
-				ifTrue: [ node := node repeatMin: 1 ].
-			char = $?
-				ifTrue: [ node := node
-								repeatMin: 0
-								max: 1 ].
-			char = ${
-				ifTrue: [ | repeat |
-						repeat := self readRepetitionCount.
-						repeat node: node.
-						node := repeat ].
-			(self match: $+)
-				ifTrue: [ node bePossessive ].
-			(self match: $?)
-				ifTrue: [ node beNotGreedy ] ].
-	^ node! !
-
-!ReCompiler methodsFor: 'private' stamp: 'ess 11/16/2024 09:47:43'!
-readRepetitionCount
-
-	| min max |
-	
-	min := nil.
-	max := nil.
-	
-	self isDigit ifTrue: [ min := self readInteger ].
-	(self match: $})  "{n}"
-		ifTrue: [ min ifNil: [ self parseError: 'Expected repetition count' ].  "Exclude {}"
-				^ ReRepetitionNode
-					min: min
-					max: min ].
-
-	"{n,m} or {,m}"
-	min := min ifNil: [ 0 ].
-	self expect: $,.
-	self isDigit ifTrue: [ max := self readInteger ].
-	self expect: $}.
-	^ ReRepetitionNode
-		min: min
-		max: max! !
-
-!ReCompiler methodsFor: 'private' stamp: 'ess 11/17/2024 08:51:29'!
-skipBlockComment
-
-	| done |
-	done := false.
-	[ done or: [ lookahead isNil ] ]
-		whileFalse:
-			[ (self match: $))
-				ifTrue: [ done := true ]
-				ifFalse:
-					[ (self match: $\)
-						ifTrue: [ self consume ]
-						ifFalse:
-							[ (self matchAll: '(?#')
-								ifFalse: [ self consume ]
-								ifTrue: [ self skipBlockComment ] ] ] ].
-	^ ReNullNode new! !
-
-!ReCompiler methodsFor: 'private' stamp: 'ess 11/17/2024 07:35:47'!
-skipLineComment
-
-	[ `{ nil . Character lf . Character cr }` statePointsTo: lookahead ]
-		whileFalse: [ self consume ].
-	self match: `Character cr`.
-	self match: `Character lf`! !
-
-!ReCompiler methodsFor: 'private' stamp: 'ess 11/17/2024 08:27:52'!
-skipWhitespace
-
-	[ lookahead == $# or: [ self isSpace ] ]
-		whileTrue: [ (self match: $#)
-						ifTrue: [ self skipLineComment ].
-					super skipWhitespace ]! !
-
-!ReCompiler methodsFor: 'constants' stamp: 'ess 11/18/2024 04:30:24'!
-anchorEscapes
-
-	^ `{
-		$A -> [ ReAnchorNode start ] .
-		$B -> [ ReAnchorNode notWordBoundary ] .
-		$Z -> [ ReAnchorNode end ] .
-		$b -> [ ReAnchorNode wordBoundary ] .
-	} asDictionary`! !
-
-!ReCompiler methodsFor: 'constants' stamp: 'ess 11/18/2024 04:33:05'!
-characterEscapes
-
-	^ `{
-		$0 -> (Character codePoint: 0) .  "NUL"
-		$a -> (Character codePoint: 7)  .  "BEL (alarm)"
-		$e -> (Character codePoint: 27) .  "ESC"
-		$f -> (Character codePoint: 12) .  "FF"
-		$n -> (Character codePoint: 10) .  "LF"
-		$r -> (Character codePoint: 13) .  "CR"
-		$t -> (Character codePoint: 9) .  "TAB"
-		$v -> (Character codePoint: 11)  "VT"
-	} asDictionary`! !
+!RegexpPattern commentStamp: 'ess 5/31/2025 08:33:24' prior: 0!
+This documentation assumes you are already familiar with regular expressions and only need to know the flavor of the day.  For a more tutorial introduction, [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Regular_expressions) is as good a place as any to start.
+
+The expression syntax is based on [ECMAScript](https://tc39.es/ecma262/multipage/text-processing.html#sec-regexp-regular-expression-objects) as that seems to be the de-facto standard.  It also borrows from [Perl5](https://perldoc.perl.org/perlre).
+
+Changes from the ECMAScript standard include
+
+- "V-mode" is always enabled.
+	- Both the input and the pattern are interpreted as Unicode strings.
+ 	- Set operations (`&&`, `--`) are suported.
+- Surrogates must always be paired (i.e., `\uXXXX\uXXXX`) because we're not matching UTF-16.
+- Patterns are always multiline.
+- Whitespace is never literal.
+	- You need to escape spaces (i.e., "\ ") if you intend them as literals.
+	- You can otherwise use whitespace liberally, and patterns can span multiple lines.
+- Comments are supported.
+	- `#` introduces a line comment, ignoring everything from that point to the end of the line.
+	- `(?# ... )` is a block comment, which cannot include a literal `)`.  Note that block comments can be inline or can span mulitple lines.
+- Parsing is lenient.
+	- It is not an error to use the "reserved for future expansion" double-punctuation characters, they are interpreted as (somewhat pointless) literals.
+	- Any metacharacters that do not apply in their context in the pattern are also interpreted as literals.
+
+Any other deviations from the standard are errors.
+
+## Metacharacters
+
+Metacharacters, or syntax characters, make up the syntax of the regular expression and do not represent literals to be matched.  Whitespace, both horizontal (blank) and vertical, is used for formatting and readability.  Any other characters represent literals to be matched.
+
+Outside of a character class, the following are interpreted as metacharacters.
+
+- `#` begins a line comment.
+- `$` matches the end of a line (just before a newline or carriage return).
+- `(` begins a group.
+- `*`matches the previous atom zero-or-more times.
+- `+` matches the previous atom one-or-more times.
+- `.` matches any single character, including vertical whitespace.
+- `?` matches the previous atom zero-or-one times.
+- `[` begins a character class.
+- `\` is a character escape.
+- `^` matches the beginning of a line (just after "\n", "\r", or "\r\n").
+- `{` quantifies the previous atom.
+- `|` separates alternative patterns.
+
+Groups `(`, character classes `[`, escapes `\`, and quantifiers `{` each have their own internal syntax.
+
+Most metacharacters retain their meaning within a group, except that
+
+- `)` is a literal only as the first character, and otherwise ends the group.
+- `?` immediately after the opening `(` introduces various extensions.
+- `?#` immediately after the opening `(` is a block comment that extends to the matching `)`.  Block comments can nest but cannot otherwise contain unescaped ")" characters: `(?# (?# this) is commented)` and `(?# so is \) this)` , but `(?# (this) is not)`.
+
+Character classes use a largely different set of metacharacters.
+
+- `$` `(` `*` `+` `.` `?` `{` `|` are now literals
+- `]` is literal only as the first character (or second, after `^`), and otherwise ends the class
+- `^` as the first character complements the class, but is elsewhere literal
+- `-` between two characters defines a range, but is elsewhere literal
+- `&&` between two sets is intersection
+- `--` between two sets is difference
+- Note that set union is represented by simple adjancency.
+
+## Character escapes
+
+Outside of a character class, we recognize the following escape sequences.
+
+- `\\` matches a literal `\`
+- `\0` (zero, not followed by another decimal digit) matches a NUL `\u0000`
+- `\a` matches a bell (alarm) `\u0007`
+- `\e` matches an escape `\u001B`
+- `\f` matches a new page (form feed) `\u000C`
+- `\r` matches a carriage return `\u000D`
+- `\n` matches a newline `\u000A`
+- `\t` matches a tab `\u0009`
+- `\v` matches a vertical tab `\u000B`
+- `\d` matches any ASCII decimal digit `[0-9]`
+- `\D` is the complement of `\d`
+- `\s` matches a blank (horizontal whitespace)
+- `\S` is the complement of `\s`
+- `\w` matches a "word" character.  A word character is defined to include underscore `_` and any ASCII alphanumeric character `[0-9A-Za-z_]`.  In a case-insensitive match, it also includes any character that case-folds to one of these characters.
+- `\W` is the complement of `\w`
+- `\p{ unicode property name or value }` matches a Unicode character class
+- `\p{ unicode propery name = value }` also matches a Unicode character class
+- `\P` is the complement of `\p`
+- `\b` matches a word boundary.   A word boundary is any position in the input that has a "word" character (`\w`) to one side (before or after) but not the other. It can match at the start or the end of the input, as there is necessarily no word character before the start or after the end.
+- `\B` is the inverse of `b`: either both characters before and after the current position are word characters, or both are not.  It cannot match the start of end of the input.
+- `\A` matches the start of the input (in contrast to `^` matching the beginning of a line)
+- `\Z` matches the end of the input (in contrast to `$` matching the end of a line)
+- `\cC` (`C` is any ASCII character) matches a control character in the range 0 to 31, taking the value of `C` mod 32.
+- `\uXXXX` (exactly four hexadecimal digits) matches a codepoint.  Two adjacent Unicode escapes (`\uXXXX\uXXXX`) can be used to represent a character as a surrogate pair, but it still matches a single character.
+- `\u{X...}` (one to six hexadecimal digits) is another way to match a codepoint.
+- `\xXX` (exactly two hexadecimal digits) matches an ASCII character
+- `\x{X...}` (one or two hexadecimal digits) is another way to match an ASCII character
+- `\D...` (one or more decimal digits), without a leading zero (first digit must be 1 to 9), is a backreference. Case-insensitive backreferences can match case-insensitively.
+- `\DDD` (exactly three octal digits) can be used to match an ASCII character only if it cannot be mistaken for a backreference
+
+Any other character following a `\` represents a literal.  This includes but is not limited to metacharacters and whitespace.
+
+Within a character class, most character escapes have the same value.
+
+- `\B` `\A` `\Z` (positional anchors) do not have any special meaning
+- `\b` represents backspace `\u0008`, losing it's positional interpretation
+
+## Character classes
+
+A basic character class `[` matches the union of all characters and classes listed within, up to the matching `]`.  The characters and classes within can be written either as literals or as [escape sequences](#character-escapes).  Importantly, the escapes `\d` `\D` `\s` `\S` `\w` `\W` `\p` `\P` still define classes.
+
+- `^` as the first character within a class turns it into a complement.
+- `]` as the first character (or second, after `^`) is a literal. Anywhere else it ends the class.
+- `-` between two character values (i.e., not classes, and not at the beginning or end of the definition, reperesents a character range.  `[1-5]` is the same as `[12345]`.
+- `[` introduces a nested character class, which may be but is not necessarily a POSIX class.  Escape it `\[` to match a literal `[`.
+
+Only in a nested class, `:` begins a POSIX class. (So `[[:digit:]]` but not `[:digit:]`.)  POSIX classes only match characters in the ASCII subset.  The supported POSIX classes are
+
+- `[:alnum:]` meaning `[0-9A-Za-z]`
+- `[:alpha:]` meaning `[A-Za-z]`
+- `[:blank:]` meaning `[\t\ ]` (tab and space only)
+- `[:cntrl:]` meaning `[\c@-\c_]` (control characters 0 to 31)
+- `[:digit:]` meaning `[0-9]`
+- `[:graph:]` meaning `[^[:cntrl:]\ ]` (graphic characters)
+- `[:lower:]` meaning `[a-z]`
+- `[:print:]` meaning `[^[:cntrl:]]` (printable characters)
+- `[:punct:]` meaning `[[:graph:]--[:alnum:]]` (punctuation)
+- `[:space:]` meaning `[\t\n\r\f\v\ ]` (both horizontal and vertical whitespace)
+- `[:upper:]` meaning `[A-Z]`
+- `[:xdigit:]` meaning `[0-9A-Fa-f]`
+
+## Groups
+
+Outside of a character class, `(` begins a group.  Groups are capturing by default, and numbered from the left starting with 1.
+
+- `)` is literal at the beginning of a group, but otherwise ends the group.
+- `?` immediately after the opening `(` is an extenion
+- `?#` immediately after the opening `(` is a block comment
+- `(?:)` is a non-capturing group
+- `(?<name>)` assigns a name to the group
+- `(?=)` is a lookahead pattern
+- `(?!!)` is a negative lookahead pattern
+- `(?<=)` is a lookbehind pattern
+- `(?<!!)` is a negative lookbehind pattern
+- `(?flags-flags)` define local pattern options
+- `(?flags-flags:)` is shorthand for defining local pattern options in a non-capturing group
+- `(?^flags:)` so is this
+
+## Quantifiers
+
+- `*` zero or more
+- `+` one or more
+- `?` zero or one
+- `{n}` exactly `n`
+- `{n,m}` at least `n` but no more than `m`
+- `{n,}` `n` or more
+- `{,m}` zero to `m`
+- `{}` zero or more
+
+Quantifiers are greedy by default.  Append
+
+- `?` to not be greedy
+- `+` to be possessive (not allow anything other that the longest match)
+
+## Assertions
+
+### Anchors
+
+- `\A`	beginning of input
+- `\Z`	end of input
+- `^`	beginning of line
+- `$`	end of line
+- `\b`	word boundary
+- `\B`	not a word boundary
+- `\<'	beginning of word
+- `\>' 	end of word
+
+### Look-ahead/-behind
+
+- `(?=)`		lookahead
+- `(?!!)`		negative lookahead
+- `(?<=)`	lookbehind
+- `(?<!!)`	negative lookbehind
+!
 
 !ReAnchor methodsFor: 'evaluating' stamp: 'ess 11/9/2024 13:01:54'!
 value: aThread
 
 	^ predicate value: aThread! !
 
-!ReAnchor methodsFor: 'private' stamp: 'ess 11/9/2024 13:01:31'!
-setPredicate: aUnaryBlock
+!ReAnchor methodsFor: 'printing' stamp: 'ess 6/4/2025 05:41:56'!
+printOn: aStream
+
+	debugString ifNil: [
+		super printOn: aStream.
+		^ self ].
+	aStream nextPutAll: debugString! !
+
+!ReAnchor methodsFor: 'private' stamp: 'ess 6/2/2025 10:08:40'!
+setPredicate: aUnaryBlock debugString: aString
 
 	predicate := aUnaryBlock.
+	debugString := aString.
 	^ self! !
 
-!ReAnchor class methodsFor: 'instance creation' stamp: 'ess 11/17/2024 13:26:44'!
+!ReAnchor class methodsFor: 'instance creation' stamp: 'ess 6/4/2025 05:47:14'!
+beginningOfInput
+	"An anchor that matches before the first character of the input."
+
+	^ beginningOfInput ifNil: [
+		beginningOfInput := self
+			predicate: [ :thread | thread isBeginningOfInput ]
+			debugString: '\A' ]! !
+
+!ReAnchor class methodsFor: 'instance creation' stamp: 'ess 6/4/2025 05:47:32'!
 beginningOfLine
+	"An anchor that matches before the first character of a line."
 
-	^ self predicate: [ :aThread | self isStart: aThread ]! !
+	^ beginningOfLine ifNil: [
+		beginningOfLine := self
+			predicate: [ :thread | thread isBeginningOfLine ]
+			debugString: '^' ]! !
 
-!ReAnchor class methodsFor: 'instance creation' stamp: 'ess 11/9/2024 13:03:22'!
-end
+!ReAnchor class methodsFor: 'instance creation' stamp: 'ess 6/4/2025 05:48:01'!
+beginningOfWord
+	"An anchor that matches before the first character of a word."
 
-	^ self predicate: [ :aThread | self isEnd: aThread ]! !
+	^ beginningOfWord ifNil: [
+		beginningOfWord := self
+			predicate: [ :thread | thread isBeginningOfWord ]
+			debugString: '\<' ]! !
 
-!ReAnchor class methodsFor: 'instance creation' stamp: 'ess 11/17/2024 13:26:36'!
+!ReAnchor class methodsFor: 'instance creation' stamp: 'ess 6/4/2025 05:48:25'!
+endOfInput
+	"An anchor that matches after the last character of the input."
+
+	^ endOfInput ifNil: [
+		endOfInput := self
+			predicate: [ :thread | thread isEndOfInput ]
+			debugString: '\Z' ]! !
+
+!ReAnchor class methodsFor: 'instance creation' stamp: 'ess 6/4/2025 05:48:39'!
 endOfLine
+	"An anchor that matches after the last character of a line."
 
-	^ self predicate: [ :aThread | self isEnd: aThread ]! !
+	^ endOfLine ifNil: [
+		endOfLine := self
+			predicate: [ :thread | thread isEndOfLine ]
+			debugString: '$' ]! !
 
-!ReAnchor class methodsFor: 'instance creation' stamp: 'ess 11/9/2024 13:03:32'!
+!ReAnchor class methodsFor: 'instance creation' stamp: 'ess 6/4/2025 05:48:54'!
+endOfWord
+	"An anchor that matches after the last character of a word."
+
+	^ endOfWord ifNil: [
+		endOfWord := self
+			predicate: [ :thread | thread isEndOfWord ]
+			debugString: '\>' ]! !
+
+!ReAnchor class methodsFor: 'instance creation' stamp: 'ess 6/4/2025 06:19:09'!
+fromCharacter: aCharacter
+
+	aCharacter = $$	ifTrue: [ ^ self endOfLine ].
+	aCharacter = $<	ifTrue: [ ^ self beginningOfWord ].
+	aCharacter = $>	ifTrue: [ ^ self endOfWord ].
+	aCharacter = $A	ifTrue: [ ^ self beginningOfInput ].
+	aCharacter = $B	ifTrue: [ ^ self notWordBoundary ].
+	aCharacter = $Z	ifTrue: [ ^ self endOfInput ].
+	aCharacter = $^	ifTrue: [ ^ self beginningOfLine ].
+	aCharacter = $b	ifTrue: [ ^ self wordBoundary ].
+	^ nil! !
+
+!ReAnchor class methodsFor: 'instance creation' stamp: 'ess 6/4/2025 05:49:12'!
 notWordBoundary
+	"An anchor that matches anywhere except before the first character of a word or after the last character of a word."
 
-	^ self predicate: [ :aThread | self notWordBoundary: aThread ]! !
+	^ notWordBoundary ifNil: [
+		notWordBoundary := self
+			predicate: [ :thread | thread notWordBoundary ]
+			debugString: '\B' ]! !
 
-!ReAnchor class methodsFor: 'instance creation' stamp: 'ess 11/9/2024 13:02:19'!
-predicate: aUnaryBlock
-	"Answer an instance that anchors the match to the given predicate."
-	
+!ReAnchor class methodsFor: 'instance creation' stamp: 'ess 6/4/2025 05:37:16'!
+predicate: aUnaryBlock debugString: aString
+	"An anchor that asserts the given predicate."
+
 	^ self new
-		setPredicate: aUnaryBlock! !
+		setPredicate: aUnaryBlock
+		debugString: aString! !
 
-!ReAnchor class methodsFor: 'instance creation' stamp: 'ess 11/9/2024 13:03:40'!
-start
-
-	^ self predicate: [ :aThread | self isStart: aThread ]! !
-
-!ReAnchor class methodsFor: 'instance creation' stamp: 'ess 11/9/2024 13:03:48'!
+!ReAnchor class methodsFor: 'instance creation' stamp: 'ess 6/4/2025 05:50:10'!
 wordBoundary
+	"An anchor that matches before the first character of a word or after the last character of a word."
 
-	^ self predicate: [ :aThread | self isWordBoundary: aThread ]! !
+	^ wordBoundary ifNil: [
+		wordBoundary := self
+			predicate: [ :thread | thread isWordBoundary ]
+			debugString: '\b' ]! !
 
-!ReAnchor class methodsFor: 'private-testing' stamp: 'ess 11/9/2024 13:02:26'!
-isEnd: aThread
-	"Are we looking at the end of the string."
-	
-	^ aThread position = aThread size! !
-
-!ReAnchor class methodsFor: 'private-testing' stamp: 'ess 11/9/2024 13:02:32'!
-isStart: aThread
-	"Are we looking at the start of the string."
-	
-	^ aThread position = 0! !
-
-!ReAnchor class methodsFor: 'private-testing' stamp: 'ess 11/9/2024 13:02:37'!
-isWordBoundary: aThread
-
-	"The negative test is easier to express."
-	^ (self notWordBoundary: aThread) not! !
-
-!ReAnchor class methodsFor: 'private-testing' stamp: 'ess 11/16/2024 09:50:56'!
-notWordBoundary: aThread
-	"True if the last character matched and the next character to match either are both word characters or both not word characters."
-	
-	| previous next wordClass |
-	
-	aThread position = 0 ifTrue: [ ^ false ].  "No previous character"
-	aThread position = aThread size ifTrue: [ ^ false ].  "No next character"
-	
-	previous := aThread at: aThread position.
-	next := aThread at: aThread position + 1.
-	
-	wordClass := ReCharacterClass word.
-	^ (wordClass includes: previous) = (wordClass includes: next)! !
-
-!ReCharacterClass methodsFor: 'converting' stamp: 'ess 11/16/2024 09:50:38'!
-complement
-
-	^ ReComplementClass complement: self! !
-
-!ReCharacterClass methodsFor: 'converting' stamp: 'ess 11/21/2024 07:54:47'!
-not
-
-	^ self complement! !
-
-!ReCharacterClass methodsFor: 'testing' stamp: 'ess 11/21/2024 07:55:32'!
-includes: aCharacter
-
-	^ self subclassResponsibility! !
-
-!ReCharacterClass methodsFor: 'as yet unclassified' stamp: 'ess 11/21/2024 07:54:09'!
+!ReCharacterClass methodsFor: 'as yet unclassified' stamp: 'ess 6/2/2025 07:46:00'!
 & anotherClass
 
 	^ ReIntersectionClass
 		intersection: self
-		and: anotherClass! !
+		with: anotherClass! !
 
 !ReCharacterClass methodsFor: 'as yet unclassified' stamp: 'ess 11/21/2024 07:54:36'!
 - anotherClass
@@ -1430,267 +739,324 @@ includes: aCharacter
 		minuend: self
 		subtrahend: anotherClass! !
 
-!ReCharacterClass methodsFor: 'as yet unclassified' stamp: 'ess 11/21/2024 07:53:55'!
+!ReCharacterClass methodsFor: 'as yet unclassified' stamp: 'ess 6/2/2025 07:46:04'!
 | anotherClass
 
 	^ ReUnionClass
 		union: self
-		and: anotherClass! !
+		with: anotherClass! !
 
-!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 12/6/2024 15:42:27'!
+!ReCharacterClass methodsFor: 'converting' stamp: 'ess 11/16/2024 09:50:38'!
+complement
+
+	^ ReComplementClass complement: self! !
+
+!ReCharacterClass methodsFor: 'converting' stamp: 'ess 6/2/2025 07:45:42'!
+not
+	"Deprecated"
+
+	^ self complement! !
+
+!ReCharacterClass methodsFor: 'testing' stamp: 'ess 11/21/2024 07:55:32'!
+includes: aCharacter
+
+	^ self subclassResponsibility! !
+
+!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:05:20'!
 character: aCharacter
 
-	^ReEnumeratedCharacterSet character: aCharacter! !
+	^ ReEnumeratedClass
+		with: aCharacter! !
 
-!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 12/6/2024 15:42:37'!
+!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:05:20'!
+character: aCharacter flags: regexpFlags
+
+	^ ReEnumeratedClass
+		character: aCharacter
+		flags: regexpFlags! !
+
+!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:05:20'!
 codepoint: aCodepoint
 
-	^ReEnumeratedCharacterSet codepoint: aCodepoint! !
+	^ ReEnumeratedClass
+		codepoint: aCodepoint! !
 
-!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 12/6/2024 15:38:35'!
+!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:31:06'!
+codepoint: aCodepoint flags: regexpFlags
+
+	^ ReEnumeratedClass
+		codepoint: aCodepoint
+		flags: regexpFlags! !
+
+!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:39:11'!
 decimal: regexpFlags
 	"`\d` Matches any decimal digit (not just [0-9])."
 
-	^ReBitmapCharacterSet decimal: regexpFlags! !
+	^ ReBitmapClass
+		decimal: regexpFlags! !
 
-!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 12/6/2024 15:39:00'!
+!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:05:20'!
+empty
+
+	^ ReEnumeratedClass
+		empty! !
+
+!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:31:23'!
+empty: regexpFlags
+
+	^ ReEnumeratedClass
+		empty: regexpFlags! !
+
+!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:05:20'!
+from: startCharacter to: endCharacter
+
+	^ ReEnumeratedClass
+		from: startCharacter
+		to: endCharacter! !
+
+!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:31:44'!
+from: startCharacter to: endCharacter flags: regexpFlags
+
+	^ ReEnumeratedClass
+		from: startCharacter
+		to: endCharacter
+		flags: regexpFlags! !
+
+!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:39:11'!
 horizontalWhitespace: regexpFlags
 	"`\h` Matches any horizontal whitespace, i.e., space separators and horizontal tab."
 
-	^ReBitmapCharacterSet horizontalWhitespace: regexpFlags! !
+	^ ReBitmapClass
+		horizontalWhitespace: regexpFlags! !
 
-!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 12/6/2024 15:50:49'!
+!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 5/29/2025 10:38:47'!
 namedClass: aCharacter flags: regexpFlags
 
-	aCharacter == $d ifTrue: [^self decimal: regexpFlags].
-	aCharacter == $h ifTrue: [^self horizontalWhitespace: regexpFlags].
-	aCharacter == $s ifTrue: [^self space: regexpFlags].
-	aCharacter == $v ifTrue: [^self verticalWhitespace: regexpFlags].
-	aCharacter == $w ifTrue: [^self word: regexpFlags].
+	aCharacter = $d	ifTrue: [ ^ self decimal: regexpFlags ].
+	aCharacter = $h	ifTrue: [ ^ self horizontalWhitespace: regexpFlags ].
+	aCharacter = $s	ifTrue: [ ^ self space: regexpFlags ].
+	aCharacter = $v	ifTrue: [ ^ self verticalWhitespace: regexpFlags ].
+	aCharacter = $w	ifTrue: [ ^ self word ].
+	aCharacter = $D	ifTrue: [ ^ (self decimal: regexpFlags) complement ].
+	aCharacter = $H	ifTrue: [ ^ (self horizontalWhitespace: regexpFlags) complement ].
+	aCharacter = $S	ifTrue: [ ^ (self space: regexpFlags) complement ].
+	aCharacter = $V	ifTrue: [ ^ (self verticalWhitespace: regexpFlags) complement ].
+	aCharacter = $W	ifTrue: [ ^ self word complement ].
+	^ nil! !
 
-	aCharacter == $D ifTrue: [^(self decimal: regexpFlags) complement].
-	aCharacter == $H ifTrue: [^(self horizontalWhitespace: regexpFlags) complement].
-	aCharacter == $S ifTrue: [^(self space: regexpFlags) complement].
-	aCharacter == $V ifTrue: [^(self verticalWhitespace: regexpFlags) complement].
-	aCharacter == $W ifTrue: [^(self word: regexpFlags) complement].
-
-	^nil! !
-
-!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 12/6/2024 15:50:10'!
+!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 07:49:35'!
 posixClass: className flags: regexpFlags
 
-	^RePropertyClass
+	^ RePredicateClass
 		posixClass: className
 		flags: regexpFlags! !
 
-!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 12/6/2024 15:43:08'!
+!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 07:49:51'!
+predicate: propertyBlock
+
+	^ RePredicateClass
+		predicate: propertyBlock! !
+
+!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 07:50:02'!
 satisfies: propertyBlock
 
-	^RePropertyClass satisfies: propertyBlock! !
+	^ self predicate: propertyBlock! !
 
-!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 12/6/2024 15:35:57'!
+!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:39:11'!
 space: regexpFlags
 	"`\s` Matches any whitespace or line terminator character."
 
-	^ReBitmapCharacterSet space: regexpFlags! !
+	^ ReBitmapClass
+		space: regexpFlags! !
 
-!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 12/6/2024 15:43:25'!
+!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:39:11'!
 unicodeProperty: propertyName equalTo: propertyValue flags: regexpFlags
 
-	^ReBitmapCharacterSet
+	^ ReBitmapClass
 		unicodeProperty: propertyName
 		equalTo: propertyValue
 		flags: regexpFlags! !
 
-!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 12/6/2024 15:43:38'!
+!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:39:11'!
 unicodeProperty: propertyName flags: regexpFlags
 
-	^ReBitmapCharacterSet
+	^ ReBitmapClass
 		unicodeProperty: propertyName
 		flags: regexpFlags! !
 
-!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 12/6/2024 15:37:51'!
+!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:39:11'!
 verticalWhitespace: regexpFlags
 	"`\v` Matches any vertical whitespace."
 
-	^ReBitmapCharacterSet verticalWhitespace: regexpFlags! !
+	^ ReBitmapClass
+		verticalWhitespace: regexpFlags! !
 
-!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 12/6/2024 16:00:16'!
+!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 07:50:49'!
 wildcard: regexpFlags
-	"Matches any character except LF in multi-line mode, but matches any character *including* LF in single-line mode."
+	"Match any character except LF in multi-line mode, but match any character *including* LF in single-line mode."
 
-	^RePropertyClass wildcard: regexpFlags! !
+	^ RePredicateClass
+		wildcard: regexpFlags! !
 
-!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 12/6/2024 15:39:34'!
-word: regexpFlags
-	"`\w` Matches any word character: alphanumeric, connector punctuation, or marks."
+!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:05:20'!
+with: character1
 
-	^ReBitmapCharacterSet word: regexpFlags! !
+	^ ReEnumeratedClass
+		with: character1! !
 
-!ReBitmapCharacterSet methodsFor: 'as yet unclassified' stamp: 'ess 12/7/2024 12:16:08'!
+!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:32:01'!
+with: character1 flags: regexpFlags
+
+	^ ReEnumeratedClass
+		with: character1
+		flags: regexpFlags! !
+
+!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:05:20'!
+with: character1 with: character2
+
+	^ ReEnumeratedClass
+		with: character1
+		with: character2! !
+
+!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:32:18'!
+with: character1 with: character2 flags: regexpFlags
+
+	^ ReEnumeratedClass
+		with: character1
+		with: character2
+		flags: regexpFlags! !
+
+!ReCharacterClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:39:11'!
+word
+	"`\w` matches any word character: alphanumeric, connector punctuation, or marks."
+
+	^ ReBitmapClass word! !
+
+!ReBitmapClass methodsFor: 'as yet unclassified' stamp: 'ess 6/2/2025 07:40:51'!
 & anotherClass
 
-	self species == anotherClass species
-		ifTrue: [^self species bitmap: bitmap & anotherClass bitmap].
-	^super & anotherClass! !
+	self species == anotherClass species ifTrue: [
+		^ self species
+			bitmap: bitmap & anotherClass bitmap ].
+	^ super & anotherClass! !
 
-!ReBitmapCharacterSet methodsFor: 'as yet unclassified' stamp: 'ess 12/7/2024 12:16:25'!
+!ReBitmapClass methodsFor: 'as yet unclassified' stamp: 'ess 6/2/2025 07:41:08'!
 - anotherClass
 
-	self species == anotherClass species
-		ifTrue: [^self species bitmap: bitmap - anotherClass bitmap].
-	^super - anotherClass! !
+	self species == anotherClass species ifTrue: [
+		^ self species
+			bitmap: bitmap - anotherClass bitmap ].
+	^ super - anotherClass! !
 
-!ReBitmapCharacterSet methodsFor: 'as yet unclassified' stamp: 'ess 12/7/2024 12:16:37'!
+!ReBitmapClass methodsFor: 'as yet unclassified' stamp: 'ess 6/2/2025 07:41:26'!
 | anotherClass
 
-	self species == anotherClass species
-		ifTrue: [^self species bitmap: bitmap | anotherClass bitmap].
-	^super | anotherClass! !
+	self species == anotherClass species ifTrue: [
+		^ self species
+			bitmap: bitmap | anotherClass bitmap ].
+	^ super | anotherClass! !
 
-!ReBitmapCharacterSet methodsFor: 'as yet unclassified' stamp: 'ess 12/7/2024 12:16:55'!
+!ReBitmapClass methodsFor: 'as yet unclassified' stamp: 'ess 6/2/2025 07:40:15'!
 bitmap
 
-	^bitmap! !
+	^ bitmap! !
 
-!ReBitmapCharacterSet methodsFor: 'as yet unclassified' stamp: 'ess 12/7/2024 12:17:00'!
+!ReBitmapClass methodsFor: 'testing' stamp: 'ess 6/2/2025 07:40:05'!
 includes: aCharacter
 
-	^bitmap includes: aCharacter codePoint! !
+	^ bitmap includes: aCharacter codePoint! !
 
-!ReBitmapCharacterSet methodsFor: 'as yet unclassified' stamp: 'ess 12/7/2024 12:17:05'!
+!ReBitmapClass methodsFor: 'private' stamp: 'ess 6/2/2025 07:39:58'!
 setBitmap: aBitmap
 
 	bitmap := aBitmap.
-	^self! !
+	^ self! !
 
-!ReBitmapCharacterSet class methodsFor: 'as yet unclassified' stamp: 'ess 12/6/2024 15:29:39'!
+!ReBitmapClass class methodsFor: 'as yet unclassified' stamp: 'ess 6/2/2025 07:41:55'!
 bitmap: aBitmap
 
-	^self new setBitmap: aBitmap! !
+	^ self new
+		setBitmap: aBitmap! !
 
-!ReBitmapCharacterSet class methodsFor: 'as yet unclassified' stamp: 'ess 12/7/2024 12:14:01'!
+!ReBitmapClass class methodsFor: 'as yet unclassified' stamp: 'ess 6/2/2025 07:44:18'!
 blank
 	"Space separators along with good ol' horizontal tab (which is classified as a control character)."
 	
-	blank ifNil:
-		[blank := Unicode generalCategory: #Space_Separator.
-		blank add: Character tab codePoint].
-	^blank! !
+	blank ifNil: [
+		blank := Unicode generalCategory: #Space_Separator.
+		blank add: Character tab codePoint ].
+	^ blank! !
 
-!ReBitmapCharacterSet class methodsFor: 'as yet unclassified' stamp: 'ess 12/7/2024 12:06:43'!
+!ReBitmapClass class methodsFor: 'as yet unclassified' stamp: 'ess 6/2/2025 07:43:16'!
 decimal: regexpFlags
-	"`\d` Matches any decimal digit.
-
-	This is not just [0-9], but also the equivalent in every writing system.  As of Unicode 16.0, there are 76 variations on this theme, totaling 760 characters.  Note that this does not include all numbers, or even all digits, only those used in a decimal radix system."
+	"`\d` Matches any decimal digit."
+	"This is not just [0-9], but also the equivalent in every writing system.  As of Unicode 16.0, there are 76 variations on this theme, totaling 760 characters.  Note that this does not include all numbers, or even all digits, only those used in a decimal radix system."
 	
-	^decimal ifNil:
-		[decimal := self bitmap: (Unicode generalCategory: #Decimal_Number)]! !
+	decimal ifNil: [
+		decimal := self bitmap: (Unicode generalCategory: #Decimal_Number) ].
+	^ decimal! !
 
-!ReBitmapCharacterSet class methodsFor: 'as yet unclassified' stamp: 'ess 12/7/2024 12:14:33'!
+!ReBitmapClass class methodsFor: 'as yet unclassified' stamp: 'ess 6/2/2025 07:43:31'!
 horizontalWhitespace: regexpFlags
 	"`\h` Matches any horizontal whitespace."
 	
-	^self bitmap: self blank! !
+	^ self bitmap: self blank! !
 
-!ReBitmapCharacterSet class methodsFor: 'as yet unclassified' stamp: 'ess 12/7/2024 12:07:23'!
+!ReBitmapClass class methodsFor: 'as yet unclassified' stamp: 'ess 6/2/2025 07:44:06'!
 space: regexpFlags
-	"`\s` Matches any whitespace or line terminator character.
+	"`\s` Matches any whitespace or line terminator character."
+	"This is the union of all characters in the `Space_Separator` category and all characters having the `White_Space` property.  This includes various line terminators and paragraph separators but excludes ZERO WIDTH NO-BREAK SPACE."
 
-	This is the union of all characters in the `Space_Separator` category and all characters having the `White_Space` property.  This includes various line terminators and paragraph separators but excludes ZERO WIDTH NO-BREAK SPACE."
-	
-	^space ifNil:
-		[| spaceSeparator whiteSpace |
+	| spaceSeparator whiteSpace |
+	space ifNil: [
 		spaceSeparator := Unicode generalCategory: #Space_Separator.
 		whiteSpace := Unicode property: #White_Space.	
-		space := self bitmap: spaceSeparator | whiteSpace]! !
+		space := self bitmap: spaceSeparator | whiteSpace ].
+	^ space! !
 
-!ReBitmapCharacterSet class methodsFor: 'as yet unclassified' stamp: 'ess 12/6/2024 15:44:53'!
+!ReBitmapClass class methodsFor: 'as yet unclassified' stamp: 'ess 12/6/2024 15:44:53'!
 unicodeProperty: propertyName equalTo: propertyValue flags: regexpFlags
 ! !
 
-!ReBitmapCharacterSet class methodsFor: 'as yet unclassified' stamp: 'ess 12/6/2024 16:08:14'!
+!ReBitmapClass class methodsFor: 'as yet unclassified' stamp: 'ess 6/2/2025 07:44:36'!
 unicodeProperty: propertyName flags: regexpFlags
 
-	^self bitmap: (Unicode generalCategory: propertyName)! !
+	^ self bitmap: (Unicode generalCategory: propertyName)! !
 
-!ReBitmapCharacterSet class methodsFor: 'as yet unclassified' stamp: 'ess 12/7/2024 12:15:27'!
+!ReBitmapClass class methodsFor: 'as yet unclassified' stamp: 'ess 6/2/2025 07:44:44'!
 verticalWhitespace: regexpFlags
 	"`\v` Matches any vertical whitespace."
 
-	^self bitmap: (Unicode property: #White_Space) - self blank! !
+	^ self bitmap: (Unicode property: #White_Space) - self blank! !
 
-!ReBitmapCharacterSet class methodsFor: 'as yet unclassified' stamp: 'ess 12/7/2024 12:08:38'!
-word: regexpFlags
-	"`\w` Matches any 'word' character.
+!ReBitmapClass class methodsFor: 'as yet unclassified' stamp: 'ess 5/29/2025 09:58:49'!
+word
+	"`\w` matches any 'word' character."
+	"Here, a word character is alphanumeric, connector punctuation (e.g., '_'), or a mark."
 
-	Here, a word character is alphanumeric, connector punctuation (e.g., '_'), or a mark."
-
-	^word ifNil:
-		[| letter number connector mark |
+	| letter number connector mark |
+	word ifNil: [
 		letter := Unicode generalCategory: #Letter.
 		number := Unicode generalCategory: #Number.
 		connector := Unicode generalCategory: #Connector_Punctuation.
 		mark := Unicode generalCategory: #Mark.
-		word := self bitmap: letter | number | connector | mark]! !
-
-!ReEnumeratedCharacterSet methodsFor: 'private' stamp: 'ess 11/9/2024 07:16:46'!
-setCharacter: aCharacter
-
-	characters := Set with: aCharacter.
-	^ self! !
-
-!ReEnumeratedCharacterSet methodsFor: 'initialization' stamp: 'ess 11/9/2024 08:53:09'!
-initialize
-
-	characters := Set new! !
-
-!ReEnumeratedCharacterSet methodsFor: 'testing' stamp: 'ess 11/17/2024 12:25:57'!
-includes: aCharacter
-
-	^ characters includes: aCharacter! !
-
-!ReEnumeratedCharacterSet methodsFor: 'testing' stamp: 'ess 11/9/2024 08:54:54'!
-isEmpty
-
-	^ characters isEmpty! !
-
-!ReEnumeratedCharacterSet methodsFor: 'testing' stamp: 'ess 11/9/2024 08:55:00'!
-notEmpty
-
-	^ characters notEmpty! !
-
-!ReEnumeratedCharacterSet methodsFor: 'as yet unclassified' stamp: 'ess 11/9/2024 09:03:45'!
-add: aCharacterOrCollection
-
-	aCharacterOrCollection isCharacter
-		ifTrue: [ characters add: aCharacterOrCollection ]
-		ifFalse: [ characters addAll: aCharacterOrCollection ]! !
-
-!ReEnumeratedCharacterSet methodsFor: 'as yet unclassified' stamp: 'ess 11/9/2024 09:02:49'!
-addCharacter: aCharacter
-
-	characters add: aCharacter! !
-
-!ReEnumeratedCharacterSet class methodsFor: 'instance creation' stamp: 'ess 12/6/2024 16:02:22'!
-character: aCharacter
-
-	^self new setCharacter: aCharacter! !
-
-!ReEnumeratedCharacterSet class methodsFor: 'instance creation' stamp: 'ess 12/6/2024 16:02:27'!
-codepoint: aCodepoint
-
-	^self character: (Character codePoint: aCodepoint)! !
-
-!ReEnumeratedCharacterSet class methodsFor: 'instance creation' stamp: 'ess 12/6/2024 16:02:32'!
-empty
-
-	^self new! !
+		word := self bitmap: letter | number | connector | mark ].
+	^ word! !
 
 !ReComplementClass methodsFor: 'converting' stamp: 'ess 11/9/2024 08:05:22'!
 complement
 
 	^ complement! !
+
+!ReComplementClass methodsFor: 'printing' stamp: 'ess 6/2/2025 10:15:19'!
+printOn: aStream
+
+	super printOn: aStream.
+	aStream
+		nextPut: $(;
+		nextPut: $^;
+		print: complement;
+		nextPut: $)! !
 
 !ReComplementClass methodsFor: 'testing' stamp: 'ess 11/9/2024 08:05:47'!
 includes: aCharacter
@@ -1703,169 +1069,1306 @@ setComplement: aCharacterClass
 	complement := aCharacterClass.
 	^ self! !
 
-!ReComplementClass class methodsFor: 'instance creation' stamp: 'ess 12/6/2024 16:02:44'!
+!ReComplementClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 07:33:20'!
 complement: aCharacterClass
 
-	^self new setComplement: aCharacterClass! !
+	^ self new
+		setComplement: aCharacterClass! !
 
-!ReDifferenceClass methodsFor: 'as yet unclassified' stamp: 'ess 11/21/2024 07:46:33'!
+!ReDifferenceClass methodsFor: 'printing' stamp: 'ess 6/2/2025 10:14:03'!
+printOn: aStream
+
+	super printOn: aStream.
+	aStream
+		nextPut: $(;
+		print: minuend;
+		nextPutAll: '--';
+		print: subtrahend;
+		nextPut: $)! !
+
+!ReDifferenceClass methodsFor: 'testing' stamp: 'ess 11/21/2024 07:46:33'!
 includes: aCharacter
 
 	^ (minuend includes: aCharacter)
 		and: [ (subtrahend includes: aCharacter) not ]! !
 
-!ReDifferenceClass methodsFor: 'as yet unclassified' stamp: 'ess 11/21/2024 07:47:29'!
+!ReDifferenceClass methodsFor: 'private' stamp: 'ess 11/21/2024 07:47:29'!
 setMinuend: firstClass subtrahend: secondClass
 
 	minuend := firstClass.
 	subtrahend := secondClass.
 	^ self! !
 
-!ReDifferenceClass class methodsFor: 'as yet unclassified' stamp: 'ess 12/6/2024 16:02:50'!
+!ReDifferenceClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 07:36:20'!
 minuend: firstClass subtrahend: secondClass
 
-	^self new
+	^ self new
 		setMinuend: firstClass
 		subtrahend: secondClass! !
 
-!ReIntersectionClass methodsFor: 'as yet unclassified' stamp: 'ess 11/21/2024 07:49:59'!
+!ReEnumeratedClass methodsFor: 'adding' stamp: 'ess 6/2/2025 07:58:28'!
+add: aCharacter
+
+	characters add: aCharacter! !
+
+!ReEnumeratedClass methodsFor: 'adding' stamp: 'ess 6/2/2025 08:15:11'!
+addAll: aCollection
+
+	aCollection do: [ :each |
+		self add: each ]! !
+
+!ReEnumeratedClass methodsFor: 'as yet unclassified' stamp: 'ess 6/2/2025 08:42:58'!
+& anotherClass
+
+	| result |
+	self species == anotherClass species ifFalse: [
+		^ super & anotherClass ].
+	result := self species empty.
+	characters do: [ :each |
+		(anotherClass includes: each) ifTrue: [
+			result add: each ] ].
+	^ result! !
+
+!ReEnumeratedClass methodsFor: 'as yet unclassified' stamp: 'ess 6/2/2025 08:45:34'!
+- anotherClass
+
+	| result |
+	self species == anotherClass species ifFalse: [
+		^ super - anotherClass ].
+	result := self species empty.
+	characters do: [ :each |
+		(anotherClass includes: each) ifFalse: [
+			result add: each ] ].
+	^ result! !
+
+!ReEnumeratedClass methodsFor: 'as yet unclassified' stamp: 'ess 6/2/2025 08:44:08'!
+| anotherClass
+
+	| result |
+	self species == anotherClass species ifFalse: [
+		^ super | anotherClass ].
+	result := anotherClass copy.
+	characters do: [ :each |
+		result add: each ].
+	^ result! !
+
+!ReEnumeratedClass methodsFor: 'initialization' stamp: 'ess 6/2/2025 07:59:00'!
+initialize
+
+	super initialize.
+	characters := Set new! !
+
+!ReEnumeratedClass methodsFor: 'initialization' stamp: 'ess 6/2/2025 08:44:21'!
+postCopy
+
+	characters := characters copy.
+	^ self! !
+
+!ReEnumeratedClass methodsFor: 'printing' stamp: 'ess 6/2/2025 10:12:44'!
+printOn: aStream
+
+	super printOn: aStream.
+	aStream
+		nextPut: $(;
+		print: characters;
+		nextPut: $)! !
+
+!ReEnumeratedClass methodsFor: 'testing' stamp: 'ess 11/17/2024 12:25:57'!
+includes: aCharacter
+
+	^ characters includes: aCharacter! !
+
+!ReEnumeratedClass methodsFor: 'testing' stamp: 'ess 11/9/2024 08:54:54'!
+isEmpty
+
+	^ characters isEmpty! !
+
+!ReEnumeratedClass methodsFor: 'testing' stamp: 'ess 11/9/2024 08:55:00'!
+notEmpty
+
+	^ characters notEmpty! !
+
+!ReEnumeratedClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:29:47'!
+character: aCharacter
+
+	^ self
+		with: aCharacter! !
+
+!ReEnumeratedClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:24:24'!
+character: aCharacter flags: regexpFlags
+
+	^ self
+		with: aCharacter
+		flags: regexpFlags! !
+
+!ReEnumeratedClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:30:13'!
+codepoint: aCodepoint
+
+	^ self
+		with: (Character codePoint: aCodepoint)! !
+
+!ReEnumeratedClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:24:04'!
+codepoint: aCodepoint flags: regexpFlags
+
+	^ self
+		with: (Character codePoint: aCodepoint)
+		flags: regexpFlags! !
+
+!ReEnumeratedClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:28:01'!
+empty
+
+	^ self new! !
+
+!ReEnumeratedClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:46:45'!
+empty: regexpFlags
+
+	| class |
+	class := regexpFlags ignoreCase
+		ifTrue: [ ReCaseInsensitiveEnumeratedClass ]
+		ifFalse: [ ReEnumeratedClass ].
+	^ class new! !
+
+!ReEnumeratedClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:29:04'!
+from: startCharacter to: endCharacter
+
+	^ self empty
+		addAll: (startCharacter to: endCharacter);
+		yourself! !
+
+!ReEnumeratedClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:21:39'!
+from: startCharacter to: endCharacter flags: regexpFlags
+
+	^ (self empty: regexpFlags)
+		addAll: (startCharacter to: endCharacter);
+		yourself! !
+
+!ReEnumeratedClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:28:41'!
+with: character1
+
+	^ self empty
+		add: character1;
+		yourself! !
+
+!ReEnumeratedClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:22:30'!
+with: character1 flags: regexpFlags
+
+	^ (self empty: regexpFlags)
+		add: character1;
+		yourself! !
+
+!ReEnumeratedClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:28:24'!
+with: character1 with: character2
+
+	^ self empty
+		add: character1;
+		add: character2;
+		yourself! !
+
+!ReEnumeratedClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:22:45'!
+with: character1 with: character2 flags: regexpFlags
+
+	^ (self empty: regexpFlags)
+		add: character1;
+		add: character2;
+		yourself! !
+
+!ReCaseInsensitiveEnumeratedClass methodsFor: 'adding' stamp: 'ess 6/2/2025 08:14:43'!
+add: aCharacter
+
+	characters add: aCharacter caseFold! !
+
+!ReCaseInsensitiveEnumeratedClass methodsFor: 'testing' stamp: 'ess 6/2/2025 08:15:31'!
+includes: aCharacter
+
+	^ characters includes: aCharacter caseFold! !
+
+!ReIntersectionClass methodsFor: 'printing' stamp: 'ess 6/2/2025 10:15:58'!
+printOn: aStream
+
+	super printOn: aStream.
+	aStream
+		nextPut: $(;
+		print: operand1;
+		nextPutAll: '&&';
+		print: operand2;
+		nextPut: $)! !
+
+!ReIntersectionClass methodsFor: 'testing' stamp: 'ess 11/21/2024 07:49:59'!
 includes: aCharacter
 
 	^ (operand1 includes: aCharacter)
 		and: [ operand2 includes: aCharacter ]! !
 
-!ReIntersectionClass methodsFor: 'as yet unclassified' stamp: 'ess 11/21/2024 07:50:30'!
+!ReIntersectionClass methodsFor: 'private' stamp: 'ess 11/21/2024 07:50:30'!
 setOperands: op1 and: op2
 
 	operand1 := op1.
 	operand2 := op2.
 	^ self! !
 
-!ReIntersectionClass class methodsFor: 'as yet unclassified' stamp: 'ess 12/6/2024 16:02:56'!
-intersection: op1 and: op2
+!ReIntersectionClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 07:35:19'!
+intersection: op1 with: op2
 
-	^self new
+	^ self new
 		setOperands: op1
 		and: op2! !
 
-!RePropertyClass methodsFor: 'as yet unclassified' stamp: 'ess 11/21/2024 07:55:21'!
+!RePredicateClass methodsFor: 'testing' stamp: 'ess 6/2/2025 07:26:17'!
 includes: aCharacter
 
-	^ property value: aCharacter! !
+	^ predicate value: aCharacter! !
 
-!RePropertyClass methodsFor: 'private' stamp: 'ess 11/21/2024 07:55:55'!
-setProperty: aUnaryBlock
+!RePredicateClass methodsFor: 'private' stamp: 'ess 6/2/2025 07:28:00'!
+setPredicate: aUnaryBlock
 
-	property := aUnaryBlock.
+	predicate := aUnaryBlock.
 	^ self! !
 
-!RePropertyClass class methodsFor: 'as yet unclassified' stamp: 'ess 12/6/2024 15:46:32'!
-satisfies: propertyBlock
+!RePredicateClass class methodsFor: 'constants' stamp: 'ess 6/2/2025 07:29:24'!
+posixClasses
 
-	^self new setProperty: propertyBlock! !
+	^`{	'alnum'	-> #isPosixAlnum.
+		'alpha'	-> #isPosixAlpha.
+		'blank'	-> #isPosixBlank.
+		'cntrl'	-> #isPosixCntrl.
+		'digit'	-> #isPosixDigit.
+		'graph'	-> #isPosixGraph.
+		'lower'	-> #isPosixLower.
+		'print'	-> #isPosixPrint.
+		'punct'	-> #isPosixPunct.
+		'space'	-> #isPosixSpace.
+		'upper'	-> #isPosixUpper.
+		'xdigit'	-> #isPosixXDigit } asDictionary`! !
 
-!RePropertyClass class methodsFor: 'instance creation' stamp: 'ess 12/6/2024 15:48:23'!
+!RePredicateClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 07:31:08'!
 posixClass: className flags: regexpFlags
 
 	| predicate |
 	predicate := self posixClasses
 		at: className
-		ifAbsent: [^nil].
-	^self satisfies: predicate! !
+		ifAbsent: [ nil ].
+	^ predicate ifNotNil: [
+		self predicate: predicate ]! !
 
-!RePropertyClass class methodsFor: 'instance creation' stamp: 'ess 12/6/2024 15:47:45'!
-posixClasses
+!RePredicateClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 07:29:57'!
+predicate: propertyBlock
 
-	^`{	'alnum' -> #isPosixAlnum.
-		'alpha' -> #isPosixAlpha.
-		'blank' -> #isPosixBlank.
-		'cntrl' -> #isPosixCntrl.
-		'digit' -> #isPosixDigit.
-		'graph' -> #isPosixGraph.
-		'lower' -> #isPosixLower.
-		'print' -> #isPosixPrint.
-		'punct' -> #isPosixPunct.
-		'space' -> #isPosixSpace.
-		'upper' -> #isPosixUpper.
-		'xdigit' -> #isPosixXDigit } asDictionary`! !
+	^self new
+		setPredicate: propertyBlock! !
 
-!RePropertyClass class methodsFor: 'instance creation' stamp: 'ess 12/6/2024 16:00:03'!
+!RePredicateClass class methodsFor: 'instance creation' stamp: 'ess 6/3/2025 15:22:46'!
 wildcard: regexpFlags
-	"Matches any character except LF in multi-line mode, but matches any character *including* LF in single-line mode."
+	"Match any character except LF in multi-line mode, but match any character _including_ LF in single-line mode."
 
-	regexpFlags multiLine ifFalse: [^self satisfies: #isCharacter].
-	^self satisfies: [:c | c ~~ Character lf]! !
+	| predicate |
+	predicate := regexpFlags multiLine
+		ifTrue: [
+			[ :c | c ~= Character lf ] ]
+		 ifFalse: [
+			#isCharacter ].
+	^ self predicate: predicate! !
 
-!RePropertyClass class methodsFor: 'instance creation' stamp: 'ess 12/6/2024 15:49:19'!
+!RePredicateClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 07:29:53'!
 word: regexpFlags
 
-	^self satisfies: #isPosixWord! !
+	^self predicate: #isPosixWord! !
 
-!ReUnionClass methodsFor: 'as yet unclassified' stamp: 'ess 11/21/2024 07:51:31'!
+!ReUnionClass methodsFor: 'printing' stamp: 'ess 6/2/2025 10:16:14'!
+printOn: aStream
+
+	super printOn: aStream.
+	aStream
+		nextPut: $(;
+		print: operand1;
+		nextPut: $,;
+		print: operand2;
+		nextPut: $)! !
+
+!ReUnionClass methodsFor: 'testing' stamp: 'ess 11/21/2024 07:51:31'!
 includes: aCharacter
 
 	^ (operand1 includes: aCharacter)
 		or: [ operand2 includes: aCharacter ]! !
 
-!ReUnionClass methodsFor: 'as yet unclassified' stamp: 'ess 11/21/2024 07:51:23'!
+!ReUnionClass methodsFor: 'private' stamp: 'ess 11/21/2024 07:51:23'!
 setOperands: op1 and: op2
 
 	operand1 := op1.
 	operand2 := op2.
 	^ self! !
 
-!ReUnionClass class methodsFor: 'as yet unclassified' stamp: 'ess 12/6/2024 16:03:07'!
-union: op1 and: op2
+!ReUnionClass class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 07:34:05'!
+union: op1 with: op2
 
-	^self new
+	^ self new
 		setOperands: op1
 		and: op2! !
 
-!ReFlags methodsFor: 'initialization' stamp: 'ess 11/21/2024 07:08:32'!
+!ReCompiler methodsFor: 'accessing' stamp: 'ess 5/30/2025 15:07:33'!
+input: aStringOrStream
+
+	input := aStringOrStream readStream.
+	self step! !
+
+!ReCompiler methodsFor: 'accessing' stamp: 'ess 5/30/2025 15:38:11'!
+nextSlot
+
+	| result |
+	result := slotsUsed.
+	slotsUsed := slotsUsed + 1.
+	^ result! !
+
+!ReCompiler methodsFor: 'as yet unclassified' stamp: 'ess 5/30/2025 15:18:41'!
+syntaxError: aMessageString
+
+	^ RegexpSyntaxError signal: aMessageString! !
+
+!ReCompiler methodsFor: 'backtracking' stamp: 'ess 5/30/2025 15:46:52'!
+restore
+
+	| saved |
+	saved := self unsave.
+	input position: saved first.
+	lookahead := saved second! !
+
+!ReCompiler methodsFor: 'backtracking' stamp: 'ess 5/30/2025 15:45:44'!
+save
+
+	shift addLast: { input position . lookahead }! !
+
+!ReCompiler methodsFor: 'backtracking' stamp: 'ess 5/30/2025 15:46:40'!
+unsave
+
+	shift isEmpty ifTrue: [
+		^ self error: self class name, ' internal error: restore without save' ].
+	^ shift removeLast! !
+
+!ReCompiler methodsFor: 'backtracking' stamp: 'ess 5/30/2025 15:39:53'!
+withSaveDo: aUnaryBlock
+
+	| didRestore restore |
+	didRestore := false.
+	restore := [
+		self restore.
+		didRestore := true ].
+	self save.
+	^ [ aUnaryBlock value: restore ]
+		ensure: [
+			didRestore ifFalse: [
+				self unsave ] ]! !
+
+!ReCompiler methodsFor: 'constants' stamp: 'ess 5/31/2025 08:34:48'!
+anchorEscapes
+
+	^ {
+		$A	-> [ ReAnchorNode beginningOfInput ] .
+		$Z	-> [ ReAnchorNode endOfInput ] .
+		$b	-> [ ReAnchorNode wordBoundary ] .
+		$B	-> [ ReAnchorNode notWordBoundary ] .
+		$<	-> [ ReAnchorNode beginningOfWord ] .
+		$>	-> [ ReAnchorNode endOfWord ]
+	} asDictionary! !
+
+!ReCompiler methodsFor: 'constants' stamp: 'ess 5/29/2025 10:16:24'!
+characterEscapes
+
+	^ `{
+		$0	-> (Character codePoint: 0)		.  "NUL"
+		$a	-> (Character codePoint: 7)		.  "BEL (alarm)"
+		$e	-> (Character codePoint: 27)	.  "ESC"
+		$f	-> (Character codePoint: 12)	.  "FF"
+		$n	-> (Character codePoint: 10)	.  "LF"
+		$r	-> (Character codePoint: 13)	.  "CR"
+		$t	-> (Character codePoint: 9)		.  "TAB"
+		$v	-> (Character codePoint: 11)	"VT"
+	} asDictionary`! !
+
+!ReCompiler methodsFor: 'initialization' stamp: 'ess 5/30/2025 15:22:56'!
 initialize
 
-	ignoreCase := false.
-	multiLine := false! !
+	super initialize.
+	shift := OrderedCollection new.
+	slotsUsed := 0! !
 
-!ReFlags methodsFor: 'accessing' stamp: 'ess 12/6/2024 15:53:46'!
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 6/3/2025 14:56:22'!
+compile: aStringOrStream
+	"May throw RegexpSyntaxError."
+
+	| node |
+	node := self parse: aStringOrStream.
+	^ RegexpPattern
+		compileProgram: node
+		slotsNeeded: slotsUsed! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 15:18:41'!
+consume
+	"Update lookahead to the next character of the input, or nil.  Answer the old value of the lookahead."
+
+	| la |
+	la := lookahead ifNil: [
+		^ self syntaxError: 'Unexpected end of input' ].
+	self step.
+	^ la! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:01:55'!
+consumeDigit
+
+	self isDigit ifFalse: [
+		^ self syntaxError: 'Expected decimal digit' ].
+	^ self consume xDigitValue! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:02:01'!
+consumeXDigit
+
+	self isXDigit ifFalse: [
+		^ self syntaxError: 'Expected hexadecimal digit' ].
+	^ self consume xDigitValue! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:02:16'!
+expect: aCharacter
+
+	(self match: aCharacter) ifFalse: [
+		^ self syntaxError: 'Expected ', aCharacter asString ]! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:02:27'!
+expectAll: aSequence
+
+	(self matchAll: aSequence) ifFalse: [
+		^ self syntaxError: 'Expected ', aSequence asString ]! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 15:09:27'!
+lookahead
+
+	^ lookahead! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 15:09:33'!
+match: aCharacter
+	"Consume the next character only if it matches aCharacter.  Answer true if the match succeeded."
+
+	| isMatch |
+	isMatch := lookahead = aCharacter.
+	isMatch ifTrue: [
+		self consume ].
+	^ isMatch! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:03:04'!
+matchAll: aSequence
+
+	| isMatch |
+	^ self withSaveDo: [ :restore |
+		isMatch := aSequence
+			inject: true
+			into: [ :sum :each |
+				sum and: [ self match: each ] ].
+		isMatch ifFalse: [
+			restore value ].
+		isMatch ]! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:03:24'!
+matchAllIgnoringCase: aSequence
+
+	| isMatch |
+	^ self withSaveDo: [ :restore  |
+		isMatch := aSequence
+			inject: true
+			into: [ :sum :each |
+				sum and: [ self matchIgnoringCase: each ] ].
+		isMatch ifFalse: [
+			restore value ].
+		isMatch ]! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:03:53'!
+matchIgnoringCase: aCharacter
+	"Consume the next character only if it matches aCharacter.  Answer true if the match succeeded."
+
+	| isMatch |
+	isMatch := lookahead asLowercase = aCharacter asLowercase.
+	isMatch ifTrue: [
+		self consume ].
+	^ isMatch! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 18:27:32'!
+maybeCompile: aStringOrStream
+	"Answer nil instead of throwing an error when presented with an invalid regular expression."
+
+	^ [ self compile: aStringOrStream ]
+		on: RegexpSyntaxError
+		do: [
+			^ nil ]! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:04:01'!
+next
+
+	^ input next! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:04:06'!
+parse
+
+	| slot node |
+	slot := self nextSlot.
+	node := self readExpression.
+	^ ReGroupNode
+		with: node
+		slot: slot! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:04:11'!
+parse: aStringOrStream
+
+	self input: aStringOrStream.
+	^ self parse! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:04:22'!
+readAlternatives
+
+	| result |
+	result := self readConcatenation.
+	self skipWhitespace.
+	[ self match: $| ] whileTrue: [
+		result := result or: self readConcatenation.
+		self skipWhitespace ].	
+	^ result! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/29/2025 10:17:33'!
+readConcatenation
+
+	| result |
+	result := self readRepetition..
+	self skipWhitespace.
+	[ lookahead notNil and: [ ('|)' includes: lookahead) not ] ]
+		whileTrue: [
+			result := result and: self readRepetition.
+			self skipWhitespace ].
+	^ result! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 11/6/2024 06:07:21'!
+readExpression
+
+	^ self readAlternatives! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 11:25:09'!
+readGroup
+
+	| capturing slot node |
+	capturing := true.
+	(self match: $?) ifTrue: [
+		(self match: $#) ifTrue: [
+			self skipBlockComment.
+			^ ReNullNode new ].
+		(self match: $:) ifTrue: [
+			capturing := false ] ].
+	capturing ifTrue: [
+		slot := self nextSlot ].
+	node := self readExpression.
+	self expect: $).
+	^ ReGroupNode
+		with: node
+		slot: slot! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 15:10:55'!
+readInteger
+
+	^ self readDigits! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:05:12'!
+readRepetition
+
+	| node char repeat |
+	node := self readCharacter.
+	(node isKindOf: ReAnchorNode) ifTrue: [
+		^ node ].
+	('*+?{' includes: lookahead) ifTrue: [
+		char := self consume.
+		char = $* ifTrue: [
+			node := node repeatMin: 0 ].
+		char = $+ ifTrue: [
+			node := node repeatMin: 1 ].
+		char = $? ifTrue: [
+			node := node
+				repeatMin: 0
+				max: 1 ].
+		char = ${ ifTrue: [
+			repeat := self readRepetitionCount.
+			repeat node: node.
+			node := repeat ].
+		(self match: $+) ifTrue: [
+			node bePossessive ].
+		(self match: $?) ifTrue: [
+			node beNotGreedy ] ].
+	^ node! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:05:37'!
+readRepetitionCount
+
+	| min max |	
+	min := nil.
+	max := nil.	
+	self isDigit ifTrue: [
+		min := self readInteger ].
+	(self match: $}) ifTrue: [  "{n}"
+		min ifNil: [  "Exclude {}"
+			^ self syntaxError: 'Expected repetition count' ].
+		^ ReRepetitionNode
+			min: min
+			max: min ].
+	"{n,m} or {,m}"
+	min := min ifNil: [ 0 ].
+	self expect: $,.
+	self isDigit ifTrue: [
+		max := self readInteger ].
+	self expect: $}.
+	^ ReRepetitionNode
+		min: min
+		max: max! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:05:48'!
+skipBlanks
+
+	[ self isBlank ] whileTrue: [
+		self consume ]! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 11:39:14'!
+skipBlockComment
+
+	[ lookahead notNil ] whileTrue: [
+		(self match: $\)
+			ifTrue: [
+				self consume ]
+			ifFalse: [
+				(self match: $)) ifTrue: [
+					^ self ].
+				(self matchAll: '(?#')
+					ifTrue: [
+						self skipBlockComment ]
+					ifFalse: [
+						self consume ] ] ]! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:06:37'!
+skipLineComment
+
+	| endOfLine |
+	endOfLine := `{ nil . Character lf . Character cr }`.
+	[ endOfLine statePointsTo: lookahead ] whileFalse: [
+		self consume ].
+	self match: `Character cr`.
+	self match: `Character lf`! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:06:55'!
+skipSpaces
+
+	[ self isSpace ] whileTrue: [
+		self consume ]! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:07:17'!
+skipWhitespace
+
+	[ lookahead = $# or: [ self isSpace ] ]
+		whileTrue: [
+			(self match: $#) ifTrue: [
+				self skipLineComment ].
+			self skipBlanks ]! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:07:26'!
+step
+	"Move to next character of input."
+
+	lookahead := input atEnd
+		ifFalse: [ self next ]
+		ifTrue: [ nil ]! !
+
+!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 6/2/2025 08:04:17'!
+readCharacter
+
+	| character |
+	self skipSpaces.
+	(self match: $() ifTrue: [
+		^ self readGroup ].
+	character := self consume.
+	character = $\ ifTrue: [
+		^ self readCharacterEscape ].
+	character = $$ ifTrue: [
+		^ ReAnchorNode endOfLine ].
+	character = $. ifTrue: [
+		^ ReCharacterNode wildcard: flags ].
+	character = $[ ifTrue: [
+		^ self readCharacterClass ].
+	character = $^ ifTrue: [
+		^ ReAnchorNode beginningOfLine ].
+	^ ReCharacterNode
+		character: character
+		flags: flags! !
+
+!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 6/2/2025 08:11:21'!
+readCharacterEscape
+
+	| escape |
+
+	"\0 \a \e \f \n \r \t \v"
+	escape := self characterEscapes
+		at: lookahead
+		ifAbsent: [ nil ].
+	escape ifNotNil: [
+		self consume.
+		^ ReCharacterNode
+			character: escape ].
+
+	"\< \> \A \B \Z \b"
+	escape := self anchorEscapes
+		at: lookahead
+		ifAbsent: [ nil ].
+	escape ifNotNil: [
+		self consume.
+		^ escape value ].
+
+	"\D \S \W \d \s \w"
+	(ReCharacterClass
+		namedClass: lookahead
+		flags: flags)
+			ifNotNil: [ :namedClass |
+				self consume.
+				^ ReCharacterNode
+					characterClass: namedClass ].
+
+	"\cX control character"
+	(self match: $c) ifTrue: [
+		| control character |
+		control := self consume codePoint \\ 32.
+		character := Character codePoint: control.
+		^ ReCharacterNode
+			character: character ].
+			
+	"\p{ unicode property name or value}"
+	((lookahead = $P)  or: [ lookahead = $p ]) ifTrue: [
+		| p class |
+		p := self consume.
+		(self match: ${) ifFalse: [
+			^ ReCharacterNode
+				character: p
+				flags: flags ].
+		class := self readPropertyEscape.
+		p = $P ifTrue: [
+			class := class complement ].
+			^ ReCharacterNode
+				characterClass: class ].
+
+	"\uXXXX or \u{X[1-6]} unicode escape"
+	(self match: $u) ifTrue: [
+		^ ReCharacterNode
+			character: self readUnicodeEscape ].
+			
+	"\xXX \x{X[1-2]} hexadecimal escape"
+	(self match: $x) ifTrue: [
+		^ ReCharacterNode
+			character: self readHexEscape ].
+
+	"Handles \\ along with unnecessary escapes"
+	^ ReCharacterNode
+		character: self consume
+		flags: flags! !
+
+!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 5/30/2025 15:50:51'!
+readDigits
+
+	| result |
+	self isDigit ifFalse: [
+		^ self syntaxError: 'Expected decimal number' ].
+	result := 0.
+	[ self isDigit ] whileTrue: [
+		result := result * 10 + self consumeDigit ].
+	^ result! !
+
+!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 5/30/2025 15:10:32'!
+readDigits: expectedCount
+
+	^ self
+		readDigitsFrom: expectedCount
+		to: expectedCount! !
+
+!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 5/30/2025 15:52:56'!
+readDigitsFrom: minCount to: maxCount
+
+	| result count |
+	result := 0.
+	count := 0.
+	[ count < maxCount and: [ self isDigit ] ]
+		whileTrue: [
+			result := result * 10 + self consumeDigit.
+			count := count + 1 ].
+	count < minCount ifTrue: [
+		^ self syntaxError: 'Expected decimal number' ].
+	^ result! !
+
+!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 5/30/2025 15:53:41'!
+readHexEscape
+
+	| codepoint |
+	(self match: ${)
+		ifFalse: [
+			codepoint := self readXDigits: 2 ]
+		ifTrue: [
+			codepoint := self
+				readXDigitsFrom: 1
+				to: 2.
+			self expect: $} ].
+	^ Character codePoint: codepoint! !
+
+!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 5/30/2025 15:18:41'!
+readPropertyEscape
+
+	| name |
+	name := self readWord.
+	name isEmptyOrNil ifTrue: [
+		^ self syntaxError: 'Expected Unicode property name or value' ].
+	self skipWhitespace.
+	self expect: $}.
+	^ ReCharacterClass
+		unicodeProperty: name
+		flags: flags! !
+
+!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 5/30/2025 15:54:20'!
+readUnicodeEscape
+
+	| codepoint |
+	(self match: ${)
+		ifFalse: [
+			codepoint := self readXDigits: 4 ]
+		ifTrue: [
+			codepoint := self
+				readXDigitsFrom: 1
+				to: 6.
+			self expect: $} ].
+	^ Character codePoint: codepoint! !
+
+!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 5/30/2025 15:54:47'!
+readWord
+
+	self skipSpaces.
+	^ String streamContents: [ :stream |
+		[ self isWord ] whileTrue: [
+			stream nextPut: self consume ] ]! !
+
+!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 5/30/2025 15:55:09'!
+readXDigits
+
+	| result |
+	self isXDigit ifFalse: [
+		^ self syntaxError: 'Expected hexadecimal number' ].
+	result := 0.
+	[ self isXDigit ] whileTrue: [
+		result := result * 16 + self consumeXDigit ].
+	^ result! !
+
+!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 5/30/2025 15:11:10'!
+readXDigits: expectedCount
+
+	^ self
+		readXDigitsFrom: expectedCount
+		to: expectedCount! !
+
+!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 5/30/2025 15:55:29'!
+readXDigitsFrom: minCount to: maxCount
+
+	| result count |
+	result := 0.
+	count := 0.
+	[ count < maxCount and: [ self isXDigit ] ]
+		whileTrue: [
+			result := result * 16 + self consumeXDigit.
+			count := count + 1 ].
+	count < minCount ifTrue: [
+		^ self syntaxError: 'Expected hexadecimal number' ].
+	^ result! !
+
+!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 6/2/2025 08:13:02'!
+readCharacterClass
+
+	^ ReCharacterNode
+		characterClass: self readClassExpression! !
+
+!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 6/2/2025 09:35:31'!
+readClassCharacter
+
+	| character1 character2 |
+	self skipWhitespace.
+	character1 := self consume.
+	character1 = $- ifTrue: [
+		^ ReCharacterClass
+			with: $- ].
+	character1 = $\ ifTrue: [
+		character1 := self readClassEscape ].
+	character1 isCharacter ifFalse: [
+		^ character1 ].
+	self skipWhitespace.
+	lookahead = $- ifFalse: [
+		^ character1 ].
+	self withSaveDo: [ :restore |
+		self consume.
+		lookahead = $] ifTrue: [
+			^ ReCharacterClass
+				with: character1
+				with: $-
+				flags: flags ].
+		lookahead = $- ifTrue: [
+			restore value.
+			^ ReCharacterClass
+				with: character1
+				flags: flags ].
+		character2 := self readClassCharacter.
+		character2 isCharacter ifFalse: [
+			restore value.
+			^ ReCharacterClass
+				with: character1
+				flags: flags ].
+		^ ReCharacterClass
+			from: character1
+			to: character2
+			flags: flags ]! !
+
+!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 5/29/2025 13:15:41'!
+readClassEscape
+
+	| escape |
+
+	"\0 \a \e \f \n \r \t \v"
+	escape := self characterEscapes
+		at: lookahead
+		ifAbsent: [ nil ].
+	escape ifNotNil: [
+		^ escape ].
+
+	"\D \S \W \d \s \w"
+	(ReCharacterClass
+		namedClass: lookahead
+		flags: flags)
+			ifNotNil: [ :namedClass |
+				self consume.
+				^ namedClass ].
+
+	"\cX control character"
+	(self match: $c) ifTrue: [
+		| control |
+		control := self consume codePoint \\ 32.
+		^ Character codePoint: control ].
+
+	"\p{ unicode property name or value}"
+	(lookahead = $P  or: [ lookahead = $p ]) ifTrue: [
+		| p class |
+		p := self consume.
+		(self match: ${) ifFalse: [
+			^ p ].
+		class := self readPropertyEscape.
+		p = $P ifTrue: [
+			class := class complement ].
+		^ class ].
+
+	"\uXXXX or \u{X[1-6]} unicode escape"
+	(self match: $u) ifTrue: [
+		^ self readUnicodeEscape ].
+			
+	"\xXX \x{X[1-2]} hexadecimal escape"
+	(self match: $x) ifTrue: [
+		^ self readHexEscape ].
+
+	"Handles \\ along with unnecessary escapes"
+	^ self consume! !
+
+!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 6/2/2025 09:18:11'!
+readClassExpression
+
+	| isComplement class |
+	self skipWhitespace.
+	isComplement := self match: $^.
+	self skipWhitespace.
+	class := lookahead = $]
+		ifTrue: [ self readClassUnion ]
+		ifFalse: [ self readClassSubtraction ].
+	self skipWhitespace.
+	self expect: $].
+	^ isComplement
+		ifTrue: [ class complement ]
+		ifFalse: [ class ]! !
+
+!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 5/30/2025 15:58:19'!
+readClassIntersection
+
+	| result operand |
+	result := self readClassUnion.
+	self skipWhitespace.
+	[ self match: $$ ] whileTrue: [
+		self expect: $$.
+		operand := self readClassUnion.
+		result := result & operand.
+		self skipWhitespace ].
+	^ result! !
+
+!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 5/30/2025 15:59:00'!
+readClassName
+
+	self isAlpha ifFalse: [
+		^ self syntaxError: 'Expected character class' ].
+	^ String streamContents: [ :stream |
+		[ self isAlpha ] whileTrue: [
+			stream nextPut: self consume ] ]! !
+
+!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 5/30/2025 15:59:16'!
+readClassSubtraction
+
+	| result operand |
+	result := self readClassIntersection.
+	self skipWhitespace.
+	[ self match: $- ] whileTrue: [
+		self expect: $-.
+		operand := self readClassIntersection.
+		result := result - operand.
+		self skipWhitespace ].
+	^ result! !
+
+!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 6/2/2025 09:19:20'!
+readClassUnion
+
+	| result done operand c |
+	result := ReCharacterClass empty: flags.
+	done := false.
+	self skipWhitespace.
+	(self match: $]) ifTrue: [
+		result add: $] ].
+	[ done or: [ lookahead = $] ] ]
+		whileFalse: [
+			done := (self matchAll: '&&') or: [ self matchAll: '--' ].
+			done ifFalse: [
+				operand := (self match: $[)
+					ifTrue: [ self readNestedClass ]
+					ifFalse: [
+						c := self readClassCharacter.
+						c isCharacter
+							ifFalse: [ c ]
+							ifTrue: [
+								ReCharacterClass
+									with: c
+									flags: flags ] ].
+				result := result | operand.
+				self skipWhitespace ] ].
+	^ result! !
+
+!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 5/30/2025 16:00:30'!
+readNestedClass
+
+	self skipWhitespace.
+	^ (self match: $:)
+		ifTrue: [ self readPosixClass ]
+		ifFalse: [ self readClassExpression ]! !
+
+!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 5/29/2025 13:17:20'!
+readPosixClass
+
+	| name |
+	self skipWhitespace.
+	name := self readClassName.
+	self skipWhitespace.
+	self expect: $:.
+	self skipWhitespace.
+	self expect: $].
+	^ ReCharacterClass
+		posixClass: name
+		flags: flags! !
+
+!ReCompiler methodsFor: 'testing' stamp: 'ess 5/30/2025 15:06:26'!
+atEnd
+
+	^ lookahead isNil! !
+
+!ReCompiler methodsFor: 'testing' stamp: 'ess 5/30/2025 15:35:03'!
+isAlnum
+	"Alphanumeric in the 7-bit ASCII character set"
+
+	^ lookahead notNil
+		and: [ lookahead isPosixAlnum ]! !
+
+!ReCompiler methodsFor: 'testing' stamp: 'ess 5/30/2025 15:35:13'!
+isAlpha
+	"Alphabetic in the 7-bit ASCII character set"
+
+	^ lookahead notNil
+		and: [ lookahead isPosixAlpha ]! !
+
+!ReCompiler methodsFor: 'testing' stamp: 'ess 5/30/2025 15:35:43'!
+isBlank
+	"Horizontal whitespace in the 7-bit ASCII character set"
+
+	^ lookahead notNil
+		and: [ lookahead isPosixBlank ]! !
+
+!ReCompiler methodsFor: 'testing' stamp: 'ess 5/30/2025 15:35:53'!
+isCntrl
+	"Control in the 7-bit ASCII character set"
+
+	^ lookahead notNil
+		and: [ lookahead isPosixCntrl ]! !
+
+!ReCompiler methodsFor: 'testing' stamp: 'ess 5/30/2025 15:36:04'!
+isDigit
+	"Decimal digit in the 7-bit ASCII character set"
+
+	^ lookahead notNil
+		and: [ lookahead isPosixDigit ]! !
+
+!ReCompiler methodsFor: 'testing' stamp: 'ess 5/30/2025 15:36:15'!
+isGraph
+	"Graphic--has a printed representation--in the 7-bit ASCII character set"
+
+	^ lookahead notNil
+		and: [ lookahead isPosixGraph ]! !
+
+!ReCompiler methodsFor: 'testing' stamp: 'ess 5/30/2025 15:36:23'!
+isLower
+	"Lowercase letter in the 7-bit ASCII character set."
+
+	^ lookahead notNil
+		and: [ lookahead isPosixLower ]! !
+
+!ReCompiler methodsFor: 'testing' stamp: 'ess 5/30/2025 15:36:38'!
+isPrint
+	"Printable--takes up space when displayed--in the 7-bit ASCII character set"
+
+	^ lookahead notNil
+		and: [ lookahead isPosixPrint ]! !
+
+!ReCompiler methodsFor: 'testing' stamp: 'ess 5/30/2025 15:36:51'!
+isPunct
+	"Punctuation in the 7-bit ASCII character set"
+
+	^ lookahead notNil
+		and: [ lookahead isPosixPunct ]! !
+
+!ReCompiler methodsFor: 'testing' stamp: 'ess 5/30/2025 15:37:02'!
+isSpace
+	"Horizontal or vertical whitespace in the 7-bit ASCII character set"
+
+	^ lookahead notNil
+		and: [ lookahead isPosixSpace ]! !
+
+!ReCompiler methodsFor: 'testing' stamp: 'ess 5/30/2025 15:37:11'!
+isUpper
+	"Uppercase letter in the 7-bit ASCII character set"
+
+	^ lookahead notNil
+		and: [ lookahead isPosixUpper ]! !
+
+!ReCompiler methodsFor: 'testing' stamp: 'ess 5/30/2025 15:09:16'!
+isWord
+
+	^ lookahead notNil
+		and: [ lookahead isPosixWord ]! !
+
+!ReCompiler methodsFor: 'testing' stamp: 'ess 5/30/2025 15:37:29'!
+isXDigit
+	"Hexadecimal digit in the 7-bit ASCII character set"
+
+	^ lookahead notNil
+		and: [ lookahead isPosixXDigit ]! !
+
+!ReCompiler methodsFor: 'private' stamp: 'ess 5/30/2025 15:22:47'!
+setIgnoreCase: ignoreCase multiLine: multiLine
+
+	flags := ReFlags
+		ignoreCase: ignoreCase
+		multiLine: multiLine.
+	^ self! !
+
+!ReCompiler class methodsFor: 'instance creation' stamp: 'ess 5/30/2025 15:22:11'!
+ignoreCase: ignoreCase
+
+	^ self
+		ignoreCase: ignoreCase
+		multiLine: nil! !
+
+!ReCompiler class methodsFor: 'instance creation' stamp: 'ess 5/30/2025 14:49:24'!
+ignoreCase: ignoreCase multiLine: multiLine
+
+	^ self new
+		setIgnoreCase: ignoreCase
+		multiLine: multiLine! !
+
+!ReCompiler class methodsFor: 'instance creation' stamp: 'ess 5/30/2025 15:22:15'!
+multiLine: multiLine
+
+	^ self
+		ignoreCase: nil
+		multiLine: multiLine! !
+
+!ReFlags methodsFor: 'accessing' stamp: 'ess 5/29/2025 08:08:07'!
 ignoreCase
 
-	^ignoreCase! !
+	^ ignoreCase! !
 
-!ReFlags methodsFor: 'accessing' stamp: 'ess 12/6/2024 15:53:56'!
-ignoreCase: aBoolean
-
-	ignoreCase := aBoolean! !
-
-!ReFlags methodsFor: 'accessing' stamp: 'ess 12/6/2024 15:54:03'!
+!ReFlags methodsFor: 'accessing' stamp: 'ess 5/29/2025 08:08:15'!
 multiLine
 
-	^multiLine! !
+	^ multiLine! !
 
-!ReFlags methodsFor: 'accessing' stamp: 'ess 12/6/2024 15:54:12'!
-multiLine: aBoolean
+!ReFlags methodsFor: 'private' stamp: 'ess 5/30/2025 15:21:25'!
+setIgnoreCase: boolean1 multiLine: boolean2
 
-	multiLine := aBoolean! !
+	ignoreCase := boolean1 ifNil: [ false ].
+	multiLine := boolean2 ifNil: [ false ].
+	^ self! !
 
-!ReInstruction methodsFor: 'evaluating' stamp: 'ess 11/9/2024 11:20:51'!
+!ReFlags class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:25:03'!
+default
+
+	default ifNil: [
+		default := self
+			ignoreCase: nil
+			multiLine: nil ].
+	^ default! !
+
+!ReFlags class methodsFor: 'instance creation' stamp: 'ess 5/30/2025 15:20:53'!
+ignoreCase: ignoreCase
+
+	^ self
+		ignoreCase: ignoreCase
+		multiLine: nil! !
+
+!ReFlags class methodsFor: 'instance creation' stamp: 'ess 5/30/2025 15:20:32'!
+ignoreCase: ignoreCase multiLine: multiLine
+
+	^ self new
+		setIgnoreCase: ignoreCase
+		multiLine: multiLine! !
+
+!ReFlags class methodsFor: 'instance creation' stamp: 'ess 5/30/2025 15:20:58'!
+multiLine: multiLine
+
+	^ self
+		ignoreCase: nil
+		multiLine: multiLine! !
+
+!ReInstruction methodsFor: 'evaluating' stamp: 'ess 5/30/2025 16:15:54'!
 execute: aThread
-	"Override to do something.  Default is no-op."! !
+	"Override to do something.  Default is no-op."
 
-!ReInstruction methodsFor: 'testing' stamp: 'ess 11/9/2024 18:48:36'!
+	^ self! !
+
+!ReInstruction methodsFor: 'testing' stamp: 'ess 5/30/2025 16:16:16'!
 waitsForNextCharacter
-	"Does this instruction need a character from the input in order to proceed?
-
-	Most instructions can run immediately, as soon as they are fetched, because their behavior is independent of the character being matched.  These instructions run 'in between' the characters.  The character matching instructions are an obvious exception.
+	"Does this instruction need a character from the input in order to proceed?"
+	"Most instructions can run immediately, as soon as they are fetched, because their behavior is independent of the character being matched.  These instructions run 'in between' the characters.  The character matching instructions are an obvious exception.
 	The main loop of the VM begins each iteration by executing a waiting character match instructuction.  If the match succeeds, the VM then goes on to execute everything it can until it hits an instruction that needs to test the next character."
 
 	^ false! !
 
-!ReAnchorInstruction methodsFor: 'evaluating' stamp: 'ess 11/9/2024 13:08:02'!
+!ReAnchorInstruction methodsFor: 'evaluating' stamp: 'ess 5/29/2025 11:08:47'!
 execute: aThread
 	"Progress aThread only when the anchor condition is satisfied."
 
-	(anchor value: aThread)
-		ifTrue: [ aThread step ]! !
+	(anchor value: aThread) ifTrue: [
+		aThread step ]! !
+
+!ReAnchorInstruction methodsFor: 'printing' stamp: 'ess 6/4/2025 07:49:14'!
+printOn: aStream
+
+	aStream
+		nextPutAll: 'assert ';
+		print: anchor! !
 
 !ReAnchorInstruction methodsFor: 'private' stamp: 'ess 11/9/2024 13:08:22'!
 setAnchor: anAnchor
@@ -1879,12 +2382,19 @@ anchor: anAnchor
 	^ self new
 		setAnchor: anAnchor! !
 
-!ReCharacterInstruction methodsFor: 'evaluating' stamp: 'ess 11/9/2024 11:26:30'!
+!ReCharacterInstruction methodsFor: 'evaluating' stamp: 'ess 6/4/2025 08:45:43'!
 execute: aThread
 	"Progress aThread when we match the current character.  Otherwise we let the thread die."
 
-	(characterClass includes: aThread character)
-		ifTrue: [ aThread step ]! !
+	(characterClass includes: aThread character) ifTrue: [
+		aThread step ]! !
+
+!ReCharacterInstruction methodsFor: 'printing' stamp: 'ess 6/4/2025 07:48:46'!
+printOn: aStream
+
+	aStream
+		nextPutAll: 'evaluate ';
+		print: characterClass! !
 
 !ReCharacterInstruction methodsFor: 'testing' stamp: 'ess 11/9/2024 18:50:11'!
 waitsForNextCharacter
@@ -1898,17 +2408,29 @@ setClass: aCharacterClass
 	characterClass := aCharacterClass.
 	^ self! !
 
-!ReCharacterInstruction class methodsFor: 'instance creation' stamp: 'ess 11/9/2024 11:25:07'!
-class: aCharacterClass
+!ReCharacterInstruction class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 07:53:05'!
+characterClass: aCharacterClass
 	"Answer an instance that progresses when the current character matches aCharacterClass."
 
 	^ self new
 		setClass: aCharacterClass! !
 
-!ReJumpInstruction methodsFor: 'evaluating' stamp: 'ess 11/7/2024 07:57:27'!
+!ReJumpInstruction methodsFor: 'accessing' stamp: 'ess 6/3/2025 15:15:30'!
+target: aLabel
+
+	target := aLabel! !
+
+!ReJumpInstruction methodsFor: 'evaluating' stamp: 'ess 6/4/2025 08:45:10'!
 execute: aThread
 
 	aThread jump: target! !
+
+!ReJumpInstruction methodsFor: 'printing' stamp: 'ess 6/4/2025 07:52:11'!
+printOn: aStream
+
+	aStream
+		nextPutAll: '#jump: ';
+		print: target! !
 
 !ReJumpInstruction methodsFor: 'private' stamp: 'ess 11/7/2024 05:39:27'!
 setJump: aTarget
@@ -1922,12 +2444,21 @@ jump: jumpTarget
 	^ self new
 		setJump: jumpTarget! !
 
-!ReBranchInstruction methodsFor: 'evaluating' stamp: 'ess 11/7/2024 07:57:54'!
+!ReBranchInstruction methodsFor: 'evaluating' stamp: 'ess 6/4/2025 10:13:21'!
 execute: aThread
 
 	aThread
 		jump: target
 		andBranch: target1! !
+
+!ReBranchInstruction methodsFor: 'printing' stamp: 'ess 6/4/2025 07:52:19'!
+printOn: aStream
+
+	aStream
+		nextPutAll: '#jump: ';
+		print: target;
+		nextPutAll: ' andBranch: ';
+		print: target1! !
 
 !ReBranchInstruction methodsFor: 'private' stamp: 'ess 11/7/2024 05:40:03'!
 setJump: priorityTarget branch: secondaryTarget
@@ -1943,10 +2474,22 @@ jump: priorityTarget andBranch: secondaryTarget
 		setJump: priorityTarget
 		branch: secondaryTarget! !
 
-!ReMatchInstruction methodsFor: 'evaluating' stamp: 'ess 11/7/2024 07:58:05'!
+!ReMatchInstruction methodsFor: 'evaluating' stamp: 'ess 6/4/2025 08:46:28'!
 execute: aThread
 
 	aThread match! !
+
+!ReMatchInstruction methodsFor: 'printing' stamp: 'ess 6/4/2025 07:52:29'!
+printOn: aStream
+
+	aStream
+		nextPutAll: '#match'! !
+
+!ReNoopInstruction methodsFor: 'printing' stamp: 'ess 6/4/2025 07:45:38'!
+printOn: aStream
+
+	aStream
+		nextPutAll: 'noop'! !
 
 !ReSaveInstruction methodsFor: 'private' stamp: 'ess 11/6/2024 12:24:04'!
 setSlot: aSlotIndex
@@ -1966,19 +2509,33 @@ start: aSlotIndex
 	^ ReSaveStartInstruction new
 		setSlot: aSlotIndex! !
 
-!ReSaveEndInstruction methodsFor: 'as yet unclassified' stamp: 'ess 11/7/2024 07:58:21'!
+!ReSaveEndInstruction methodsFor: 'evaluating' stamp: 'ess 6/4/2025 08:05:54'!
 execute: aThread
 
 	aThread
 		saveEnd: slot;
 		step! !
 
-!ReSaveStartInstruction methodsFor: 'as yet unclassified' stamp: 'ess 11/7/2024 07:58:37'!
+!ReSaveEndInstruction methodsFor: 'printing' stamp: 'ess 6/4/2025 07:52:44'!
+printOn: aStream
+
+	aStream
+		nextPutAll: '#saveEnd: ';
+		print: slot! !
+
+!ReSaveStartInstruction methodsFor: 'evaluating' stamp: 'ess 6/4/2025 08:05:37'!
 execute: aThread
 
 	aThread
 		saveStart: slot;
 		step! !
+
+!ReSaveStartInstruction methodsFor: 'printing' stamp: 'ess 6/4/2025 07:52:48'!
+printOn: aStream
+
+	aStream
+		nextPutAll: '#saveStart: ';
+		print: slot! !
 
 !ReLabel methodsFor: 'accessing' stamp: 'ess 11/6/2024 06:50:31'!
 counter
@@ -1989,6 +2546,12 @@ counter
 counter: aLocation
 
 	counter := aLocation! !
+
+!ReLabel methodsFor: 'printing' stamp: 'ess 6/4/2025 07:50:01'!
+printOn: aStream
+
+	aStream
+		print: counter! !
 
 !ReNode methodsFor: 'as yet unclassified' stamp: 'ess 11/16/2024 09:47:22'!
 and: aNode
@@ -2037,6 +2600,15 @@ compileTo: aProgram
 
 	aProgram anchor: anchor! !
 
+!ReAnchorNode methodsFor: 'printing' stamp: 'ess 6/2/2025 10:19:06'!
+printOn: aStream
+
+	super printOn: aStream.
+	aStream
+		nextPut: $(;
+		print: anchor;
+		nextPut: $)! !
+
 !ReAnchorNode methodsFor: 'private' stamp: 'ess 11/9/2024 13:06:29'!
 setAnchor: anAnchor
 
@@ -2049,30 +2621,40 @@ anchor: anAnchor
 	^ self new
 		setAnchor: anAnchor! !
 
+!ReAnchorNode class methodsFor: 'instance creation' stamp: 'ess 5/31/2025 09:07:17'!
+beginningOfInput
+
+	^ self anchor: ReAnchor beginningOfInput! !
+
 !ReAnchorNode class methodsFor: 'instance creation' stamp: 'ess 11/17/2024 13:27:25'!
 beginningOfLine
 
 	^ self anchor: ReAnchor beginningOfLine! !
 
-!ReAnchorNode class methodsFor: 'instance creation' stamp: 'ess 11/16/2024 09:51:03'!
-end
+!ReAnchorNode class methodsFor: 'instance creation' stamp: 'ess 5/31/2025 09:08:18'!
+beginningOfWord
 
-	^ self anchor: ReAnchor end! !
+	^ self anchor: ReAnchor beginningOfWord! !
+
+!ReAnchorNode class methodsFor: 'instance creation' stamp: 'ess 5/31/2025 09:07:32'!
+endOfInput
+
+	^ self anchor: ReAnchor endOfInput! !
 
 !ReAnchorNode class methodsFor: 'instance creation' stamp: 'ess 11/17/2024 13:27:36'!
 endOfLine
 
 	^ self anchor: ReAnchor endOfLine! !
 
+!ReAnchorNode class methodsFor: 'instance creation' stamp: 'ess 5/31/2025 09:08:26'!
+endOfWord
+
+	^ self anchor: ReAnchor endOfWord! !
+
 !ReAnchorNode class methodsFor: 'instance creation' stamp: 'ess 11/16/2024 09:51:03'!
 notWordBoundary
 
 	^ self anchor: ReAnchor notWordBoundary! !
-
-!ReAnchorNode class methodsFor: 'instance creation' stamp: 'ess 11/16/2024 09:51:03'!
-start
-
-	^ self anchor: ReAnchor start! !
 
 !ReAnchorNode class methodsFor: 'instance creation' stamp: 'ess 11/16/2024 09:51:03'!
 wordBoundary
@@ -2084,17 +2666,35 @@ compileTo: aProgram
 
 	aProgram characterClass: characters! !
 
+!ReCharacterNode methodsFor: 'printing' stamp: 'ess 6/2/2025 10:19:17'!
+printOn: aStream
+
+	super printOn: aStream.
+	aStream
+		nextPut: $(;
+		print: characters;
+		nextPut: $)! !
+
 !ReCharacterNode methodsFor: 'private' stamp: 'ess 11/7/2024 02:16:47'!
 setCharacterClass: aCharacterClass
 
 	characters := aCharacterClass.
 	^ self! !
 
-!ReCharacterNode class methodsFor: 'instance creation' stamp: 'ess 11/16/2024 09:50:56'!
+!ReCharacterNode class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:32:46'!
 character: aCharacter
 
 	^ self characterClass:
-			(ReCharacterClass character: aCharacter)! !
+		(ReCharacterClass
+			character: aCharacter)! !
+
+!ReCharacterNode class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:04:36'!
+character: aCharacter flags: regexpFlags
+
+	^ self characterClass:
+		(ReCharacterClass
+			character: aCharacter
+			flags: regexpFlags)! !
 
 !ReCharacterNode class methodsFor: 'instance creation' stamp: 'ess 11/7/2024 02:16:13'!
 characterClass: aCharacterClass
@@ -2102,36 +2702,32 @@ characterClass: aCharacterClass
 	^ self new
 		setCharacterClass: aCharacterClass! !
 
-!ReCharacterNode class methodsFor: 'instance creation' stamp: 'ess 11/9/2024 08:53:50'!
-class: aCharacterClass
-
-	^ self new
-		setCharacterClass: aCharacterClass! !
-
-!ReCharacterNode class methodsFor: 'instance creation' stamp: 'ess 11/17/2024 09:00:12'!
+!ReCharacterNode class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 07:51:58'!
 codepoint: aCodepoint
 
 	^ self characterClass:
-			(ReCharacterClass codepoint: aCodepoint)! !
+		(ReCharacterClass codepoint: aCodepoint)! !
 
-!ReCharacterNode class methodsFor: 'instance creation' stamp: 'ess 11/17/2024 11:55:34'!
+!ReCharacterNode class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 08:33:04'!
+codepoint: aCodepoint flags: regexpFlags
+
+	^ self characterClass:
+		(ReCharacterClass
+			codepoint: aCodepoint
+			flags: regexpFlags)! !
+
+!ReCharacterNode class methodsFor: 'instance creation' stamp: 'ess 5/31/2025 06:59:21'!
 generalCategory: unicodeGeneralCategoryName
 
 	^ self characterClass:
-			(ReCharacterClass generalCategory: unicodeGeneralCategoryName)! !
+		(ReCharacterClass generalCategory: unicodeGeneralCategoryName)! !
 
-!ReCharacterNode class methodsFor: 'instance creation' stamp: 'ess 11/16/2024 09:50:56'!
-wildcard
+!ReCharacterNode class methodsFor: 'instance creation' stamp: 'ess 6/2/2025 07:52:06'!
+wildcard: regexpFlags
+	"Match any character except LF in multi-line mode, but match any character *including* LF in single-line mode."
 
 	^ self characterClass:
-			(ReCharacterClass wildcard)! !
-
-!ReGroupNode methodsFor: 'private' stamp: 'ess 11/6/2024 12:12:02'!
-setNode: aNode slot: aSlotIndex
-
-	node := aNode.
-	slot := aSlotIndex.
-	^ self! !
+		(ReCharacterClass wildcard: regexpFlags)! !
 
 !ReGroupNode methodsFor: 'as yet unclassified' stamp: 'ess 11/6/2024 12:07:17'!
 compileTo: aProgram
@@ -2141,6 +2737,24 @@ compileTo: aProgram
 		compileNode: node;
 		saveEnd: slot! !
 
+!ReGroupNode methodsFor: 'printing' stamp: 'ess 6/2/2025 10:19:37'!
+printOn: aStream
+
+	super printOn: aStream.
+	aStream
+		nextPut: $(;
+		print: slot;
+		nextPut: $,;
+		print: node;
+		nextPut: $)! !
+
+!ReGroupNode methodsFor: 'private' stamp: 'ess 11/6/2024 12:12:02'!
+setNode: aNode slot: aSlotIndex
+
+	node := aNode.
+	slot := aSlotIndex.
+	^ self! !
+
 !ReGroupNode class methodsFor: 'instance creation' stamp: 'ess 11/6/2024 12:11:35'!
 with: aNode slot: aSlotIndex
 
@@ -2148,28 +2762,9 @@ with: aNode slot: aSlotIndex
 		setNode: aNode
 		slot: aSlotIndex! !
 
-!ReNullNode methodsFor: 'as yet unclassified' stamp: 'ess 11/17/2024 08:35:34'!
-compileTo: aProgram! !
+!ReNullNode methodsFor: 'as yet unclassified' stamp: 'ess 5/30/2025 16:12:05'!
+compileTo: aProgram
 
-!ReNullNode class methodsFor: 'as yet unclassified' stamp: 'ess 11/17/2024 08:52:48'!
-new
-
-	instance ifNil: [ instance := self basicNew initialize ].
-	^ instance! !
-
-!ReRepetitionNode methodsFor: 'private' stamp: 'ess 11/7/2024 02:31:41'!
-setMin: minMatches max: maxMatches
-
-	min := minMatches.
-	max := maxMatches.
-	^ self! !
-
-!ReRepetitionNode methodsFor: 'private' stamp: 'ess 11/6/2024 09:56:21'!
-setNode: aNode min: aMin max: aMax
-
-	node := aNode.
-	min := aMin.
-	max := aMax.
 	^ self! !
 
 !ReRepetitionNode methodsFor: 'accessing' stamp: 'ess 11/6/2024 09:57:08'!
@@ -2207,33 +2802,27 @@ node: aSyntaxNode
 
 	node := aSyntaxNode! !
 
-!ReRepetitionNode methodsFor: 'initialization' stamp: 'ess 11/9/2024 09:13:19'!
-initialize
-
-	min := 0.
-	max := nil.
-	greedy := true.
-	possessive := false! !
-
-!ReRepetitionNode methodsFor: 'as yet unclassified' stamp: 'ess 11/6/2024 10:14:39'!
+!ReRepetitionNode methodsFor: 'as yet unclassified' stamp: 'ess 5/30/2025 16:13:12'!
 compileBranchTo: aProgram match: matchLabel skip: skipLabel
 
 	self isGreedy
-			ifTrue: [ aProgram
-						jump: matchLabel
-						andBranch: skipLabel ]
-			ifFalse: [ aProgram
-						jump: skipLabel
-						andBranch: matchLabel ]! !
+		ifTrue: [
+			aProgram
+				jump: matchLabel
+				andBranch: skipLabel ]
+		ifFalse: [
+			aProgram
+				jump: skipLabel
+				andBranch: matchLabel ]! !
 
-!ReRepetitionNode methodsFor: 'as yet unclassified' stamp: 'ess 11/6/2024 10:18:19'!
+!ReRepetitionNode methodsFor: 'as yet unclassified' stamp: 'ess 5/30/2025 16:13:43'!
 compileOptionalTo: aProgram
 
-	max ifNil: [ ^ self compileUnboundedTo: aProgram ].
-
+	max ifNil: [
+		^ self compileUnboundedTo: aProgram ].
 	(max - min)
-		timesRepeat:
-			[ | matchLabel skipLabel |
+		timesRepeat: [
+			| matchLabel skipLabel |
 			matchLabel := self newLabel.
 			skipLabel := self newLabel.
 			self
@@ -2245,10 +2834,11 @@ compileOptionalTo: aProgram
 				compileNode: node;
 				label: skipLabel ]! !
 
-!ReRepetitionNode methodsFor: 'as yet unclassified' stamp: 'ess 11/6/2024 10:15:07'!
+!ReRepetitionNode methodsFor: 'as yet unclassified' stamp: 'ess 5/30/2025 16:13:50'!
 compileRequiredTo: aProgram
 
-	min timesRepeat: [ node compileTo: aProgram ]! !
+	min timesRepeat: [
+		node compileTo: aProgram ]! !
 
 !ReRepetitionNode methodsFor: 'as yet unclassified' stamp: 'ess 11/6/2024 10:15:41'!
 compileTo: aProgram
@@ -2257,15 +2847,13 @@ compileTo: aProgram
 		compileRequiredTo: aProgram;
 		compileOptionalTo: aProgram! !
 
-!ReRepetitionNode methodsFor: 'as yet unclassified' stamp: 'ess 11/6/2024 10:17:46'!
+!ReRepetitionNode methodsFor: 'as yet unclassified' stamp: 'ess 5/30/2025 16:14:01'!
 compileUnboundedTo: aProgram
 
 	| repeatLabel matchLabel skipLabel |
-
 	repeatLabel := self newLabel.
 	matchLabel := self newLabel.
 	skipLabel := self newLabel.
-
 	aProgram label: repeatLabel.
 	self
 		compileBranchTo: aProgram
@@ -2276,6 +2864,29 @@ compileUnboundedTo: aProgram
 		compileNode: node;
 		jump: repeatLabel;
 		label: skipLabel! !
+
+!ReRepetitionNode methodsFor: 'initialization' stamp: 'ess 11/9/2024 09:13:19'!
+initialize
+
+	min := 0.
+	max := nil.
+	greedy := true.
+	possessive := false! !
+
+!ReRepetitionNode methodsFor: 'private' stamp: 'ess 11/7/2024 02:31:41'!
+setMin: minMatches max: maxMatches
+
+	min := minMatches.
+	max := maxMatches.
+	^ self! !
+
+!ReRepetitionNode methodsFor: 'private' stamp: 'ess 11/6/2024 09:56:21'!
+setNode: aNode min: aMin max: aMax
+
+	node := aNode.
+	min := aMin.
+	max := aMax.
+	^ self! !
 
 !ReRepetitionNode class methodsFor: 'as yet unclassified' stamp: 'ess 11/7/2024 02:31:16'!
 min: minMatches max: maxMatches
@@ -2302,6 +2913,15 @@ initialize
 
 	children := OrderedCollection new! !
 
+!ReSequenceNode methodsFor: 'printing' stamp: 'ess 6/2/2025 10:20:47'!
+printOn: aStream
+
+	super printOn: aStream.
+	aStream
+		nextPut: $(;
+		print: children;
+		nextPut: $)! !
+
 !ReSequenceNode methodsFor: 'private' stamp: 'ess 11/6/2024 06:18:54'!
 setFirstChild: firstNode secondChild: secondNode
 
@@ -2316,14 +2936,12 @@ with: firstChild with: secondChild
 		setFirstChild: firstChild
 		secondChild: secondChild! !
 
-!ReAlternationNode methodsFor: 'as yet unclassified' stamp: 'ess 11/6/2024 09:54:53'!
+!ReAlternationNode methodsFor: 'as yet unclassified' stamp: 'ess 5/30/2025 16:15:21'!
 compileTo: aProgram
 
-	| alternativesDone |
-
+	| alternativesDone thisAlternative nextAlternative|
 	alternativesDone := self newLabel.
-	children allButLast do:
-		[ :each | | thisAlternative nextAlternative |
+	children allButLast do: [ :each |
 		thisAlternative := self newLabel.
 		nextAlternative := self newLabel.
 		aProgram
@@ -2352,126 +2970,235 @@ and: aNode
 	self addChild: aNode.
 	^ self! !
 
-!ReConcatenationNode methodsFor: 'as yet unclassified' stamp: 'ess 11/6/2024 07:04:09'!
+!ReConcatenationNode methodsFor: 'as yet unclassified' stamp: 'ess 5/30/2025 16:15:36'!
 compileTo: aProgram
 
-	children do: [ :each | each compileTo: aProgram ]! !
+	children do: [ :each |
+		each compileTo: aProgram ]! !
 
-!ReProcess methodsFor: 'accessing' stamp: 'ess 11/7/2024 05:34:31'!
+!ReProcess methodsFor: 'accessing' stamp: 'ess 5/30/2025 16:49:37'!
 character
+	"Answer the current input character, may be nil."
+	"All threads in a process execute concurrently on each input character.  The current character may be nil before execution reaches the first character of the input or after execution has passed the last character of the input."
 
 	^ character! !
 
-!ReProcess methodsFor: 'accessing' stamp: 'ess 11/7/2024 05:59:02'!
+!ReProcess methodsFor: 'accessing' stamp: 'ess 5/30/2025 16:59:27'!
+inputAt: anIndex
+	"Answer the indexed character from the input."
+
+	^ input at: anIndex! !
+
+!ReProcess methodsFor: 'accessing' stamp: 'ess 5/30/2025 16:59:06'!
 instructionAt: aProgramCounter
+	"Answer the indexed instruction."
 
 	^ program instructionAt: aProgramCounter! !
 
-!ReProcess methodsFor: 'accessing' stamp: 'ess 11/9/2024 11:41:38'!
+!ReProcess methodsFor: 'accessing' stamp: 'ess 6/4/2025 05:06:27'!
+next
+
+	^ input
+		at: position + 1
+		ifAbsent: [ nil ]! !
+
+!ReProcess methodsFor: 'accessing' stamp: 'ess 5/30/2025 16:50:57'!
 position
-	"String index of current character, from 0 (before the first character) to size + 1 (after the last character)."
+	"Index of current character, from 0 (before the first character) to size + 1 (after the last character)."
+	"See also #character."
 
 	^ position! !
 
-!ReProcess methodsFor: 'accessing' stamp: 'ess 11/7/2024 08:17:03'!
+!ReProcess methodsFor: 'accessing' stamp: 'ess 6/4/2025 14:47:48'!
 ready
+	"Answer an ordered collection of all threads ready for execution."
 
 	| ready |
-	
 	ready := scheduled.
 	scheduled := OrderedCollection new.
-	ready do: [ :each | each ready ].
+	ready do: [ :each |
+		each ready ].
 	^ ready! !
 
-!ReProcess methodsFor: 'accessing' stamp: 'ess 11/7/2024 06:26:27'!
+!ReProcess methodsFor: 'accessing' stamp: 'ess 5/30/2025 16:52:18'!
 result
+	"Answer the current (longest) match result."
 
-	^ result ifNotNil: [ result on: input ]! !
+	^ result ifNotNil: [
+		result on: input ]! !
 
-!ReProcess methodsFor: 'accessing' stamp: 'ess 11/7/2024 08:32:38'!
+!ReProcess methodsFor: 'accessing' stamp: 'ess 6/4/2025 11:37:02'!
 result: aMatchResult
+	"Set the latest match result."
+	"Threads have priority and execute in priority order.  At each process step (i.e., each input character), the first thread to set a match result will be the highest-priority running thread, meaning that any other running threads will not impact the final match and can be terminated.
+	Another thread can set a new result at a later process step to yield a longer match."	
 
+	(result notNil and: [ aMatchResult size <= result size ]) ifTrue: [
+		^ self ].
 	result := aMatchResult.
 	running := OrderedCollection new! !
 
-!ReProcess methodsFor: 'accessing' stamp: 'ess 11/9/2024 11:42:12'!
+!ReProcess methodsFor: 'accessing' stamp: 'ess 5/30/2025 16:57:54'!
 size
-	"Number of characters in string being matched."
+	"The number of characters in the string being matched."
 
+	input ifNil: [ ^ 0 ].
 	^ input size! !
 
-!ReProcess methodsFor: 'accessing' stamp: 'ess 11/7/2024 06:17:06'!
+!ReProcess methodsFor: 'accessing' stamp: 'ess 5/30/2025 16:57:38'!
 slotsNeeded
+	"Answer the number of save-registers needed for each thread."
 
 	^ program slotsNeeded! !
 
-!ReProcess methodsFor: 'evaluating' stamp: 'ess 11/16/2024 09:46:42'!
-match: aString
+!ReProcess methodsFor: 'accessing' stamp: 'ess 6/4/2025 05:10:49'!
+wordClass
 
-	| stream |
-	
-	position := 0.
+	^ ReCharacterClass word! !
+
+!ReProcess methodsFor: 'evaluating' stamp: 'ess 6/4/2025 14:48:56'!
+execute: aString startingAt: startIndex endingAt: endIndex
+	"Execute the program against the inclusive substring [startIndex, endIndex] of aString, answering the longest match."
+	"Execution walks sequentially through the characters of the input, evaluating all threads against each successive character.
+	For each character:
+		- all scheduled threads are moved to running,
+		- running threads are executed in priority order,
+		- each running thread can potentially set a match result, and
+		- each running thread can schedule itself or one-or-more new threads to run on the next character.
+	If a thread does not schedule itself or a successor to run on the next character, it terminates.
+	The result will be the last successful match made after all threads have terminated."
+
+	| start end thread |
+	start := (startIndex ifNil: [ 1 ]) max: 1.
+	end := (endIndex ifNil: [ aString size ]) min: aString size.
+	input := aString.
+	position := start - 1.
+	character := nil.
 	scheduled := OrderedCollection new.
 	(ReThread process: self)
 		start.
-
-	input := aString.
-	stream := input readStream.
-	[ stream atEnd ]
-		whileFalse:
-			[ character := stream next.
-			position := stream position.
-			running := self ready.
-			running isEmpty
-				ifTrue: [ ^ nil ].
-			[ running notEmpty ]
-				whileTrue:
-					[ | thread |
-					thread := running removeFirst.
-					thread execute ] ].
-			
+	[ position < end ] whileTrue: [
+		position := position + 1.
+		character := input at: position.
+		running := self ready.
+		running isEmpty ifTrue: [
+			^ self result ].
+		[ running notEmpty ] whileTrue: [
+			thread := running removeFirst.
+			thread execute ] ].
 	^ self result! !
 
-!ReProcess methodsFor: 'evaluating' stamp: 'ess 11/21/2024 10:34:55'!
+!ReProcess methodsFor: 'evaluating' stamp: 'ess 6/4/2025 06:40:45'!
+find: aString startingAt: startIndex endingAt: endIndex
+
+	program beFind.
+	^ self
+		execute: aString
+		startingAt: startIndex
+		endingAt: endIndex! !
+
+!ReProcess methodsFor: 'evaluating' stamp: 'ess 6/4/2025 06:40:45'!
 match: aString startingAt: startIndex endingAt: endIndex
 
-	| stream |
-	
-	position := startIndex - 1.
-	scheduled := OrderedCollection new.
-	(ReThread process: self)
-		start.
+	program beMatch.
+	^ self
+		execute: aString
+		startingAt: startIndex
+		endingAt: endIndex! !
 
-	input := aString.
-	stream := input readStream.
-	stream position: startIndex - 1.
-	[ stream atEnd or: [ stream position > endIndex ] ]
-		whileFalse:
-			[ character := stream next.
-			position := stream position.
-			running := self ready.
-			running isEmpty
-				ifTrue: [ ^ self result ].
-			[ running notEmpty ]
-				whileTrue:
-					[ | thread |
-					thread := running removeFirst.
-					thread execute ] ].
-			
-	^ self result! !
+!ReProcess methodsFor: 'evaluating' stamp: 'ess 6/4/2025 12:07:52'!
+run: aThread
+	"Schedule aThread to run against the current character of the input."
 
-!ReProcess methodsFor: 'evaluating' stamp: 'ess 11/7/2024 08:01:55'!
+	(running includes: aThread) ifFalse: [
+		running addLast: aThread ]! !
+
+!ReProcess methodsFor: 'evaluating' stamp: 'ess 5/30/2025 17:06:42'!
 schedule: aThread
+	"Schedule aThread to run against the next character of the input."
 
-	(scheduled includes: aThread)
-		ifFalse: [ scheduled addLast: aThread ]! !
+	(scheduled includes: aThread) ifFalse: [
+		scheduled addLast: aThread ]! !
 
-!ReProcess methodsFor: 'evaluating' stamp: 'ess 11/7/2024 08:01:55'!
-suspend: aThread
+!ReProcess methodsFor: 'evaluating' stamp: 'ess 6/4/2025 11:09:10'!
+spawn: aThread start: programCounter
 
-	self halt.
-	(scheduled includes: aThread)
-		ifFalse: [ scheduled addLast: aThread ]! !
+	aThread fetch: programCounter.
+	self run: aThread! !
+
+!ReProcess methodsFor: 'testing' stamp: 'ess 6/4/2025 05:19:22'!
+isBeginningOfInput
+	"True before we read the first character of the input."
+
+	^ position = 0! !
+
+!ReProcess methodsFor: 'testing' stamp: 'ess 6/4/2025 12:16:12'!
+isBeginningOfLine
+	"True before we read the first character of a line."
+
+	^ (self isBeginningOfInput
+		or: [ character = Character lf ])
+		or: [ character = Character cr
+				and: [ self next ~= Character lf ] ]! !
+
+!ReProcess methodsFor: 'testing' stamp: 'ess 6/4/2025 14:40:50'!
+isBeginningOfWord
+	"True before we read the first character of a word."
+
+	| wordClass next |
+	wordClass := self wordClass.
+	next := self next.
+	^ (next notNil
+		and: [ wordClass includes: next ])
+		and: [ self isBeginningOfLine
+				or: [ character notNil
+						and: [ (wordClass includes: character) not ] ] ]! !
+
+!ReProcess methodsFor: 'testing' stamp: 'ess 6/4/2025 05:19:47'!
+isEndOfInput
+	"True after we read the last character of the input."
+
+	^ position = input size! !
+
+!ReProcess methodsFor: 'testing' stamp: 'ess 6/4/2025 12:24:18'!
+isEndOfLine
+	"True after we read the last character of a line."
+
+	| next |
+	self isEndOfInput ifTrue: [
+		^ true ].
+	next := self next.
+	next ifNil: [
+		^ true ].
+	character ifNil: [
+		^ false ].
+	^ next = Character cr
+		or: [ next = Character lf
+				and: [ character ~= Character cr ] ]! !
+
+!ReProcess methodsFor: 'testing' stamp: 'ess 6/4/2025 12:34:38'!
+isEndOfWord
+	"True after we read the last character of a word."
+
+	| wordClass |
+	wordClass := self wordClass.
+	^ (character notNil
+		and: [ wordClass includes: character ])
+		and: [ self isEndOfLine
+				or: [ (wordClass includes: self next) not ] ]! !
+
+!ReProcess methodsFor: 'testing' stamp: 'ess 6/4/2025 05:31:13'!
+isWordBoundary
+	"True if either the beginning or the end of a word."
+
+	^ self isBeginningOfWord
+		or: [ self isEndOfWord ]! !
+
+!ReProcess methodsFor: 'testing' stamp: 'ess 6/4/2025 14:40:44'!
+notWordBoundary
+	"True if neither the beginning nor the end of a word."
+
+	^ self isWordBoundary not! !
 
 !ReProcess methodsFor: 'private' stamp: 'ess 11/7/2024 05:50:30'!
 setProgram: aProgram
@@ -2479,123 +3206,196 @@ setProgram: aProgram
 	program := aProgram.
 	^ self! !
 
-!ReProcess class methodsFor: 'instance creation' stamp: 'ess 11/7/2024 06:04:39'!
+!ReProcess class methodsFor: 'instance creation' stamp: 'ess 5/30/2025 16:22:14'!
 program: aProgram
+	"Create a new process to execute the ReProgram."
 
 	^ self new
 		setProgram: aProgram! !
 
-!ReProgram methodsFor: 'as yet unclassified' stamp: 'ess 11/5/2024 20:48:47'!
-addInstruction: anInstruction
-
-	instructions add: anInstruction! !
-
-!ReProgram methodsFor: 'as yet unclassified' stamp: 'ess 11/16/2024 09:50:07'!
-anchor: anAnchor
-
-	self addInstruction:
-			(ReAnchorInstruction anchor: anAnchor)! !
-
-!ReProgram methodsFor: 'as yet unclassified' stamp: 'ess 11/16/2024 09:50:01'!
-characterClass: aCharacterClass
-
-	self addInstruction:
-			(ReCharacterInstruction class: aCharacterClass)! !
-
-!ReProgram methodsFor: 'as yet unclassified' stamp: 'ess 11/5/2024 20:47:38'!
-compileNode: aSyntaxNode
-
-	aSyntaxNode compileTo: self! !
-
-!ReProgram methodsFor: 'as yet unclassified' stamp: 'ess 11/6/2024 12:59:20'!
-initialize
-
-	slotsNeeded := 1.
-	instructions := OrderedCollection new! !
-
-!ReProgram methodsFor: 'as yet unclassified' stamp: 'ess 11/16/2024 09:50:12'!
+!ReProgram methodsFor: 'accessing' stamp: 'ess 5/30/2025 16:32:26'!
 instructionAt: anIndex
+	"Answer the indexed instruction or a no-op if anIndex is out-of-bounds."
 
 	^ instructions
 		at: anIndex
-		ifAbsent: [ ReInstruction new ]! !
+		ifAbsent: [ ReNoopInstruction new ]! !
 
-!ReProgram methodsFor: 'as yet unclassified' stamp: 'ess 11/16/2024 09:49:54'!
-jump: jumpTarget
-
-	self addInstruction:
-			(ReJumpInstruction jump: jumpTarget)! !
-
-!ReProgram methodsFor: 'as yet unclassified' stamp: 'ess 11/16/2024 09:49:47'!
-jump: priorityTarget andBranch: secondaryTarget
-
-	self addInstruction:
-			(ReBranchInstruction
-				jump: priorityTarget
-				andBranch: secondaryTarget)! !
-
-!ReProgram methodsFor: 'as yet unclassified' stamp: 'ess 11/6/2024 07:02:18'!
-label: aLabel
-
-	aLabel counter: instructions size + 1! !
-
-!ReProgram methodsFor: 'as yet unclassified' stamp: 'ess 11/16/2024 09:49:40'!
-match
-
-	self addInstruction:
-			(ReMatchInstruction new)! !
-
-!ReProgram methodsFor: 'as yet unclassified' stamp: 'ess 11/16/2024 09:49:32'!
-saveEnd: aSlotIndex
-
-	self addInstruction:
-			(ReSaveInstruction end: aSlotIndex)
-				! !
-
-!ReProgram methodsFor: 'as yet unclassified' stamp: 'ess 11/16/2024 09:49:32'!
-saveStart: aSlotIndex
-
-	self addInstruction:
-			(ReSaveInstruction start: aSlotIndex)
-				! !
-
-!ReProgram methodsFor: 'as yet unclassified' stamp: 'ess 11/6/2024 12:59:41'!
+!ReProgram methodsFor: 'accessing' stamp: 'ess 5/30/2025 16:30:40'!
 slotsNeeded
+	"Answer the number of registers needed to execute the program."
 
 	^ slotsNeeded! !
 
-!ReProgram methodsFor: 'as yet unclassified' stamp: 'ess 11/6/2024 12:59:34'!
+!ReProgram methodsFor: 'accessing' stamp: 'ess 5/30/2025 16:30:54'!
 slotsNeeded: totalSlots
+	"Set the number of registers needed to execute the program."
 
 	slotsNeeded := totalSlots! !
 
-!ReRegister methodsFor: 'as yet unclassified' stamp: 'ess 12/3/2024 09:02:36'!
+!ReProgram methodsFor: 'as yet unclassified' stamp: 'ess 6/3/2025 15:14:26'!
+beFind
+
+	(instructions at: 1)
+		target: findLabel! !
+
+!ReProgram methodsFor: 'as yet unclassified' stamp: 'ess 6/3/2025 15:14:18'!
+beMatch
+
+	(instructions at: 1)
+		target: matchLabel! !
+
+!ReProgram methodsFor: 'as yet unclassified' stamp: 'ess 6/4/2025 10:19:48'!
+printOn: aStream
+
+	super printOn: aStream.
+	aStream
+		nextPut: $(;
+		print: instructions;
+		nextPut: $)! !
+
+!ReProgram methodsFor: 'compiling' stamp: 'ess 5/30/2025 16:33:08'!
+addInstruction: anInstruction
+	"Append an instruction to the program being compiled."
+
+	instructions addLast: anInstruction! !
+
+!ReProgram methodsFor: 'compiling' stamp: 'ess 5/30/2025 16:24:55'!
+anchor: anAnchor
+	"Compile an anchor instruction to the program."
+
+	self addInstruction:
+		(ReAnchorInstruction anchor: anAnchor)! !
+
+!ReProgram methodsFor: 'compiling' stamp: 'ess 6/2/2025 07:52:46'!
+characterClass: aCharacterClass
+	"Compile a character class (matching) instruction to the program."
+
+	self addInstruction:
+		(ReCharacterInstruction characterClass: aCharacterClass)! !
+
+!ReProgram methodsFor: 'compiling' stamp: 'ess 5/30/2025 16:29:44'!
+compileNode: aSyntaxNode
+	"Compile a syntax node as a sequence of instructions."
+
+	aSyntaxNode compileTo: self! !
+
+!ReProgram methodsFor: 'compiling' stamp: 'ess 6/3/2025 15:13:43'!
+compileProgram: aSyntaxNode
+	"We prefix the regular-expression program with '.*?' (match anything, non-greedy) to facilitate 'find' operations.  However, because we're not always executing 'find', we prefix that with a jump to the main body of the match.
+	Normal execution will perform the match operation.  Change the destination of the first instruction to perform a search."
+
+	| scanLabel wildcard |
+	findLabel := ReLabel new.
+	matchLabel := ReLabel new.
+	scanLabel := ReLabel new.
+	wildcard := ReCharacterClass
+		wildcard: ReFlags default.  "Match any character, including LF."
+	self jump: matchLabel.
+	self label: findLabel.
+	self
+		jump: matchLabel
+		andBranch: scanLabel.
+	self label: scanLabel.
+	self characterClass: wildcard.
+	self jump: findLabel.
+	self label: matchLabel.
+	self compileNode: aSyntaxNode! !
+
+!ReProgram methodsFor: 'compiling' stamp: 'ess 5/30/2025 16:26:06'!
+jump: jumpTarget
+	"Compile a jump instruction to the program."
+
+	self addInstruction:
+		(ReJumpInstruction jump: jumpTarget)! !
+
+!ReProgram methodsFor: 'compiling' stamp: 'ess 5/30/2025 16:26:32'!
+jump: priorityTarget andBranch: secondaryTarget
+	"Compile a branch instruction to the program."
+
+	self addInstruction:
+		(ReBranchInstruction
+			jump: priorityTarget
+			andBranch: secondaryTarget)! !
+
+!ReProgram methodsFor: 'compiling' stamp: 'ess 5/30/2025 16:36:33'!
+label: aLabel
+	"_Compile_ a label instruction to the program."
+	"As labels do not execute, we just update the target of the label to point to the next compiled instruction."
+
+	aLabel counter: instructions size + 1! !
+
+!ReProgram methodsFor: 'compiling' stamp: 'ess 5/30/2025 16:33:47'!
+match
+	"Compile a match (i.e., success) instruction to the program."
+
+	self addInstruction: ReMatchInstruction new! !
+
+!ReProgram methodsFor: 'compiling' stamp: 'ess 5/30/2025 16:27:32'!
+saveEnd: aSlotIndex
+	"Compile a save instruction to the program."
+
+	self addInstruction:
+		(ReSaveInstruction end: aSlotIndex)! !
+
+!ReProgram methodsFor: 'compiling' stamp: 'ess 5/30/2025 16:27:39'!
+saveStart: aSlotIndex
+	"Compile a save instruction to the program."
+
+	self addInstruction:
+		(ReSaveInstruction start: aSlotIndex)! !
+
+!ReProgram methodsFor: 'initialization' stamp: 'ess 5/30/2025 16:20:42'!
+initialize
+
+	super initialize.
+	slotsNeeded := 1.
+	instructions := OrderedCollection new! !
+
+!ReRegister methodsFor: 'accessing' stamp: 'ess 5/30/2025 16:38:44'!
 end
+	"Answer the index of the last character (inclusive) stored in this register."
 
-	^end! !
+	^ end! !
 
-!ReRegister methodsFor: 'as yet unclassified' stamp: 'ess 11/6/2024 15:12:49'!
+!ReRegister methodsFor: 'accessing' stamp: 'ess 5/30/2025 16:38:54'!
 end: matchEndPosition
+	"Set the index of the last character (inclusive) stored in this register."
 
 	end := matchEndPosition! !
 
-!ReRegister methodsFor: 'as yet unclassified' stamp: 'ess 12/3/2024 09:03:25'!
-on: aString
+!ReRegister methodsFor: 'accessing' stamp: 'ess 5/30/2025 16:38:16'!
+start
+	"Answer the index of the first character stored in this register."
 
-	(start isNil or: [end isNil]) ifTrue: [^nil].
-	^aString
+	^ start! !
+
+!ReRegister methodsFor: 'accessing' stamp: 'ess 5/30/2025 16:38:26'!
+start: matchStartPosition
+	"Set the index of the first character stored in this register."
+
+	start := matchStartPosition! !
+
+!ReRegister methodsFor: 'evaluating' stamp: 'ess 5/31/2025 02:25:13'!
+on: aString
+	"Answer the substring saved in this register."
+
+	(start isNil or: [ end isNil ]) ifTrue: [
+		^ nil ].
+	^ aString
 		copyFrom: start
 		to: end! !
 
-!ReRegister methodsFor: 'as yet unclassified' stamp: 'ess 12/3/2024 09:02:52'!
-start
+!ReRegister methodsFor: 'as yet unclassified' stamp: 'ess 6/4/2025 10:15:23'!
+printOn: aStream
 
-	^start! !
-
-!ReRegister methodsFor: 'as yet unclassified' stamp: 'ess 11/6/2024 15:12:40'!
-start: matchStartPosition
-
-	start := matchStartPosition! !
+	super printOn: aStream.
+	aStream
+		nextPut: $(;
+		print: start;
+		nextPut: $,;
+		print: end;
+		nextPut: $)! !
 
 !ReThread methodsFor: 'accessing' stamp: 'ess 11/7/2024 05:08:37'!
 character
@@ -2607,13 +3407,29 @@ counter
 
 	^ counter! !
 
-!ReThread methodsFor: 'accessing' stamp: 'ess 11/9/2024 18:57:06'!
+!ReThread methodsFor: 'accessing' stamp: 'ess 6/4/2025 14:32:31'!
+fetch
+
+	self instruction waitsForNextCharacter ifTrue: [
+		process schedule: self.
+		^ self ].
+	(executed includes: counter) ifTrue: [
+		^ self ].
+	executed add: counter.
+	self execute! !
+
+!ReThread methodsFor: 'accessing' stamp: 'ess 6/4/2025 14:30:35'!
 fetch: aProgramCounter
 
 	counter := aProgramCounter.
 	self fetch! !
 
-!ReThread methodsFor: 'accessing' stamp: 'ess 11/7/2024 05:58:26'!
+!ReThread methodsFor: 'accessing' stamp: 'ess 5/29/2025 09:54:31'!
+inputAt: anIndex
+
+	^ process inputAt: anIndex! !
+
+!ReThread methodsFor: 'accessing' stamp: 'ess 6/4/2025 14:28:33'!
 instruction
 
 	^ process instructionAt: counter! !
@@ -2624,57 +3440,55 @@ position
 
 	^ process position! !
 
+!ReThread methodsFor: 'accessing' stamp: 'ess 6/4/2025 12:07:21'!
+shouldSuspend
+
+	^ shouldSuspend! !
+
 !ReThread methodsFor: 'accessing' stamp: 'ess 11/9/2024 11:43:11'!
 size
 	"Total number of characters in input."
 
 	^ process size! !
 
-!ReThread methodsFor: 'comparing' stamp: 'ess 11/6/2024 13:10:06'!
+!ReThread methodsFor: 'comparing' stamp: 'ess 6/4/2025 12:07:12'!
 = aThread
 
 	self == aThread ifTrue: [ ^ true ].
-	^ (aThread isKindOf: self class)
-			and: [ aThread counter = counter ]! !
+	self species == aThread species ifFalse: [ ^ false ].
+	^ counter = aThread counter
+		and: [ shouldSuspend = aThread shouldSuspend ]! !
 
-!ReThread methodsFor: 'comparing' stamp: 'ess 11/6/2024 13:10:15'!
+!ReThread methodsFor: 'comparing' stamp: 'ess 6/4/2025 12:07:32'!
 hash
 
-	^ self class hash
-			bitXor: counter hash! !
+	^ (self species hash
+		bitXor: counter hash)
+		bitXor: shouldSuspend hash! !
 
-!ReThread methodsFor: 'copying' stamp: 'ess 11/7/2024 03:18:28'!
+!ReThread methodsFor: 'copying' stamp: 'ess 6/4/2025 10:59:20'!
 postCopy
 
 	result := result copy.
 	^ self! !
 
-!ReThread methodsFor: 'evaluating' stamp: 'ess 11/9/2024 19:02:30'!
+!ReThread methodsFor: 'evaluating' stamp: 'ess 5/29/2025 09:51:50'!
 execute
-	"Carry-out one instruction.
+	"Carry-out one instruction."
+	"Whether or not the thread continues to execute after this is for the instruction to decide.  If the instruction choses not to continue, this thread will silently stop."
 
-	Whether or not the thread continues to execute after this is for the instruction to decide.  If the instruction choses not to continue, this thread will silently stop."
-
-	self instruction execute: self! !
-
-!ReThread methodsFor: 'evaluating' stamp: 'ess 11/9/2024 18:52:33'!
-fetch
-	"Look at the next instruction.  If it does not require a character from the input, go ahead and execute it directly.  Otherwise, schedule it to run in the next cycle."
-
-	self instruction waitsForNextCharacter
-			ifFalse: [ self run ]
-			ifTrue: [ self schedule ]! !
+	self instruction
+		execute: self! !
 
 !ReThread methodsFor: 'evaluating' stamp: 'ess 11/7/2024 08:00:08'!
 jump: aTarget
 
 	self fetch: aTarget counter! !
 
-!ReThread methodsFor: 'evaluating' stamp: 'ess 11/7/2024 05:04:03'!
+!ReThread methodsFor: 'evaluating' stamp: 'ess 5/29/2025 09:52:26'!
 jump: priorityTarget andBranch: secondaryTarget
 
 	| branch |
-
 	branch := self copy.
 	self jump: priorityTarget.
 	branch jump: secondaryTarget! !
@@ -2690,139 +3504,239 @@ ready
 
 	executed := Set new! !
 
-!ReThread methodsFor: 'evaluating' stamp: 'ess 11/7/2024 08:16:22'!
-run
-
-	(executed includes: counter)
-		ifTrue: [ ^ self ].
-
-	executed add: counter.
-	self execute! !
-
-!ReThread methodsFor: 'evaluating' stamp: 'ess 11/21/2024 10:38:12'!
+!ReThread methodsFor: 'evaluating' stamp: 'ess 6/4/2025 06:38:25'!
 saveEnd: slotIndex
+	"Save the position of the current (last read) character."
+	"See discussion at #saveStart:"
 
 	result
 		endSlot: slotIndex
 		at: process position! !
 
-!ReThread methodsFor: 'evaluating' stamp: 'ess 11/7/2024 06:01:50'!
+!ReThread methodsFor: 'evaluating' stamp: 'ess 6/4/2025 10:35:43'!
 saveStart: slotIndex
+	"Save the position of the _next_ character."
+	"In a compiled group expression such as '(abc)', #saveStart: executes before we read the first character of the group, and so needs to record the next position.  Similarly, #saveEnd: executes after we read the last character, so it records the (then) current position.
+	An empty group will trigger both #saveStart: and #saveEnd: without advancing the position, yielding `start = end + 1`."
 
 	result
 		startSlot: slotIndex
 		at: process position + 1! !
 
-!ReThread methodsFor: 'evaluating' stamp: 'ess 11/7/2024 08:01:07'!
-schedule
+!ReThread methodsFor: 'evaluating' stamp: 'ess 6/4/2025 14:30:30'!
+start
 
-	process schedule: self! !
+	self
+		ready;
+		fetch: 1! !
 
 !ReThread methodsFor: 'evaluating' stamp: 'ess 11/7/2024 07:59:55'!
 step
 
 	self fetch: counter + 1! !
 
-!ReThread methodsFor: 'private' stamp: 'ess 11/16/2024 09:34:36'!
+!ReThread methodsFor: 'testing' stamp: 'ess 6/4/2025 05:27:54'!
+isBeginningOfInput
+	"True before we read the first character of the input."
+
+	^ process isBeginningOfInput! !
+
+!ReThread methodsFor: 'testing' stamp: 'ess 6/4/2025 05:28:09'!
+isBeginningOfLine
+	"True before we read the first character of a line."
+
+	^ process isBeginningOfLine! !
+
+!ReThread methodsFor: 'testing' stamp: 'ess 6/4/2025 05:28:19'!
+isBeginningOfWord
+	"True before we read the first character of a word."
+
+	^ process isBeginningOfWord! !
+
+!ReThread methodsFor: 'testing' stamp: 'ess 6/4/2025 05:28:30'!
+isEndOfInput
+	"True after we read the last character of the input."
+
+	^ process isEndOfInput! !
+
+!ReThread methodsFor: 'testing' stamp: 'ess 6/4/2025 05:28:40'!
+isEndOfLine
+	"True after we read the last character of a line."
+
+	^ process isEndOfLine! !
+
+!ReThread methodsFor: 'testing' stamp: 'ess 6/4/2025 05:28:49'!
+isEndOfWord
+	"True after we read the last character of a word."
+
+	^ process isEndOfWord! !
+
+!ReThread methodsFor: 'testing' stamp: 'ess 6/4/2025 05:31:21'!
+isWordBoundary
+	"True if either the beginning or the end of a word."
+
+	^ process isWordBoundary
+! !
+
+!ReThread methodsFor: 'testing' stamp: 'ess 6/4/2025 05:31:03'!
+notWordBoundary
+	"True if neither the beginning nor the end of a word."
+
+	^ process notWordBoundary! !
+
+!ReThread methodsFor: 'private' stamp: 'ess 6/4/2025 11:55:37'!
 setProcess: aProcess
 
 	process := aProcess.
-	counter := 1.
-	result := ReMatch slotsNeeded: process slotsNeeded.
+	executed := Set new.
+	result := RegexpMatch
+		slotsNeeded: process slotsNeeded.
 	^ self! !
 
-!ReThread methodsFor: 'as yet unclassified' stamp: 'ess 11/7/2024 08:19:22'!
-start
+!ReThread methodsFor: 'as yet unclassified' stamp: 'ess 6/4/2025 10:23:25'!
+printOn: aStream
 
-	self ready.
-	self fetch: 1! !
+	super printOn: aStream.
+	aStream
+		nextPut: $(;
+		print: counter;
+		nextPut: $,;
+		print: instruction;
+		nextPut: $)! !
 
-!ReThread class methodsFor: 'instance creation' stamp: 'ess 11/7/2024 05:54:33'!
+!ReThread class methodsFor: 'instance creation' stamp: 'ess 6/4/2025 08:56:52'!
 process: aProcess
+	"Create a new thread of execution in the process."
 
 	^ self new
 		setProcess: aProcess! !
 
-!ReMatch methodsFor: 'accessing' stamp: 'ess 12/3/2024 09:05:20'!
+!RegexpMatch methodsFor: 'accessing' stamp: 'ess 5/31/2025 07:09:56'!
 endOfGroup: anIndex
 
-	^ (self registerAt: anIndex) end! !
+	^ (self registerAt: anIndex)
+		end! !
 
-!ReMatch methodsFor: 'accessing' stamp: 'ess 11/16/2024 09:42:18'!
+!RegexpMatch methodsFor: 'accessing' stamp: 'ess 11/16/2024 09:42:18'!
 endingAt
 
 	^ endingAt! !
 
-!ReMatch methodsFor: 'accessing' stamp: 'ess 11/16/2024 09:35:12'!
-expand: aTemplateString! !
-
-!ReMatch methodsFor: 'accessing' stamp: 'ess 12/3/2024 09:05:20'!
+!RegexpMatch methodsFor: 'accessing' stamp: 'ess 5/31/2025 07:34:44'!
 groupAt: anIndex
 
-	string ifNil: [^nil].
-	^(self registerAt: anIndex) on: string! !
+	string ifNil: [ ^ nil ].
+	^ (self registerAt: anIndex)
+		on: string! !
 
-!ReMatch methodsFor: 'accessing' stamp: 'ess 11/16/2024 09:35:29'!
+!RegexpMatch methodsFor: 'accessing' stamp: 'ess 11/16/2024 09:35:29'!
 groups! !
 
-!ReMatch methodsFor: 'accessing' stamp: 'ess 11/16/2024 09:38:34'!
+!RegexpMatch methodsFor: 'accessing' stamp: 'ess 11/16/2024 09:38:34'!
 lastGroup! !
 
-!ReMatch methodsFor: 'accessing' stamp: 'ess 11/16/2024 09:38:32'!
-lastIndex! !
+!RegexpMatch methodsFor: 'accessing' stamp: 'ess 6/2/2025 09:49:36'!
+lastIndex
 
-!ReMatch methodsFor: 'accessing' stamp: 'ess 11/16/2024 09:35:33'!
+	^ registers
+		ifNotNil: [ registers size ]
+		ifNil: [ 0 ]! !
+
+!RegexpMatch methodsFor: 'accessing' stamp: 'ess 11/16/2024 09:35:33'!
 namedGroups! !
 
-!ReMatch methodsFor: 'accessing' stamp: 'ess 11/16/2024 09:41:08'!
+!RegexpMatch methodsFor: 'accessing' stamp: 'ess 11/16/2024 09:41:08'!
 pattern
 
 	^ pattern! !
 
-!ReMatch methodsFor: 'accessing' stamp: 'ess 11/16/2024 09:41:44'!
+!RegexpMatch methodsFor: 'accessing' stamp: 'ess 11/16/2024 09:41:44'!
 pattern: aCompiledPattern
 
 	pattern := aCompiledPattern! !
 
-!ReMatch methodsFor: 'accessing' stamp: 'ess 11/16/2024 09:37:50'!
-spanOfGroup: anIndex
-! !
+!RegexpMatch methodsFor: 'accessing' stamp: 'ess 6/3/2025 18:02:47'!
+size
 
-!ReMatch methodsFor: 'accessing' stamp: 'ess 12/3/2024 09:05:20'!
+	^ (self endOfGroup: 0) - (self startOfGroup: 0) + 1! !
+
+!RegexpMatch methodsFor: 'accessing' stamp: 'ess 5/31/2025 07:10:32'!
+spanOfGroup: anIndex
+
+	^ Array
+		with: (self startOfGroup: anIndex)
+		with: (self endOfGroup: anIndex)! !
+
+!RegexpMatch methodsFor: 'accessing' stamp: 'ess 5/31/2025 07:10:07'!
 startOfGroup: anIndex
 
-	^ (self registerAt: anIndex) start! !
+	^ (self registerAt: anIndex)
+		start! !
 
-!ReMatch methodsFor: 'accessing' stamp: 'ess 11/16/2024 09:42:24'!
+!RegexpMatch methodsFor: 'accessing' stamp: 'ess 11/16/2024 09:42:24'!
 startingAt
 
 	^ startingAt! !
 
-!ReMatch methodsFor: 'accessing' stamp: 'ess 11/16/2024 09:40:29'!
+!RegexpMatch methodsFor: 'accessing' stamp: 'ess 11/16/2024 09:40:29'!
 string
 
 	^ string! !
 
-!ReMatch methodsFor: 'copying' stamp: 'ess 11/16/2024 09:45:35'!
+!RegexpMatch methodsFor: 'copying' stamp: 'ess 5/31/2025 07:02:56'!
 postCopy
 
 	register0 := register0 ifNotNil: [ register0 copy ].
-	registers := registers ifNotNil:
-				[ registers collect: [ :each | each copy ] ].
+	registers := registers ifNotNil: [
+		registers collect: [ :each | each copy ] ].
 	^ self! !
 
-!ReMatch methodsFor: 'private' stamp: 'ess 12/3/2024 09:05:20'!
+!RegexpMatch methodsFor: 'evaluating' stamp: 'ess 6/2/2025 09:56:58'!
+expand: aTemplateString
+
+	| last escape index group |
+	last := self lastIndex.
+	escape := false.
+	^ String streamContents: [ :stream |
+		aTemplateString do: [ :each |
+			escape
+				ifTrue: [
+					escape := false.
+					($1 <= each and: [ each <= $9 ])
+						ifTrue: [
+							index := each digitValue.
+							group := (index between: 1 and: last)
+								ifTrue: [ self groupAt: index ]
+								ifFalse: [ nil ].
+							stream nextPutAll: (group ifNil: [ '' ]) ]
+						ifFalse: [
+							stream nextPut: each ] ]
+				ifFalse: [
+					each = $\
+						ifTrue: [
+							escape := true ]
+						ifFalse: [
+							each = $&
+								ifTrue: [
+									stream nextPutAll: (self groupAt: 0) ]
+								ifFalse: [
+									stream nextPut: each ] ] ] ].
+		escape ifTrue: [
+			stream nextPut: $\ ] ]
+! !
+
+!RegexpMatch methodsFor: 'private' stamp: 'ess 12/3/2024 09:05:20'!
 endSlot: slotIndex at: matchPosition
 
 	(self registerAt: slotIndex)
 		end: matchPosition! !
 
-!ReMatch methodsFor: 'private' stamp: 'ess 11/16/2024 09:40:21'!
+!RegexpMatch methodsFor: 'private' stamp: 'ess 11/16/2024 09:40:21'!
 on: aString
 
 	string := aString! !
 
-!ReMatch methodsFor: 'private' stamp: 'ess 12/3/2024 09:05:20'!
+!RegexpMatch methodsFor: 'private' stamp: 'ess 12/3/2024 09:05:20'!
 registerAt: anIndex
 
 	^anIndex isZero
@@ -2832,380 +3746,1264 @@ registerAt: anIndex
 						at: anIndex
 						put: ReRegister new]]! !
 
-!ReMatch methodsFor: 'private' stamp: 'ess 11/16/2024 09:45:15'!
+!RegexpMatch methodsFor: 'private' stamp: 'ess 11/16/2024 09:45:15'!
 setSlots: totalSlots
 
 	totalSlots > 1
 		ifTrue: [ registers := Array new: totalSlots - 1 ]! !
 
-!ReMatch methodsFor: 'private' stamp: 'ess 12/3/2024 09:05:20'!
+!RegexpMatch methodsFor: 'private' stamp: 'ess 6/4/2025 10:42:54'!
 startSlot: slotIndex at: matchPosition
 
 	(self registerAt: slotIndex)
 		start: matchPosition! !
 
-!ReMatch methodsFor: 'private' stamp: 'ess 11/16/2024 09:41:21'!
+!RegexpMatch methodsFor: 'private' stamp: 'ess 11/16/2024 09:41:21'!
 string: aString
 
 	string := aString! !
 
-!ReMatch class methodsFor: 'instance creation' stamp: 'ess 11/6/2024 13:22:27'!
+!RegexpMatch methodsFor: 'as yet unclassified' stamp: 'ess 6/4/2025 10:16:21'!
+printOn: aStream
+
+	super printOn: aStream.
+	aStream
+		nextPut: $(;
+		print: register0;
+		nextPut: $,;
+		print: registers;
+		nextPut: $)! !
+
+!RegexpMatch class methodsFor: 'instance creation' stamp: 'ess 11/6/2024 13:22:27'!
 slotsNeeded: totalSlots
 
 	^ self new
 		setSlots: totalSlots! !
 
-!RePattern methodsFor: 'evaluating' stamp: 'ess 12/3/2024 09:15:48'!
-allMatches: aCharacterSequence startingAt: startIndex endingAt: endIndex
-	"Answer a collection of all non-overlapping matches from aCharacterSequence, ordered from left-to-right."
+!RegexpPattern methodsFor: 'accessing' stamp: 'ess 5/31/2025 07:52:40'!
+slotsNeeded
 
-	^self
-		allMatches: aCharacterSequence
+	^ program slotsNeeded! !
+
+!RegexpPattern methodsFor: 'converting' stamp: 'ess 5/31/2025 07:15:37'!
+asRegex
+
+	^ self! !
+
+!RegexpPattern methodsFor: 'evaluating' stamp: 'ess 5/31/2025 05:14:39'!
+allMatches: aString startingAt: startIndex endingAt: endIndex
+	"Answer an array of all non-overlapping matches from aString, from left-to-right."
+
+	^ self
+		allMatches: aString
 		startingAt: startIndex
 		endingAt: endIndex
-		collect: [:each | each]! !
+		collect: [ :each | each ]! !
 
-!RePattern methodsFor: 'evaluating' stamp: 'ess 12/3/2024 09:35:03'!
-allMatches: aCharacterSequence startingAt: startIndex endingAt: endIndex asStringsCollect: aUnaryBlock
-	"Answer a collection of the results of evaluating aUnaryBlock on all non-overlapping substring matches from aCharacterSequence."
+!RegexpPattern methodsFor: 'evaluating' stamp: 'ess 5/31/2025 05:18:31'!
+allMatches: aString startingAt: startIndex endingAt: endIndex asStringsCollect: aUnaryBlock
+	"Answer an array of the results of evaluating aUnaryBlock on all non-overlapping substring matches from aString."
 
-	| result |
-	result := OrderedCollection new.
+	^ Array streamContents: [ :stream |
+		self
+			allMatches: aString
+			startingAt: startIndex
+			endingAt: endIndex
+			asStringsDo: [ :each |
+				stream
+					nextPut: (aUnaryBlock value: each) ] ]! !
+
+!RegexpPattern methodsFor: 'evaluating' stamp: 'ess 5/31/2025 05:19:04'!
+allMatches: aString startingAt: startIndex endingAt: endIndex asStringsDo: aUnaryBlock
+	"Evaluate aUnaryBlock with each consecutive, non-overlapping substring match from aString."
+
 	self
-		allMatches: aCharacterSequence
+		allMatches: aString
 		startingAt: startIndex
 		endingAt: endIndex
-		asStringsDo: [:each | result add: (aUnaryBlock value: each)].
-	^result! !
+		do: [ :each |
+			aUnaryBlock
+				value: (each groupAt: 0) ]! !
 
-!RePattern methodsFor: 'evaluating' stamp: 'ess 12/3/2024 09:17:11'!
-allMatches: aCharacterSequence startingAt: startIndex endingAt: endIndex asStringsDo: aUnaryBlock
-	"Evaluate aUnaryBlock with each consecutive, non-overlapping substring matches from aCharacterSequence."
+!RegexpPattern methodsFor: 'evaluating' stamp: 'ess 5/31/2025 05:14:59'!
+allMatches: aString startingAt: startIndex endingAt: endIndex collect: aUnaryBlock
+	"Answer an array of the results of evaluating aUnaryBlock on all non-overlapping matches from aString."
 
-	self
-		allMatches: aCharacterSequence
-		startingAt: startIndex
-		endingAt: endIndex
-		do: [:each | aUnaryBlock value: (each groupAt: 0)]! !
+	^ Array streamContents: [ :stream |
+		self
+			allMatches: aString
+			startingAt: startIndex
+			endingAt: endIndex
+			do: [ :each |
+				stream
+					nextPut: (aUnaryBlock value: each) ] ]! !
 
-!RePattern methodsFor: 'evaluating' stamp: 'ess 12/3/2024 09:13:45'!
-allMatches: aCharacterSequence startingAt: startIndex endingAt: endIndex collect: aUnaryBlock
-	"Answer a collection of the results of evaluating aUnaryBlock on all non-overlapping matches from aCharacterSequence."
+!RegexpPattern methodsFor: 'evaluating' stamp: 'ess 6/4/2025 14:51:37'!
+allMatches: aString startingAt: startIndex endingAt: endIndex do: aUnaryBlock
+	"Evaluate aUnaryBlock with each consecutive, non-overlapping match from aString."
 
-	| result |
-	result := OrderedCollection new.
-	self
-		allMatches: aCharacterSequence
-		startingAt: startIndex
-		endingAt: endIndex
-		do: [:each | result add: (aUnaryBlock value: each)].
-	^result! !
-
-!RePattern methodsFor: 'evaluating' stamp: 'ess 12/3/2024 09:13:11'!
-allMatches: aCharacterSequence startingAt: startIndex endingAt: endIndex do: aUnaryBlock
-	"Evaluate aUnaryBlock with each consecutive, non-overlapping match from aCharacterSequence."
-
-	| nextStart |
-	nextStart := startIndex.
-	[nextStart <= endIndex] whileTrue:
-		[| match |
+	| start end nextStart match |
+	start := (startIndex ifNil: [ 1 ]) max: 1.
+	end := (endIndex ifNil: [ aString size ]) min: aString size.
+	nextStart := start.
+	[ nextStart <= end ] whileTrue: [
 		match := self
-			findIn: aCharacterSequence
+			findIn: aString
 			startingAt: nextStart
-			endingAt: endIndex.
-		match
-			ifNil: [nextStart := endIndex + 1]
-			ifNotNil:
-				[aUnaryBlock value: match.
-				nextStart := (match endOfGroup: 0) + 1]]! !
+			endingAt: end.
+		nextStart := match
+			ifNil: [ end + 1 ]
+			ifNotNil: [
+				aUnaryBlock value: match.
+				((match endOfGroup: 0) max: nextStart) + 1 ] ]! !
 
-!RePattern methodsFor: 'evaluating' stamp: 'ess 12/3/2024 09:16:33'!
-allMatchesAsStrings: aCharacterSequence startingAt: startIndex endingAt: endIndex
-	"Answer a collection of all non-overlapping substring matches from aCharacterSequence, ordered from left-to-right."
+!RegexpPattern methodsFor: 'evaluating' stamp: 'ess 5/31/2025 05:15:59'!
+allMatchesAsStrings: aString startingAt: startIndex endingAt: endIndex
+	"Answer an array of all non-overlapping substring matches from aString, from left-to-right."
 
-	^self
-		allMatches: aCharacterSequence
+	^ self
+		allMatches: aString
 		startingAt: startIndex
 		endingAt: endIndex
-		asStringsCollect: [:each | each]! !
+		asStringsCollect: [ :each | each ]! !
 
-!RePattern methodsFor: 'evaluating' stamp: 'ess 11/21/2024 10:10:38'!
-findIn: aCharacterSequence startingAt: startIndex endingAt: endIndex
+!RegexpPattern methodsFor: 'evaluating' stamp: 'ess 5/31/2025 05:33:06'!
+findAsStringIn: aString startingAt: startIndex endingAt: endIndex
+	"Search for a match of pattern in aString, answering the matching substring or nil if no match can be found."
 
-	startIndex
-		to: endIndex
-		do: [ :each | | match |
-			match := self
-						match: aCharacterSequence
-						startingAt: each
-						endingAt: endIndex.
-			match ifNotNil: [ ^ match ] ].
-	^ nil! !
-
-!RePattern methodsFor: 'evaluating' stamp: 'ess 11/16/2024 08:27:53'!
-fullMatch: aCharacterSequence startingAt: startIndex endingAt: endIndex
-
-	^ self
-		match: aCharacterSequence
+	| match |
+	match := self
+		findIn: aString
 		startingAt: startIndex
-		endingAt: endIndex! !
+		endingAt: endIndex.
+	^ match ifNotNil: [
+		match groupAt: 0 ]! !
 
-!RePattern methodsFor: 'evaluating' stamp: 'ess 11/16/2024 08:50:10'!
-fullMatchAsString: aCharacterSequence startingAt: startIndex endingAt: endIndex
-
-	^ self
-		fullMatch: aCharacterSequence
-		startingAt: startIndex
-		endingAt: endIndex! !
-
-!RePattern methodsFor: 'evaluating' stamp: 'ess 11/21/2024 10:05:12'!
-match: aCharacterSequence startingAt: startIndex endingAt: endIndex
+!RegexpPattern methodsFor: 'evaluating' stamp: 'ess 6/3/2025 16:21:34'!
+findIn: aString startingAt: startIndex endingAt: endIndex
+	"Search for a match of pattern in aString, answering nil if no match can be found."
 
 	^ (ReProcess program: program)
-		match: aCharacterSequence
+		find: aString
 		startingAt: startIndex
 		endingAt: endIndex! !
 
-!RePattern methodsFor: 'evaluating' stamp: 'ess 11/16/2024 08:53:40'!
-matchAsString: aCharacterSequence startingAt: startIndex endingAt: endIndex
+!RegexpPattern methodsFor: 'evaluating' stamp: 'ess 5/31/2025 05:29:07'!
+fullMatch: aString startingAt: startIndex endingAt: endIndex
+	"Answer a match object if pattern matches all of aString, otherwise nil."
+
+	| match end isFullMatch |
+	match := self
+		match: aString
+		startingAt: startIndex
+		endingAt: endIndex.
+	match ifNil: [
+		^ nil ].
+	end := (endIndex ifNil: [ aString size ]) min: aString size.
+	isFullMatch := (match endOfGroup: 0) = end.
+	^ isFullMatch
+		ifTrue: [ match ]
+		ifFalse: [ nil ]! !
+
+!RegexpPattern methodsFor: 'evaluating' stamp: 'ess 5/31/2025 05:30:52'!
+fullMatchAsString: aString startingAt: startIndex endingAt: endIndex
+	"Answer the matching string if pattern matches all of aString, otherwise nil."
+
+	| match |
+	match := self
+		fullMatch: aString
+		startingAt: startIndex
+		endingAt: endIndex.
+	^ match ifNotNil: [
+		match groupAt: 0 ]! !
+
+!RegexpPattern methodsFor: 'evaluating' stamp: 'ess 5/31/2025 05:27:28'!
+match: aString startingAt: startIndex endingAt: endIndex
+	"Try to match pattern at the start of aString, answering the match or nil."
+
+	^ (ReProcess program: program)
+		match: aString
+		startingAt: startIndex
+		endingAt: endIndex! !
+
+!RegexpPattern methodsFor: 'evaluating' stamp: 'ess 5/31/2025 05:27:01'!
+matchAsString: aString startingAt: startIndex endingAt: endIndex
+	"Try to match pattern at the start of aString, answering the matching prefix or nil."
+
+	| match |
+	match := self
+		match: aString
+		startingAt: startIndex
+		endingAt: endIndex.
+	^ match ifNotNil: [
+		match groupAt: 0 ]! !
+
+!RegexpPattern methodsFor: 'evaluating' stamp: 'ess 6/3/2025 17:44:27'!
+replaceAllIn: aString startingAt: startIndex endingAt: endIndex using: aUnaryBlock
+	"Answer the result of substituting the value of aUnaryBlock for all matches found in aString."
+	"Note that the startIndex and endIndex parameters only constrain the search for the match.  The answer will use the whole of aString."
+
+	| start end nextStart |
+	start := (startIndex ifNil: [ 1 ]) max: 1.
+	end := (endIndex ifNil: [ aString size ]) min: aString size.
+	nextStart := start.
+	^ String streamContents: [ :stream |
+		self
+			allMatches: aString
+			startingAt: start
+			endingAt: end
+			do: [ :each |
+				stream nextPutAll:
+					(aString
+						copyFrom: nextStart
+						to: (each startOfGroup: 0) - 1).
+				stream nextPutAll:
+					(aUnaryBlock value: each).
+				nextStart := (each endOfGroup: 0) + 1 ].
+		stream nextPutAll:
+			(aString
+				copyFrom: nextStart
+				to: aString size) ]! !
+
+!RegexpPattern methodsFor: 'evaluating' stamp: 'ess 5/31/2025 07:41:28'!
+replaceAllIn: aString startingAt: startIndex endingAt: endIndex with: aTemplateString
+	"Answer the result of substituting the expansion of aTemplateString for all matches found in aString."
+	"Note that the startIndex and endIndex parameters only constrain the search for the match.  The answer will use the whole of aString."
 
 	^ self
-		match: aCharacterSequence
-		startingAt: startIndex
-		endingAt: endIndex! !
-
-!RePattern methodsFor: 'evaluating' stamp: 'ess 11/16/2024 09:28:35'!
-replaceAllIn: aCharacterSequence startingAt: startIndex endingAt: endIndex with: aTemplateString! !
-
-!RePattern methodsFor: 'evaluating' stamp: 'ess 11/16/2024 09:28:10'!
-replaceIn: aCharacterSequence startingAt: startIndex endingAt: endIndex with: aTemplateString! !
-
-!RePattern methodsFor: 'evaluating' stamp: 'ess 11/21/2024 10:40:22'!
-separateSubstringsOf: aCharacterSequence startingAt: startIndex endingAt: endIndex
-
-	| substrings nextStart |
-	
-	substrings := OrderedCollection new.
-	nextStart := startIndex.
-	self
-		allMatches: aCharacterSequence
+		replaceAllIn: aString
 		startingAt: startIndex
 		endingAt: endIndex
-		do: [ :each | | matchStart |
-			matchStart := each startOfGroup: 0.
-			matchStart > nextStart
-				ifTrue: [ substrings add: (aCharacterSequence
-											copyFrom: nextStart
-											to: matchStart - 1) ].
-			nextStart := (each endOfGroup: 0) + 1 ].
-	endIndex > nextStart
-		ifTrue: [ substrings add: (aCharacterSequence
-									copyFrom: nextStart
-									to: endIndex) ].
-	^ substrings! !
+		using: [ :each |
+			each expand: aTemplateString ]! !
 
-!RePattern methodsFor: 'evaluating' stamp: 'ess 11/16/2024 09:25:41'!
-tokensIn: aCharacterSequence startingAt: startIndex endingAt: endIndex
+!RegexpPattern methodsFor: 'evaluating' stamp: 'ess 5/31/2025 07:40:28'!
+replaceIn: aString startingAt: startIndex endingAt: endIndex using: aUnaryBlock
+	"Answer the result of substituting the value of aUnaryBlock for the first match found in aString."
+	"Note that the startIndex and endIndex parameters only constrain the search for the match.  The answer will use the whole of aString."
+
+	| match before result after |
+	match := self
+		findIn: aString
+		startingAt: startIndex
+		endingAt: endIndex.
+	match ifNil: [
+		^ aString ].
+	before := aString
+		copyFrom: 1
+		to: (match startOfGroup: 0) - 1.
+	result := aUnaryBlock value: match.
+	after := aString
+		copyFrom: (match endOfGroup: 0) + 1
+		to: aString size.
+	^ before, result, after! !
+
+!RegexpPattern methodsFor: 'evaluating' stamp: 'ess 5/31/2025 07:40:12'!
+replaceIn: aString startingAt: startIndex endingAt: endIndex with: aTemplateString
+	"Answer the result of substituting the expansion of aTemplateString for the first match found in aString."
+	"Note that the startIndex and endIndex parameters only constrain the search for the match.  The answer will use the whole of aString."
 
 	^ self
-		allMatchesAsStrings: aCharacterSequence
+		replaceIn: aString
+		startingAt: startIndex
+		endingAt: endIndex
+		using: [ :each |
+			each expand: aTemplateString ]! !
+
+!RegexpPattern methodsFor: 'evaluating' stamp: 'ess 5/31/2025 05:50:03'!
+separateSubstringsOf: aString startingAt: startIndex endingAt: endIndex
+	"Answer an array of all non-matching substrings from aString, from left-to-right."
+
+	| start end nextStart matchStart |
+	start := (startIndex ifNil: [ 1 ]) max: 1.
+	end := (endIndex ifNil: [ aString size ]) min: aString size.
+	nextStart := start.
+	^ Array streamContents: [ :stream |
+		self
+			allMatches: aString
+			startingAt: start
+			endingAt: end
+			do: [ :each |
+				matchStart := each startOfGroup: 0.
+				matchStart > nextStart ifTrue: [
+					stream nextPut:
+						(aString
+							copyFrom: nextStart
+							to: matchStart - 1) ].
+				nextStart := (each endOfGroup: 0) + 1 ].
+		end > nextStart ifTrue: [
+			stream nextPut:
+				(aString
+					copyFrom: nextStart
+					to: endIndex) ] ]! !
+
+!RegexpPattern methodsFor: 'evaluating' stamp: 'ess 5/31/2025 05:34:10'!
+tokensIn: aString startingAt: startIndex endingAt: endIndex
+	"Answer an array of all non-overlapping substring matches from aString, from left-to-right."
+
+	^ self
+		allMatchesAsStrings: aString
 		startingAt: startIndex
 		endingAt: endIndex! !
 
-!RePattern methodsFor: 'shortcuts' stamp: 'ess 12/10/2024 10:32:36'!
-doesNotUnderstand: aMessage
+!RegexpPattern methodsFor: 'evaluating-compatibility' stamp: 'ess 6/2/2025 09:05:21'!
+copy: aString translatingMatchesUsing: aUnaryBlock
 
-	| newSelector aCharacterSequence startIndex endIndex |
-	
-	newSelector := (aMessage keywords first, #startingAt:endingAt:) asSymbol.
-	(self respondsTo: newSelector) ifFalse: [^super doesNotUnderstand: aMessage].
+	^ self
+		replaceAllIn: aString
+		using: [ :each |
+			aUnaryBlock value: (each groupAt: 0) ]! !
 
-	aCharacterSequence := aMessage arguments at: 1.
-	startIndex := 1.
-	endIndex := aCharacterSequence size.
-	aMessage keywords withIndexDo:
-		[:each :index |
-		each == #startingAt ifTrue: [startIndex := aMessage arguments at: index].
-		each == #endingAt ifTrue: [endIndex := aMessage argument at: index]].
+!RegexpPattern methodsFor: 'evaluating-compatibility' stamp: 'ess 6/2/2025 09:09:09'!
+matchingRangesIn: aString
 
-	^self
-		perform: newSelector
-		with: aCharacterSequence
-		with: startIndex
-		with: endIndex! !
+	^ self
+		allMatches: aString
+		collect: [ :each |
+			each spanOfGroup: 0 ]! !
 
-!RePattern methodsFor: 'testing' stamp: 'ess 11/17/2024 06:56:30'!
-fullyMatches: aCharacterSequence startingAt: startIndex endingAt: endIndex
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:17:29'!
+allMatches: aString
+	"Answer an array of all non-overlapping matches from aString, from left-to-right."
+
+	^ self
+		allMatches: aString
+		startingAt: nil
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:18:25'!
+allMatches: aString asStringsCollect: aUnaryBlock
+	"Answer an array of the results of evaluating aUnaryBlock on all non-overlapping substring matches from aString."
+
+	^ self
+		allMatches: aString
+		startingAt: nil
+		endingAt: nil
+		asStringsCollect: aUnaryBlock! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:19:09'!
+allMatches: aString asStringsDo: aUnaryBlock
+	"Evaluate aUnaryBlock with each consecutive, non-overlapping substring match from aString."
+
+	self
+		allMatches: aString
+		startingAt: nil
+		endingAt: nil
+		asStringsDo: aUnaryBlock! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:19:33'!
+allMatches: aString collect: aUnaryBlock
+	"Answer an array of the results of evaluating aUnaryBlock on all non-overlapping matches from aString."
+
+	^ self
+		allMatches: aString
+		startingAt: nil
+		endingAt: nil
+		collect: aUnaryBlock! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:21:00'!
+allMatches: aString do: aUnaryBlock
+	"Evaluate aUnaryBlock with each consecutive, non-overlapping match from aString."
+
+	self
+		allMatches: aString
+		startingAt: nil
+		endingAt: nil
+		do: aUnaryBlock! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:17:35'!
+allMatches: aString endingAt: endIndex
+	"Answer an array of all non-overlapping matches from aString, from left-to-right."
+
+	^ self
+		allMatches: aString
+		startingAt: nil
+		endingAt: endIndex! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:16:43'!
+allMatches: aString endingAt: endIndex asStringsCollect: aUnaryBlock
+	"Answer an array of the results of evaluating aUnaryBlock on all non-overlapping substring matches from aString."
+
+	^ self
+		allMatches: aString
+		startingAt: nil
+		endingAt: endIndex
+		asStringsCollect: aUnaryBlock! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:17:00'!
+allMatches: aString endingAt: endIndex asStringsDo: aUnaryBlock
+	"Evaluate aUnaryBlock with each consecutive, non-overlapping substring match from aString."
+
+	self
+		allMatches: aString
+		startingAt: nil
+		endingAt: endIndex
+		asStringsDo: aUnaryBlock! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:19:40'!
+allMatches: aString endingAt: endIndex collect: aUnaryBlock
+	"Answer an array of the results of evaluating aUnaryBlock on all non-overlapping matches from aString."
+
+	^ self
+		allMatches: aString
+		startingAt: nil
+		endingAt: endIndex
+		collect: aUnaryBlock! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:21:06'!
+allMatches: aString endingAt: endIndex do: aUnaryBlock
+	"Evaluate aUnaryBlock with each consecutive, non-overlapping match from aString."
+
+	self
+		allMatches: aString
+		startingAt: nil
+		endingAt: endIndex
+		do: aUnaryBlock! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:17:42'!
+allMatches: aString startingAt: startIndex
+	"Answer an array of all non-overlapping matches from aString, from left-to-right."
+
+	^ self
+		allMatches: aString
+		startingAt: startIndex
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:18:43'!
+allMatches: aString startingAt: startIndex asStringsCollect: aUnaryBlock
+	"Answer an array of the results of evaluating aUnaryBlock on all non-overlapping substring matches from aString."
+
+	^ self
+		allMatches: aString
+		startingAt: startIndex
+		endingAt: nil
+		asStringsCollect: aUnaryBlock! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:19:17'!
+allMatches: aString startingAt: startIndex asStringsDo: aUnaryBlock
+	"Evaluate aUnaryBlock with each consecutive, non-overlapping substring match from aString."
+
+	self
+		allMatches: aString
+		startingAt: startIndex
+		endingAt: nil
+		asStringsDo: aUnaryBlock! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:19:45'!
+allMatches: aString startingAt: startIndex collect: aUnaryBlock
+	"Answer an array of the results of evaluating aUnaryBlock on all non-overlapping matches from aString."
+
+	^ self
+		allMatches: aString
+		startingAt: startIndex
+		endingAt: nil
+		collect: aUnaryBlock! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:21:11'!
+allMatches: aString startingAt: startIndex do: aUnaryBlock
+	"Evaluate aUnaryBlock with each consecutive, non-overlapping match from aString."
+
+	self
+		allMatches: aString
+		startingAt: startIndex
+		endingAt: nil
+		do: aUnaryBlock! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:22:39'!
+allMatchesAsStrings: aString
+	"Answer an array of all non-overlapping substring matches from aString, from left-to-right."
+
+	^ self
+		allMatchesAsStrings: aString
+		startingAt: nil
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:22:34'!
+allMatchesAsStrings: aString endingAt: endIndex
+	"Answer an array of all non-overlapping substring matches from aString, from left-to-right."
+
+	^ self
+		allMatchesAsStrings: aString
+		startingAt: nil
+		endingAt: endIndex! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:22:29'!
+allMatchesAsStrings: aString startingAt: startIndex
+	"Answer an array of all non-overlapping substring matches from aString, from left-to-right."
+
+	^ self
+		allMatchesAsStrings: aString
+		startingAt: startIndex
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:33:21'!
+findAsStringIn: aString
+	"Search for a match of pattern in aString, answering the matching substring or nil if no match can be found."
+
+	^ self
+		findAsStringIn: aString
+		startingAt: nil
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:33:16'!
+findAsStringIn: aString endingAt: endIndex
+	"Search for a match of pattern in aString, answering the matching substring or nil if no match can be found."
+
+	^ self
+		findAsStringIn: aString
+		startingAt: nil
+		endingAt: endIndex! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:33:11'!
+findAsStringIn: aString startingAt: startIndex
+	"Search for a match of pattern in aString, answering the matching substring or nil if no match can be found."
+
+	^ self
+		findAsStringIn: aString
+		startingAt: startIndex
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:32:40'!
+findIn: aString
+	"Search for a match of pattern in aString, answering nil if no match can be found."
+
+	^ self
+		findIn: aString
+		startingAt: nil
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:32:35'!
+findIn: aString endingAt: endIndex
+	"Search for a match of pattern in aString, answering nil if no match can be found."
+
+	^ self
+		findIn: aString
+		startingAt: nil
+		endingAt: endIndex! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:32:30'!
+findIn: aString startingAt: startIndex
+	"Search for a match of pattern in aString, answering nil if no match can be found."
+
+	^ self
+		findIn: aString
+		startingAt: startIndex
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:29:27'!
+fullMatch: aString
+	"Answer a match object if pattern matches all of aString, otherwise nil."
+
+	^ self
+		fullMatch: aString
+		startingAt: nil
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:29:22'!
+fullMatch: aString endingAt: endIndex
+	"Answer a match object if pattern matches all of aString, otherwise nil."
+
+	^ self
+		fullMatch: aString
+		startingAt: nil
+		endingAt: endIndex! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:29:16'!
+fullMatch: aString startingAt: startIndex
+	"Answer a match object if pattern matches all of aString, otherwise nil."
+
+	^ self
+		fullMatch: aString
+		startingAt: startIndex
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:31:10'!
+fullMatchAsString: aString
+	"Answer the matching string if pattern matches all of aString, otherwise nil."
+
+	^ self
+		fullMatchAsString: aString
+		startingAt: nil
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:31:05'!
+fullMatchAsString: aString endingAt: endIndex
+	"Answer the matching string if pattern matches all of aString, otherwise nil."
+
+	^ self
+		fullMatchAsString: aString
+		startingAt: nil
+		endingAt: endIndex! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:31:00'!
+fullMatchAsString: aString startingAt: startIndex
+	"Answer the matching string if pattern matches all of aString, otherwise nil."
+
+	^ self
+		fullMatchAsString: aString
+		startingAt: startIndex
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:27:47'!
+match: aString
+	"Try to match pattern at the start of aString, answering the match or nil."
+
+	^ self
+		match: aString
+		startingAt: nil
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:27:42'!
+match: aString endingAt: endIndex
+	"Try to match pattern at the start of aString, answering the match or nil."
+
+	^ self
+		match: aString
+		startingAt: nil
+		endingAt: endIndex! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:27:37'!
+match: aString startingAt: startIndex
+	"Try to match pattern at the start of aString, answering the match or nil."
+
+	^ self
+		match: aString
+		startingAt: startIndex
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:26:31'!
+matchAsString: aString
+	"Try to match pattern at the start of aString, answering the matching prefix or nil."
+
+	^ self
+		matchAsString: aString
+		startingAt: nil
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:26:26'!
+matchAsString: aString endingAt: endIndex
+	"Try to match pattern at the start of aString, answering the matching prefix or nil."
+
+	^ self
+		matchAsString: aString
+		startingAt: nil
+		endingAt: endIndex! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:26:21'!
+matchAsString: aString startingAt: startIndex
+	"Try to match pattern at the start of aString, answering the matching prefix or nil."
+
+	^ self
+		matchAsString: aString
+		startingAt: startIndex
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 07:38:50'!
+replaceAllIn: aString endingAt: endIndex using: aUnaryBlock
+	"Answer the result of substituting the value of aUnaryBlock for all matches found in aString."
+
+	^ self
+		replaceAllIn: aString
+		startingAt: nil
+		endingAt: endIndex
+		using: aUnaryBlock! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:39:38'!
+replaceAllIn: aString endingAt: endIndex with: aTemplateString
+	"Answer the result of substituting the expansion of aTemplateString for all matches found in aString."
+
+	^ self
+		replaceAllIn: aString
+		startingAt: nil
+		endingAt: endIndex
+		with: aTemplateString! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 07:38:24'!
+replaceAllIn: aString startingAt: startIndex using: aUnaryBlock
+	"Answer the result of substituting the value of aUnaryBlock for all matches found in aString."
+
+	^ self
+		replaceAllIn: aString
+		startingAt: startIndex
+		endingAt: nil
+		using: aUnaryBlock! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:39:32'!
+replaceAllIn: aString startingAt: startIndex with: aTemplateString
+	"Answer the result of substituting the expansion of aTemplateString for all matches found in aString."
+
+	^ self
+		replaceAllIn: aString
+		startingAt: startIndex
+		endingAt: nil
+		with: aTemplateString! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 07:38:57'!
+replaceAllIn: aString using: aUnaryBlock
+	"Answer the result of substituting the value of aUnaryBlock for all matches found in aString."
+
+	^ self
+		replaceAllIn: aString
+		startingAt: nil
+		endingAt: nil
+		using: aUnaryBlock! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:39:25'!
+replaceAllIn: aString with: aTemplateString
+	"Answer the result of substituting the expansion of aTemplateString for all matches found in aString."
+
+	^ self
+		replaceAllIn: aString
+		startingAt: nil
+		endingAt: nil
+		with: aTemplateString! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 07:36:37'!
+replaceIn: aString endingAt: endIndex using: aUnaryBlock
+	"Answer the result of substituting the value of aUnaryBlock for the first match found in aString."
+
+	^ self
+		replaceIn: aString
+		startingAt: nil
+		endingAt: endIndex
+		using: aUnaryBlock! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:38:35'!
+replaceIn: aString endingAt: endIndex with: aTemplateString
+	"Answer the result of substituting the expansion of aTemplateString for the first match found in aString."
+
+	^ self
+		replaceIn: aString
+		startingAt: nil
+		endingAt: endIndex
+		with: aTemplateString! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 07:36:20'!
+replaceIn: aString startingAt: startIndex using: aUnaryBlock
+	"Answer the result of substituting the value of aUnaryBlock for the first match found in aString."
+
+	^ self
+		replaceIn: aString
+		startingAt: startIndex
+		endingAt: nil
+		using: aUnaryBlock! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:38:30'!
+replaceIn: aString startingAt: startIndex with: aTemplateString
+	"Answer the result of substituting the expansion of aTemplateString for the first match found in aString."
+
+	^ self
+		replaceIn: aString
+		startingAt: startIndex
+		endingAt: nil
+		with: aTemplateString! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 07:36:44'!
+replaceIn: aString using: aUnaryBlock
+	"Answer the result of substituting the value of aUnaryBlock for the first match found in aString."
+
+	^ self
+		replaceIn: aString
+		startingAt: nil
+		endingAt: nil
+		using: aUnaryBlock! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:38:40'!
+replaceIn: aString with: aTemplateString
+	"Answer the result of substituting the expansion of aTemplateString for the first match found in aString."
+
+	^ self
+		replaceIn: aString
+		startingAt: nil
+		endingAt: nil
+		with: aTemplateString! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:35:40'!
+separateSubstringsOf: aString
+	"Answer an array of all non-matching substrings from aString, from left-to-right."
+
+	^ self
+		separateSubstringsOf: aString
+		startingAt: nil
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:35:34'!
+separateSubstringsOf: aString endingAt: endIndex
+	"Answer an array of all non-matching substrings from aString, from left-to-right."
+
+	^ self
+		separateSubstringsOf: aString
+		startingAt: nil
+		endingAt: endIndex! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:35:30'!
+separateSubstringsOf: aString startingAt: startIndex
+	"Answer an array of all non-matching substrings from aString, from left-to-right."
+
+	^ self
+		separateSubstringsOf: aString
+		startingAt: startIndex
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:34:24'!
+tokensIn: aString
+	"Answer an array of all non-overlapping substring matches from aString, from left-to-right."
+
+	^ self
+		tokensIn: aString
+		startingAt: nil
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:34:19'!
+tokensIn: aString endingAt: endIndex
+	"Answer an array of all non-overlapping substring matches from aString, from left-to-right."
+
+	^ self
+		tokensIn: aString
+		startingAt: nil
+		endingAt: endIndex! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:34:15'!
+tokensIn: aString startingAt: startIndex
+	"Answer an array of all non-overlapping substring matches from aString, from left-to-right."
+
+	^ self
+		tokensIn: aString
+		startingAt: startIndex
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'testing' stamp: 'ess 5/31/2025 05:51:39'!
+fullyMatches: aString startingAt: startIndex endingAt: endIndex
+	"Does pattern match the entirety of aString?"
 
 	^ (self
-		fullMatch: aCharacterSequence
+		fullMatch: aString
 		startingAt: startIndex
 		endingAt: endIndex)
 			notNil! !
 
-!RePattern methodsFor: 'testing' stamp: 'ess 11/16/2024 09:02:22'!
-indexIn: aCharacterSequence startingAt: startIndex endingAt: endIndex
+!RegexpPattern methodsFor: 'testing' stamp: 'ess 5/31/2025 05:54:50'!
+indexIn: aString startingAt: startIndex endingAt: endIndex
+	"If pattern matches some part of aString, answer the index of the first matching character, otherwise 0."
 
-	^ self
-		findIn: aCharacterSequence
+	| match |
+	match := self
+		findIn: aString
 		startingAt: startIndex
-		endingAt: endIndex! !
+		endingAt: endIndex.
+	^ match ifNotNil: [
+		match startOfGroup: 0 ]! !
 
-!RePattern methodsFor: 'testing' stamp: 'ess 11/17/2024 06:56:13'!
-matches: aCharacterSequence startingAt: startIndex endingAt: endIndex
+!RegexpPattern methodsFor: 'testing' stamp: 'ess 5/31/2025 05:52:13'!
+matches: aString startingAt: startIndex endingAt: endIndex
+	"Does pattern match a prefix of aString?"
 
 	^ (self
-		match: aCharacterSequence
+		match: aString
 		startingAt: startIndex
 		endingAt: endIndex)
 			notNil! !
 
-!RePattern methodsFor: 'private' stamp: 'ess 11/16/2024 09:46:53'!
-compileNode: aNode slotsNeeded: totalSlots
+!RegexpPattern methodsFor: 'testing' stamp: 'ess 5/31/2025 05:53:36'!
+matchesIn: aString startingAt: startIndex endingAt: endIndex
+	"Does pattern match some part of aString?"
+
+	^ (self
+		findIn: aString
+		startingAt: startIndex
+		endingAt: endIndex)
+			notNil! !
+
+!RegexpPattern methodsFor: 'testing-shortcuts' stamp: 'ess 5/31/2025 05:51:57'!
+fullyMatches: aString
+	"Does pattern match the entirety of aString?"
+
+	^ self
+		fullyMatches: aString
+		startingAt: nil
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'testing-shortcuts' stamp: 'ess 5/31/2025 05:51:52'!
+fullyMatches: aString endingAt: endIndex
+	"Does pattern match the entirety of aString?"
+
+	^ self
+		fullyMatches: aString
+		startingAt: nil
+		endingAt: endIndex! !
+
+!RegexpPattern methodsFor: 'testing-shortcuts' stamp: 'ess 5/31/2025 05:51:46'!
+fullyMatches: aString startingAt: startIndex
+	"Does pattern match the entirety of aString?"
+
+	^ self
+		fullyMatches: aString
+		startingAt: startIndex
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'testing-shortcuts' stamp: 'ess 5/31/2025 05:55:06'!
+indexIn: aString
+	"If pattern matches some part of aString, answer the index of the first matching character, otherwise 0."
+
+	^ self
+		indexIn: aString
+		startingAt: nil
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'testing-shortcuts' stamp: 'ess 5/31/2025 05:55:02'!
+indexIn: aString endingAt: endIndex
+	"If pattern matches some part of aString, answer the index of the first matching character, otherwise 0."
+
+	^ self
+		indexIn: aString
+		startingAt: nil
+		endingAt: endIndex! !
+
+!RegexpPattern methodsFor: 'testing-shortcuts' stamp: 'ess 5/31/2025 05:54:57'!
+indexIn: aString startingAt: startIndex
+	"If pattern matches some part of aString, answer the index of the first matching character, otherwise 0."
+
+	^ self
+		indexIn: aString
+		startingAt: startIndex
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'testing-shortcuts' stamp: 'ess 5/31/2025 05:52:28'!
+matches: aString
+	"Does pattern match a prefix of aString?"
+
+	^ self
+		matches: aString
+		startingAt: nil
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'testing-shortcuts' stamp: 'ess 5/31/2025 05:52:23'!
+matches: aString endingAt: endIndex
+	"Does pattern match a prefix of aString?"
+
+	^ self
+		matches: aString
+		startingAt: nil
+		endingAt: endIndex! !
+
+!RegexpPattern methodsFor: 'testing-shortcuts' stamp: 'ess 5/31/2025 05:52:18'!
+matches: aString startingAt: startIndex
+	"Does pattern match a prefix of aString?"
+
+	^ self
+		matches: aString
+		startingAt: startIndex
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'testing-shortcuts' stamp: 'ess 5/31/2025 05:53:56'!
+matchesIn: aString
+	"Does pattern match some part of aString?"
+
+	^ self
+		matchesIn: aString
+		startingAt: nil
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'testing-shortcuts' stamp: 'ess 5/31/2025 05:53:51'!
+matchesIn: aString endingAt: endIndex
+	"Does pattern match some part of aString?"
+
+	^ self
+		matchesIn: aString
+		startingAt: nil
+		endingAt: endIndex! !
+
+!RegexpPattern methodsFor: 'testing-shortcuts' stamp: 'ess 5/31/2025 05:53:44'!
+matchesIn: aString startingAt: startIndex
+	"Does pattern match some part of aString?"
+
+	^ self
+		matchesIn: aString
+		startingAt: startIndex
+		endingAt: nil! !
+
+!RegexpPattern methodsFor: 'private' stamp: 'ess 6/3/2025 14:55:56'!
+compileProgram: aNode slotsNeeded: totalSlots
 
 	program := ReProgram new.
 	program
 		slotsNeeded: totalSlots;
-		compileNode: aNode;
+		compileProgram: aNode;
 		match! !
 
-!RePattern class methodsFor: 'instance creation' stamp: 'ess 12/7/2024 12:24:23'!
-compileNode: aNode slotsNeeded: totalSlots
+!RegexpPattern class methodsFor: 'instance creation' stamp: 'ess 6/3/2025 14:56:16'!
+compileProgram: aNode slotsNeeded: totalSlots
 
-	^self new
-		compileNode: aNode
+	^ self new
+		compileProgram: aNode
 		slotsNeeded: totalSlots! !
 
-!RePattern class methodsFor: 'instance creation' stamp: 'ess 12/7/2024 12:24:44'!
+!RegexpPattern class methodsFor: 'instance creation' stamp: 'ess 5/29/2025 06:14:57'!
 from: aStringOrPattern
 
-	(aStringOrPattern isKindOf: self) ifTrue: [^aStringOrPattern].
-	^self fromString: aStringOrPattern! !
+	(aStringOrPattern isKindOf: self) ifTrue: [
+		^ aStringOrPattern ].
+	^ self fromString: aStringOrPattern! !
 
-!RePattern class methodsFor: 'instance creation' stamp: 'ess 12/7/2024 12:25:40'!
-fromString: aCharacterSequence
-
-	^self cache
-		at: aCharacterSequence
-		ifAbsentPut:
-			[self
-				fromString: aCharacterSequence
-				caseInsensitive: false
-				multiLine: false]! !
-
-!RePattern class methodsFor: 'instance creation' stamp: 'ess 11/16/2024 08:20:01'!
-fromString: aCharacterSequence caseInsensitive: caseInsensitive
+!RegexpPattern class methodsFor: 'instance creation' stamp: 'ess 5/30/2025 14:52:32'!
+fromString: aString
 
 	^ self
-		fromString: aCharacterSequence
-		caseInsensitive: caseInsensitive
+		fromString: aString
+		ignoreCase: false
 		multiLine: false! !
 
-!RePattern class methodsFor: 'instance creation' stamp: 'ess 11/16/2024 09:50:19'!
-fromString: aCharacterSequence caseInsensitive: caseInsensitive multiLine: multiLine
-
-	^ ReCompiler new
-		compile: aCharacterSequence! !
-
-!RePattern class methodsFor: 'instance creation' stamp: 'ess 11/16/2024 08:20:22'!
-fromString: aCharacterSequence multiLine: multiLine
+!RegexpPattern class methodsFor: 'instance creation' stamp: 'ess 5/30/2025 14:52:06'!
+fromString: aString ignoreCase: ignoreCase
 
 	^ self
-		fromString: aCharacterSequence
-		caseInsensitive: false
+		fromString: aString
+		ignoreCase: ignoreCase
+		multiLine: false! !
+
+!RegexpPattern class methodsFor: 'instance creation' stamp: 'ess 5/30/2025 14:51:36'!
+fromString: aString ignoreCase: ignoreCase multiLine: multiLine
+
+	^ (ReCompiler
+		ignoreCase: ignoreCase
+		multiLine: multiLine)
+			compile: aString! !
+
+!RegexpPattern class methodsFor: 'instance creation' stamp: 'ess 5/30/2025 14:52:21'!
+fromString: aString multiLine: multiLine
+
+	^ self
+		fromString: aString
+		ignoreCase: false
 		multiLine: multiLine! !
 
-!RePattern class methodsFor: 'as yet unclassified' stamp: 'ess 12/7/2024 12:23:52'!
-cache
-
-	^cache ifNil: [cache := LookupCache lru: 25]! !
-
-!RePatternTests methodsFor: 'assertions' stamp: 'ess 11/18/2024 07:12:06'!
+!RegexpPatternTests methodsFor: 'assertions' stamp: 'ess 5/30/2025 13:55:43'!
 assertFullyMatches: aString
+	"Assert that pattern matches the entirety of aString."
 
 	self assert: (pattern fullyMatches: aString)! !
 
-!RePatternTests methodsFor: 'assertions' stamp: 'ess 11/18/2024 07:12:06'!
+!RegexpPatternTests methodsFor: 'assertions' stamp: 'ess 5/30/2025 13:53:41'!
+assertIn: aString
+	"Assert that pattern matches somewhere in aString."
+
+	self assert: (pattern findIn: aString) notNil! !
+
+!RegexpPatternTests methodsFor: 'assertions' stamp: 'ess 5/30/2025 13:54:52'!
+assertIn: aString equals: expected
+	"Assert that pattern matches somewhere in aString and the matched substring is equal to expected."
+
+	self
+		assert: (pattern findAsStringIn: aString)
+		equals: expected! !
+
+!RegexpPatternTests methodsFor: 'assertions' stamp: 'ess 5/30/2025 13:56:32'!
 assertMatches: aString
+	"Assert that pattern matches at the beginning of aString."
 
 	self assert: (pattern matches: aString)! !
 
-!RePatternTests methodsFor: 'assertions' stamp: 'ess 11/18/2024 07:12:06'!
+!RegexpPatternTests methodsFor: 'assertions' stamp: 'ess 5/30/2025 13:52:01'!
 denyFullyMatches: aString
+	"Assert that pattern does not match the entirety of aString."
 
 	self deny: (pattern fullyMatches: aString)! !
 
-!RePatternTests methodsFor: 'assertions' stamp: 'ess 11/18/2024 07:12:06'!
-denyMatches: aString
+!RegexpPatternTests methodsFor: 'assertions' stamp: 'ess 5/30/2025 13:53:21'!
+denyIn: aString
+	"Assert that pattern does not match anywhere in aString."
 
-	self deny: (pattern matches: aString)! !
+	self assert: (pattern findIn: aString) isNil! !
 
-!RePatternTests methodsFor: 'running' stamp: 'ess 11/18/2024 07:12:06'!
-compile: regularExpression
+!RegexpPatternTests methodsFor: 'running' stamp: 'ess 5/31/2025 02:26:47'!
+compile: aString
 
-	^ pattern := RePattern fromString: regularExpression! !
+	self
+		compile: aString
+		ignoreCase: false! !
 
-!RePatternTests methodsFor: 'tests' stamp: 'ess 11/18/2024 07:11:52'!
-testAnchor
+!RegexpPatternTests methodsFor: 'running' stamp: 'ess 5/31/2025 02:26:26'!
+compile: aString ignoreCase: ignoreCase
 
-	self compile: '^bbb'.
-	self denyMatches: 'abbb'! !
+	pattern := RegexpPattern
+		fromString: aString
+		ignoreCase: ignoreCase! !
 
-!RePatternTests methodsFor: 'tests' stamp: 'ess 11/18/2024 07:11:25'!
-testBacktrack
+!RegexpPatternTests methodsFor: 'tests' stamp: 'ess 6/2/2025 13:28:37'!
+testBeginningOfInput1
 
-	| target |
-	
-	target := 'aaaaa'.  "5 characters"
-	target := target, target.  "10"
-	target := target, target, target, target, target.  "50"
+	self
+		compile: '\Abb';
+		assertMatches: 'bbb';
+		denyIn: 'abb';
+		denyIn: 'babb'! !
 
-	self compile: '(a*)*'.
-	self assertFullyMatches: target! !
+!RegexpPatternTests methodsFor: 'tests' stamp: 'ess 6/2/2025 13:28:01'!
+testBeginningOfInput2
 
-!RePatternTests methodsFor: 'tests' stamp: 'ess 12/6/2024 16:11:50'!
+	self
+		compile: '\A';
+		assertMatches: 'abb';
+		assertMatches: 'babb';
+		assertMatches: ''! !
+
+!RegexpPatternTests methodsFor: 'tests' stamp: 'ess 6/2/2025 13:22:56'!
+testBeginningOfLine1
+
+	self
+		compile: '^bb';
+		assertMatches: 'bbb';
+		denyIn: 'abb';
+		denyIn: 'babb'! !
+
+!RegexpPatternTests methodsFor: 'tests' stamp: 'ess 6/2/2025 13:24:00'!
+testBeginningOfLine2
+
+	self
+		compile: '^';
+		assertMatches: 'abb';
+		assertMatches: 'babb';
+		assertMatches: ''! !
+
+!RegexpPatternTests methodsFor: 'tests' stamp: 'ess 6/2/2025 13:32:32'!
+testBeginningOfWord1
+
+	self
+		compile: '\<bb';
+		assertMatches: 'bbb';
+		denyIn: 'abb';
+		denyIn: 'babb'! !
+
+!RegexpPatternTests methodsFor: 'tests' stamp: 'ess 6/2/2025 13:32:52'!
+testBeginningOfWord2
+
+	self
+		compile: '\<';
+		assertMatches: 'abb';
+		assertMatches: 'babb';
+		denyIn: ''! !
+
+!RegexpPatternTests methodsFor: 'tests' stamp: 'ess 5/30/2025 13:57:51'!
 testBlockComment
 
 	self compile: 'ab (?# (?# a|b ) b )'.
-	self assertFullyMatches: 'ab'.
-	self denyFullyMatches: 'abb'! !
+	self
+		assertFullyMatches: 'ab';
+		denyFullyMatches: 'abb'! !
 
-!RePatternTests methodsFor: 'tests' stamp: 'ess 11/18/2024 07:12:06'!
+!RegexpPatternTests methodsFor: 'tests' stamp: 'ess 6/2/2025 13:24:55'!
+testDoesntBacktrack
+
+	| target |	
+	target := 'aaaaa'.  "5 characters"
+	target := target, target.  "10"
+	target := target, target, target, target, target.  "50"
+	self compile: '(a*)*'.
+	self assertFullyMatches: target! !
+
+!RegexpPatternTests methodsFor: 'tests' stamp: 'ess 6/2/2025 13:48:19'!
+testEndOfInput1
+
+	self
+		compile: 'bb\Z';
+		assertIn: 'bbb';
+		denyIn: 'bba';
+		denyIn: 'bbab'! !
+
+!RegexpPatternTests methodsFor: 'tests' stamp: 'ess 6/3/2025 11:42:58'!
+testEndOfInput2
+
+	self
+		compile: '\Z';
+		assertIn: 'abb';
+		assertIn: 'babb';
+		assertIn: ''! !
+
+!RegexpPatternTests methodsFor: 'tests' stamp: 'ess 6/2/2025 13:47:10'!
+testEndOfLine1
+
+	self
+		compile: 'bb$';
+		assertIn: 'bbb';
+		denyIn: 'bba';
+		denyIn: 'bbab'! !
+
+!RegexpPatternTests methodsFor: 'tests' stamp: 'ess 6/2/2025 13:47:37'!
+testEndOfLine2
+
+	self
+		compile: '$';
+		assertIn: 'abb';
+		assertIn: 'babb';
+		assertIn: ''! !
+
+!RegexpPatternTests methodsFor: 'tests' stamp: 'ess 6/2/2025 13:49:11'!
+testEndOfWord1
+
+	self
+		compile: 'bb\>';
+		assertIn: 'bbb';
+		denyIn: 'bba';
+		denyIn: 'bbab'! !
+
+!RegexpPatternTests methodsFor: 'tests' stamp: 'ess 6/3/2025 15:17:45'!
+testEndOfWord2
+
+	self
+		compile: '\>';
+		assertIn: 'abb';
+		assertIn: 'babb';
+		denyIn: ''! !
+
+!RegexpPatternTests methodsFor: 'tests' stamp: 'ess 6/4/2025 08:47:03'!
 testExample1
 
-	| result |
-
+	| match |
 	self compile: 'a (bb)+ a'.
-	self assertFullyMatches: 'abba'.
-	self assertFullyMatches: 'abbbba'.
-	self denyMatches: 'abbba'.
-
-	result := pattern fullMatch: 'abbbba'.
 	self
-		assert: (result groupAt: 0)
+		assertFullyMatches: 'abba';
+		assertFullyMatches: 'abbbba';
+		denyIn: 'abbba'.
+	match := pattern fullMatch: 'abbbba'.
+	self
+		assert: (match groupAt: 0)
 		equals: 'abbbba'.
 	self
-		assert: (result groupAt: 1)
+		assert: (match groupAt: 1)
 		equals: 'bb'! !
 
-!RePatternTests methodsFor: 'tests' stamp: 'ess 11/18/2024 06:59:48'!
+!RegexpPatternTests methodsFor: 'tests' stamp: 'ess 6/2/2025 13:30:30'!
 testExample2a
 
 	self compile: 'abab | abbb'.
-	self assertFullyMatches: 'abab'.
-	self assertFullyMatches: 'abbb'.
-	self denyMatches: 'abba'! !
+	self
+		assertFullyMatches: 'abab';
+		assertFullyMatches: 'abbb';
+		denyIn: 'abba'! !
 
-!RePatternTests methodsFor: 'tests' stamp: 'ess 11/18/2024 07:12:06'!
+!RegexpPatternTests methodsFor: 'tests' stamp: 'ess 6/2/2025 13:30:51'!
 testExample2b
 
 	| result |
-	
+	self compile: 'ab (a|b) b'.
+	self
+		assertFullyMatches: 'abab';
+		assertFullyMatches: 'abbb';
+		denyIn: 'abba'.
+	result := pattern fullMatch: 'abab'.
+	self
+		assert: (result groupAt: 1)
+		equals: 'a'! !
+
+!RegexpPatternTests methodsFor: 'tests' stamp: 'ess 6/2/2025 13:31:00'!
+testExample2c
+
+	| result |
 	self compile: 'ab ((?# either ) ab | (?# or) bb)'.
-	self assertFullyMatches: 'abab'.
-	self assertFullyMatches: 'abbb'.
-	self denyMatches: 'abba'.
-	
+	self
+		assertFullyMatches: 'abab';
+		assertFullyMatches: 'abbb';
+		denyIn: 'abba'.
 	result := pattern fullMatch: 'abbb'.
 	self
 		assert: (result groupAt: 0)
@@ -3214,52 +5012,1383 @@ testExample2b
 		assert: (result groupAt: 1)
 		equals: 'bb'! !
 
-!RePatternTests methodsFor: 'tests' stamp: 'ess 11/18/2024 07:12:06'!
-testExample2c
-
-	| result |
-	
-	self compile: 'ab (a|b) b'.
-	self assertFullyMatches: 'abab'.
-	self assertFullyMatches: 'abbb'.
-	self denyMatches: 'abba'.
-	
-	result := pattern fullMatch: 'abab'.
-	self
-		assert: (result groupAt: 1)
-		equals: 'a'! !
-
-!RePatternTests methodsFor: 'tests' stamp: 'ess 11/18/2024 07:10:49'!
-testGeneralCategory
+!RegexpPatternTests methodsFor: 'tests' stamp: 'ess 6/2/2025 13:50:13'!
+testGeneralCategory1
 
 	self compile: '\p{ Lowercase_Letter }'.
-	self denyMatches: '1'.
-	self denyMatches: 'A'.
-	self assertMatches: 'ß'.
-	
+	self
+		denyIn: '1';
+		denyIn: 'A';
+		assertMatches: 'ß'! !
+
+!RegexpPatternTests methodsFor: 'tests' stamp: 'ess 6/2/2025 13:50:22'!
+testGeneralCategory2
+
 	self compile: '\P{ Lowercase_Letter } # not a lowercase letter'.
-	self assertMatches: '1'.
-	self assertMatches: 'A'.
-	self denyMatches: 'ß'.
-	
+	self
+		assertMatches: '1';
+		assertMatches: 'A';
+		denyIn: 'ß'! !
+
+!RegexpPatternTests methodsFor: 'tests' stamp: 'ess 6/2/2025 13:50:30'!
+testGeneralCategory3
+
 	self compile: '\p{ Decimal_Number }'.
-	self assertMatches: '1'.
-	self denyMatches: 'A'.
-	self denyMatches: 'ß'! !
+	self
+		assertMatches: '1';
+		denyIn: 'A';
+		denyIn: 'ß'! !
 
-!CharacterSequence methodsFor: '*Regexp-accessing' stamp: 'ess 12/3/2024 08:55:39'!
-allRegexpMatchesAsStrings: aRegularExpression
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 07:04:04'!
+aboutTestsRegex
+	"Tests in this category are from [Cuis-Smalltalk-Regex](https://github.com/Cuis-Smalltalk/Cuis-Smalltalk-Regex).
+	Test names have been preserved for traceability."! !
 
-	^(RePattern fromString: aRegularExpression) allMatchesAsStrings: self! !
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 6/4/2025 14:52:25'!
+failingTestEmptyStringNotAtWordBoundary
 
-!CharacterSequence methodsFor: '*Regexp-accessing' stamp: 'ess 11/21/2024 12:30:07'!
-regexpReplaceAll: regularExpression with: aTemplateString! !
+	| result |
+	self compile: '\B'.
+	result := pattern
+		replaceAllIn: 'foo bar'
+		with: '*'.
+	self
+		assert: result
+		equals: 'f*o*o b*a*r'! !
 
-!CharacterSequence methodsFor: '*Regexp-accessing' stamp: 'ess 11/21/2024 08:58:09'!
-substringsSeparatedByRegexp: aRegularExpression
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 6/2/2025 09:03:05'!
+test
+	"the regular expression matches words beginning with either an uppercase or a lowercase T"
 
-	^ (RePattern fromString: aRegularExpression)
-		separateSubstringsOf: self! !
+	| result |
+	result := '\<t\w+' asRegexIgnoringCase
+		copy: 'now is the Time'
+		translatingMatchesUsing: [ :each | each asUppercase ].
+	self
+		assert: result
+		equals: 'now is THE TIME'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:59:46'!
+testBackQuotesEscape
+	"Regular expressions can also include the following backquote escapes to refer to popular classes of characters:
+		\w	any word constituent character (same as [a-zA-Z0-9:=])
+		\W	any character but a word constituent
+		\d	a digit (same as [0-9])
+		\D	anything but a digit
+		\s	a whitespace character
+		\S	anything but a whitespace character
+	These escapes are also allowed in character classes: '[\w+-]' means 'any character that is either a word constituent, or a plus, or a minus'."
+
+	self
+		assert: ('one word' prefixMatchesRegex: '\w+');
+		assert: ('one' matchesRegex: '\w+')! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 6/4/2025 11:56:10'!
+testCadrMatching
+	"A bit more complex example is the following expression, matching the name of any of the Lisp-style `car', `cdr', `caar', `cadr', ... functions:"
+
+	self
+		"assert: ('car' matchesRegex: 'c(a|d)+r');
+		assert: ('cdr' matchesRegex: 'c(a|d)+r');"
+		assert: ('caar' matchesRegex: 'c(a|d)+r')";
+		assert: ('cadr' matchesRegex: 'c(a|d)+r');
+		assert: ('caddar' matchesRegex: 'c(a|d)+r')"! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 02:30:18'!
+testCaseInsensitive
+
+	self
+		compile: 'the\ quick\ brown\ fox'
+		ignoreCase: true.
+	self
+		assertFullyMatches: 'the quick brown fox';
+		assertFullyMatches: 'The quick brown FOX';
+		assertIn: 'What do you know about the quick brown fox?';
+		assertIn: 'What do you know about THE QUICK BROWN FOX?'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 02:29:12'!
+testCaseSensitive
+
+	self
+		compile: 'the\ quick\ brown\ fox'
+		ignoreCase: false.
+	self
+		assertFullyMatches: 'the quick brown fox';
+		denyIn: 'The quick brown FOX';
+		assertIn: 'What do you know about the quick brown fox?';
+		denyIn: 'What do you know about THE QUICK BROWN FOX?'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:15:25'!
+testCharacterSet
+	"So far, we have used only characters as the 'smallest' components of regular expressions.  There are other, more `interesting', components.  A character set is a string of characters enclosed in square brackets.  It matches any single character if it appears between the brackets.
+	For example, `[01]' matches either `0' or `1':"
+
+	self
+		assert: ('0' matchesRegex: '[01]');
+		deny: ('3' matchesRegex: '[01]');
+		deny: ('11' matchesRegex: '[01]');  "-- false: a set matches only one character"
+		assert: ('01' matchesRegex: '[01][01]')! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:15:38'!
+testCharacterSetBinaryNumber
+	"Using plus operator, we can build the following binary number recognizer:"
+
+	self
+		assert: ('10010100' matchesRegex: '[01]+');
+		deny: ('10001210' matchesRegex: '[01]+')! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:16:14'!
+testCharacterSetInversion
+	"If the first character after the opening bracket is `^', the set is inverted: it matches any single character *not* appearing between the brackets:"
+
+	self
+		deny: ('0' matchesRegex: '[^01]');  "0 appears in 01 so there is no match"
+		assert: ('3' matchesRegex: '[^01]');  "3 is not in 01 so it matches"
+		deny: ('30' matchesRegex: '[^01]');
+		deny: ('33333333333333333333333330' matchesRegex: '[^01]')  "there is one zero so it does not match"! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:16:36'!
+testCharacterSetRange
+	"For convenience, a set may include ranges: pairs of characters separated with `-'.  This is equivalent to listing all characters between them: `[0-9]' is the same as `[0123456789]'. "
+
+	self
+		assert: ('0' matchesRegex: '[0-9]');
+		assert: ('9' matchesRegex: '[0-9]');
+		deny: ('a' matchesRegex: '[0-9]');
+		deny: ('01' matchesRegex: '[0-9]');
+		assert: ('01442128629839374565' matchesRegex: '[0-9]+')! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 09:45:30'!
+testCopyReplacingMatches
+	"See that the match context is preserved while copying stuff between matches:"
+
+	| result |
+	self compile: '\<\d\D+'.
+	result := pattern
+		replaceAllIn: '9aaa1bbb 8ccc'
+		with: 'foo'.
+	self
+		assert: result
+		equals: 'foo1bbb foo'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 09:58:43'!
+testCopyTranslatingMatches
+
+	| result |
+	result := 'now is  the   time    '
+		copyWithRegex: '\w+'
+		matchesTranslatedUsing: [ :each |
+			each reversed ].
+	self
+		assert: result
+		equals: 'won si  eht   emit    '! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 02:33:49'!
+testEmptyStringAtBeginningOfLine
+
+	| result |
+	self compile: '^'.
+	result := pattern
+		replaceAllIn: 'foo1 bar1', String crString, 'foo2 bar2'
+		with: '*'.
+	self
+		assert: result
+		equals: '*foo1 bar1', String crString, '*foo2 bar2'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 10:03:10'!
+testEmptyStringAtBeginningOfWord
+
+	| result |
+	self compile: '\<'.
+	result := pattern
+		replaceAllIn: 'foo bar'
+		with: '*'.
+	self
+		assert: result
+		equals: '*foo *bar'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 02:34:34'!
+testEmptyStringAtEndOfLine
+
+	| result |
+	self compile: '$'.
+	result := pattern
+		replaceAllIn: 'foo1 bar1', String crString, 'foo2 bar2'
+		with: '*'.
+	self
+		assert: result
+		equals: 'foo1 bar1*', String crString, 'foo2 bar2*'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 10:03:05'!
+testEmptyStringAtEndOfWord
+
+	| result |
+	self compile: '\>'.
+	result := pattern
+		replaceAllIn: 'foo bar'
+		with: '*'.
+	self
+		assert: result
+		equals: 'foo* bar*'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 02:35:26'!
+testEmptyStringAtWordBoundary
+
+	| result |
+	self compile: '\b'.
+	result := pattern
+		replaceAllIn: 'foo bar'
+		with: '*'.
+	self
+		assert: result
+		equals: '*foo* *bar*'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:01:31'!
+testHenry012a
+
+	self compile: 'a.*c'.
+	self
+		assertFullyMatches: 'axyzc';
+		assertFullyMatches: 'axy zc';
+		denyIn: 'axyzd'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 6/3/2025 15:21:55'!
+testHenry012b
+
+	| stringWithNUL |
+	stringWithNUL := 'axy', (String with: Character null), 'zc'.
+	self compile: 'a.*c'.
+	self assertFullyMatches: stringWithNUL! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 13:54:18'!
+testHenry013
+
+	self compile: '.a.*'.
+	self
+		assertIn: '1234abc'
+		equals: '4abc'.
+	self denyIn: 'abcd'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:01:46'!
+testHenry014
+
+	self compile: 'a\w+c'.
+	self
+		assertFullyMatches: 'abbbbc';
+		denyIn: 'abb bc'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 13:54:18'!
+testHenry015
+
+	self compile: '\w+'.
+	self
+		assertIn: '  	foobar	quux'
+		equals: 'foobar'.
+	self denyIn: ' 	~!!@#$%^&*()-+=\|/?.>,<'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:01:58'!
+testHenry016
+
+	self compile: 'a\W+c'.
+	self
+		assertFullyMatches: 'a   c';
+		denyIn: 'a bc'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 13:54:18'!
+testHenry017
+
+	self compile: '\W+'.
+	self denyIn: 'foobar'.
+	self
+		assertIn: 'foo!!@#$bar'
+		equals: '!!@#$'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:02:09'!
+testHenry018
+
+	self compile: 'a\s*c'.
+	self
+		assertFullyMatches: 'a   c';
+		denyIn: 'a bc'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 13:54:18'!
+testHenry019
+
+	self compile: '\s+'.
+	self denyIn: '1234$^*^&asdfb'.
+	self
+		assertIn: 'abc3457 sd'
+		equals: ' '! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:02:21'!
+testHenry020
+
+	self compile: 'a\S*c'.
+	self
+		assertFullyMatches: 'aqwertyc';
+		denyIn: 'ab c'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 13:54:18'!
+testHenry021
+
+	self compile: '\S+'.
+	self
+		assertIn: '     	asdf		'
+		equals: 'asdf'.
+
+	"N.B., test string contains newline, spaces, and tabs"
+	self denyIn: ' 	
+			'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:02:39'!
+testHenry022
+
+	self compile: 'a\d+c'.
+	self
+		assertFullyMatches: 'a0123456789c';
+		denyIn: 'a12b34c'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 13:54:18'!
+testHenry023
+
+	self compile: '\d+'.
+	self
+		assertIn: 'foo@#$%123ASD #$$%^&'
+		equals: '123'.
+	self denyIn: 'foo!!@#$asdfl;'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:02:50'!
+testHenry024
+
+	self compile: 'a\D+c'.
+	self
+		assertFullyMatches: 'aqwertyc';
+		denyIn: 'aqw6ertc'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 13:54:18'!
+testHenry025
+
+	self compile: '\D+'.
+	self
+		assertIn: '1234 abc 456'
+		equals: ' abc '.
+	self denyIn: '1234567890'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 13:55:43'!
+testHenry026
+
+	self compile: '(f|o)+\b'.
+	self assertFullyMatches: 'foo'.
+	self
+		assertIn: ' foo '
+		equals: 'foo'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:03:01'!
+testHenry027
+
+	self compile: '\ba\w+'.  "A word beginning with an 'a'."
+	self
+		assertIn: 'land ancient'
+		equals: 'ancient'.
+	self
+		assertIn: 'antique vase'
+		equals: 'antique'.
+	self denyIn: 'goofy foobar'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 13:54:18'!
+testHenry028
+
+	self compile: '(f|o)+\B'.
+	self
+		assertIn: 'quuxfoobar'
+		equals: 'foo'.
+	self
+		assertIn: 'quuxfoo'
+		equals: 'fo'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:03:09'!
+testHenry029
+
+	self compile: '\Ba\w+'.  "A word with an 'a' in the middle."
+	self
+		assertIn: 'land ancient'
+		equals: 'and'.
+	self
+		assertIn: 'antique vase'
+		equals: 'ase'.
+	self
+		assertIn: 'smalltalk shall overcome'
+		equals: 'alltalk'.
+	self denyIn: 'foonix is better'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 13:56:32'!
+testHenry030
+
+	self compile: 'fooa\>.*'.
+	self
+		assertMatches: 'fooa ';
+		denyIn: 'fooa123';
+		assertMatches: 'fooa bar';
+		assertMatches: 'fooa';
+		denyIn: 'fooargh'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 10:09:44'!
+testHenry031
+
+	self compile: '\>.+abc'.
+	self
+		denyIn: 'abcde fg';
+		assertIn: 'foo abcde';
+		denyIn: 'abcde'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 10:09:09'!
+testHenry032
+
+	self compile: '\<foo.*'.
+	self
+		assertMatches: 'foo';
+		assertMatches: 'foobar'.
+	self
+		assertIn: 'qfoobarq foonix'
+		equals: 'foonix'.
+	self
+		assertIn: ' foo';
+		denyIn: ' 12foo';
+		denyIn: 'barfoo'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 13:54:18'!
+testHenry033
+
+	self compile: '.+\<foo'.
+	self denyIn: 'foo'.
+	self
+		assertIn: 'ab foo'
+		equals: 'ab foo'.
+	self denyIn: 'abfoo'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 13:56:32'!
+testHenry039
+
+	self compile: 'a[a-b-c]'.
+	self assertMatches: 'a-'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:04:12'!
+testHenry049
+
+	self compile: '[\de]+'.
+	self
+		assertFullyMatches: '01234';
+		assertFullyMatches: '0123e456';
+		assertMatches: '0123e45g78'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:04:25'!
+testHenry050
+
+	self compile: '[e\d]+'.
+	self
+		assertFullyMatches: '01234';
+		assertFullyMatches: '0123e456';
+		assertMatches: '0123e45g78'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 13:54:18'!
+testHenry051
+
+	self compile: '[\D]+'.
+	self
+		assertIn: '123abc45def78'
+		equals: 'abc'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:04:52'!
+testHenry052
+
+	self compile: '[[:digit:]e]+'.
+	self
+		assertFullyMatches: '01234';
+		assertFullyMatches: '0123e456';
+		assertMatches: '0123e45g78'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 13:54:18'!
+testHenry053
+
+	self compile: '[\s]+'.
+	self
+		assertIn: '2  spaces'
+		equals: '  '! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 13:54:18'!
+testHenry054
+
+	self compile: '[\S]+'.
+	self
+		assertIn: '  word12!!@#$  '
+		equals: 'word12!!@#$'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 13:54:18'!
+testHenry055
+
+	self compile: '[\w]+'.
+	self
+		assertIn: ' 	foo123bar	45'
+		equals: 'foo123bar'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 13:54:18'!
+testHenry056
+
+	self compile: '[\W]+'.
+	self
+		assertIn: 'fii234!!@#$34f'
+		equals: '!!@#$'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 13:54:18'!
+testHenry057
+
+	self compile: '[^[:alnum:]]+'.
+	self
+		assertIn: 'fii234!!@#$34f'
+		equals: '!!@#$'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 13:54:18'!
+testHenry058
+
+	self compile: '[%&[:alnum:]]+'.
+	self
+		assertIn: 'foo%3'
+		equals: 'foo%3'.
+	self
+		assertIn: 'foo34&rt4$57a'
+		equals: 'foo34&rt4'.
+	self denyIn: '!!@#$'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:06:14'!
+testHenry059
+
+	self compile: '[[:alpha:]]+'.
+	self
+		assertIn: ' 123foo3 '
+		equals: 'foo'.
+	self
+		assertIn: '123foo'
+		equals: 'foo'.
+	self
+		assertIn: 'foo1b'
+		equals: 'foo'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:06:53'!
+testHenry060
+
+	self compile: '[[:cntrl:]]+'.
+	self denyIn: ' a 1234asdf'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:07:48'!
+testHenry061
+
+	self compile: '[[:lower:]]+'.
+	self
+		assertIn: 'UPPERlower1234'
+		equals: 'lower'.
+	self
+		assertIn: 'lowerUPPER'
+		equals: 'lower'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:08:27'!
+testHenry062
+
+	self compile: '[[:upper:]]+'.
+	self
+		assertIn: 'UPPERlower1234'
+		equals: 'UPPER'.
+	self
+		assertIn: 'lowerUPPER'
+		equals: 'UPPER'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:08:59'!
+testHenry063
+
+	self compile: '[[:space:]]+'.
+	self
+		assertIn: '2  spaces'
+		equals: '  '! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:09:40'!
+testHenry064
+
+	self compile: '[^[:space:]]+'.
+	self
+		assertIn: '  word12!!@#$  '
+		equals: 'word12!!@#$'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:10:15'!
+testHenry065
+
+	self compile: '[[:graph:]]+'.
+	self
+		assertIn: 'abc'
+		equals: 'abc'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:10:41'!
+testHenry066
+
+	self compile: '[[:print:]]+'.
+	self
+		assertIn: 'abc'
+		equals: 'abc'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:11:19'!
+testHenry067
+
+	self compile: '[^[:punct:]]+'.
+	self
+		assertIn: '!!hello,world!!'
+		equals: 'hello'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:12:31'!
+testHenry068
+
+	self compile: '[[:xdigit:]]+'.
+	self
+		assertIn: '  x10FCD  '
+		equals: '10FCD'.
+	self
+		assertIn: ' hgfedcba0123456789ABCDEFGH '
+		equals: 'fedcba0123456789ABCDEF'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:17:33'!
+testMatches
+
+	self compile: '\w+'.
+	self
+		assertFullyMatches: 'now';
+		denyFullyMatches: 'now is'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 02:38:12'!
+testMatchesIn
+
+	| result |
+	self compile: '\w+'.
+	result := pattern allMatchesAsStrings: 'now is the time'.
+	self
+		assert: result
+		equals: #('now' 'is' 'the' 'time')! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 02:39:43'!
+testMatchesInCollect
+
+	| result |
+	self compile: '\w+'.
+	result := pattern
+		allMatches: 'now is the time'
+		asStringsCollect: [ :each | each reversed ].
+	self
+		assert: result
+		equals: #('won' 'si' 'eht' 'emit')! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 02:41:27'!
+testMatchesInDo
+
+	| expected |
+	self compile: '\w+'.
+	expected := #('now' 'is' 'the' 'time') asOrderedCollection.
+	pattern
+		allMatches: 'now is the time'
+		asStringsDo: [ :each |
+			self
+				assert: each
+				equals: expected removeFirst ].
+	self assert: expected isEmpty! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 02:43:57'!
+testMatchesInwW
+
+	| result |
+	self compile: '\w+'.
+	result := pattern allMatchesAsStrings: 'now is the time'.
+	self
+		assert: result
+		equals: #('now' 'is' 'the' 'time').
+		
+	self compile: '\W+'.
+	result := pattern allMatchesAsStrings: 'now is the time'.
+	self
+		assert: result
+		equals: #(' ' ' ' ' ').
+
+	self compile: '\w'.
+	result := pattern allMatchesAsStrings: 'now'.
+	self
+		assert: result
+		equals: #('n' 'o' 'w')! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 10:27:43'!
+testMatchesOnStream
+	"| matcher |
+	matcher := self matcherClass forString: '\w+'.
+	self assert: (matcher matchesOnStream: 'now is the time' readStream) asArray 
+		= #('now' 'is' 'the' 'time')"! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 10:27:47'!
+testMatchesOnStreamCollect
+	"| matcher |
+	matcher := self matcherClass forString: '\w+'.
+	self assert: (matcher 
+		matchesOnStream: 'now is the time' readStream 
+		collect: [ :each | each reversed ]) asArray
+			= #('won' 'si' 'eht' 'emit')"! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 10:27:52'!
+testMatchesOnStreamDo
+	"| matcher expected |
+	matcher := self matcherClass forString: '\w+'.
+	expected := #('now' 'is' 'the' 'time') asOrderedCollection.
+	matcher 
+		matchesOnStream: 'now is the time' readStream
+		do: [ :each | self assert: each = expected removeFirst ].
+	self assert: expected isEmpty"! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 10:27:56'!
+testMatchesStream
+	"| matcher |
+	matcher := self matcherClass forString: '\w+'.
+	self assert: (matcher matchesStream: 'now' readStream).
+	self deny: (matcher matchesStream: 'now is' readStream)"! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 6/2/2025 09:10:13'!
+testMatchingRangesIn
+
+	| expected |
+	expected := #(1 3 5 6 8 10 12 15) asOrderedCollection.
+	self compile: '\w+'.
+	(pattern matchingRangesIn: 'now is the time') do: [ :each |
+		self
+			assert: each first
+			equals: expected removeFirst.
+		self
+			assert: each second
+			equals: expected removeFirst ].
+	self assert: expected isEmpty! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:20:15'!
+testOrOperator
+	"The last operator is `|' meaning `or'. It is placed between two regular expressions, and the resulting expression matches if one of the expressions matches.  It has the lowest possible precedence (lower than sequencing).  For example, `ab*|ba*' means `a followed by any number of b's, or b followed by any number of a's':"
+
+	self
+		assert: ('abb' matchesRegex: 'ab*|ba*');
+		assert: ('baa' matchesRegex: 'ab*|ba*');
+		deny: ('baab' matchesRegex: 'ab*|ba*').
+
+	"It is possible to write an expression matching an empty string, for example: `a|'.   However, it is an error to apply `*', `+', or `?' to such expression: `(a|)*' is an invalid expression."
+	self
+		should: [ '(a|)*' asRegex ]
+		raise: Error! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:21:18'!
+testQuotingOperators
+	"As we have seen, characters `*', `+', `?', `(', and `)' have special meaning in regular expressions.  If one of them is to be used literally, it should be quoted: preceded with a backslash.  (Thus, backslash is also special character, and needs to be quoted for a literal match--as well as any other special character described further)."
+
+	self
+		deny: ('ab*' matchesRegex: 'ab*');  "	-- false: star in the right string is special"
+		assert: ('ab*' matchesRegex: 'ab\*');
+		assert: ('a\c' matchesRegex: 'a\\c')! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:28:07'!
+testRegex001
+
+	self compile: '^.*$'.
+	self
+		assertFullyMatches: '';
+		assertFullyMatches: 'a';
+		assertFullyMatches: 'abc'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:28:29'!
+testRegex002
+
+	self compile: 'a\w+c'.
+	self
+		assertFullyMatches: 'abb_bbc';
+		denyIn: 'abb-bc'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:28:54'!
+testRegex003
+
+	self compile: 'a\W+c'.
+	self
+		denyIn: 'abb_bbc';
+		denyIn: 'abb-bc';
+		assertFullyMatches: 'a.,:;-&!!"#%/()={[]}+?\~*''c'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 07:00:38'!
+testRegex005
+
+	self
+		compile: 'H(ä|ae?)ndel';
+		assertFullyMatches: 'Handel'.
+	self
+		compile: 'H(ä|ae?)ndel';
+		assertFullyMatches: 'Händel'.
+	self
+		compile: 'H(ä|ae?)ndel';
+		assertFullyMatches: 'Haendel'.
+	self
+		compile: 'H(ä|ae?)ndel';
+		denyIn: 'Hendel'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 02:46:32'!
+testRemoveHTMLTags
+
+	| result |
+	self compile: '</?[0-9A-Za-z]+[^>]*>'.
+	result := pattern
+		replaceAllIn: '<a>foo<b>bar</b></a>'
+		with: ''.
+	self
+		assert: result
+		equals: 'foobar'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:30:51'!
+testSimpleMatchesRegex
+	"The simplest regular expression is a single character.  It matches exactly that character.  A sequence of characters matches a string with exactly the same sequence of characters:"
+
+	self
+		assert: ('a' matchesRegex: 'a');
+		assert: ('foobar' matchesRegex: 'foobar');
+		deny: ('blorple' matchesRegex: 'foobar')! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:32:04'!
+testSimpleMatchesRegexWithStar
+	"The above paragraph in testSimpleMatchesRegex introduced a primitive regular expression (a character), and an operator (sequencing).  Operators are applied to regular expressions to produce more complex regular expressions.  Sequencing (placing expressions one after another) as an operator is, in a certain sense, `invisible'--yet it is arguably the most common.  A more `visible' operator is Kleene closure, more often simply
+referred to as `a star'.  A regular expression followed by an asterisk matches any number (including 0) of matches of the original expression.  For example:"
+
+	self
+		assert: ('ab' matchesRegex: 'a*b');
+		assert: ('aaaaab' matchesRegex: 'a*b');
+		assert: ('b' matchesRegex: 'a*b');
+		deny: ('aac' matchesRegex: 'a*b')! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 07:06:36'!
+testSpecialCharacterInSetRange
+	"Special characters within a set are `^', `-', and `]' that closes the set.  Below are the examples of how to literally use them in a set:
+		[01^]	-- put the caret anywhere except the beginning
+		[01-]	-- put the dash as the last character
+		[]01]	-- put the closing bracket as the first character 
+		[^]01]	(thus, empty and universal sets cannot be specified)"
+
+	self
+		assert: ('0' matchesRegex: '[01^]');
+		assert: ('1' matchesRegex: '[01^]');
+		assert: ('^' matchesRegex: '[01^]');
+		deny: ('0' matchesRegex: '[^01]');
+		deny: ('1' matchesRegex: '[^01]').
+
+	"[^abc] means that everything except abc is matched"
+	self assert: ('^' matchesRegex: '[^01]')! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 07:07:09'!
+testStarPlusQuestionMark
+	"Two other operators similar to `*' are `+' and `?'. `+' (positive closure, or simply `plus') matches one or more occurrences of the original expression.  `?' (`optional') matches zero or one, but never more, occurrences."
+
+	self
+		assert: ('ac' matchesRegex: 'ab*c');
+		deny: ('ac' matchesRegex: 'ab+c');  "false: need at least one b"
+		assert: ('abbc' matchesRegex: 'ab+c');
+		assert: ('abbbbbbc' matchesRegex: 'ab+c');
+		deny: ('abbc' matchesRegex: 'ab?c')  "false: too many b's"! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:35:02'!
+testStarPrecedence
+	"A star's precedence is higher than that of sequencing.  A star applies to the shortest possible subexpression that precedes it.  For example, 'ab*' means `a followed by zero or more occurrences of b', not `zero or more occurrences of ab':"
+
+	self
+		assert: ('abbb' matchesRegex: 'ab*');
+		deny: ('abab' matchesRegex: 'ab*').
+
+	"To actually make a regex matching `zero or more occurrences of ab', `ab' is enclosed in parentheses:"
+	self
+		assert: ('abab' matchesRegex: '(ab)*');
+		deny: ('abcab' matchesRegex: '(ab)*')! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 07:24:07'!
+testStringAllRangesOfRegexMatches
+
+	| result |
+	result := 'aabbcc' allRangesOfRegexMatches: 'b+'.
+	self
+		assert: result size
+		equals: 1.
+	self
+		assert: (result at: 1)
+		equals: #(3 4)! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 07:27:41'!
+testStringAllRegexMatches
+
+	| result |
+	result := 'aabbcc' allRegexMatches: 'b+'.
+	self
+		assert: result size
+		equals: 1.
+	self
+		assert: (result at: 1)
+		equals: 'bb'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 07:27:58'!
+testStringAsRegex
+
+	self
+		assert: 'b+' asRegex class
+		equals: RegexpPattern! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 07:28:30'!
+testStringAsRegexIgnoringCase
+
+	self
+		assert: 'b+' asRegexIgnoringCase class
+		equals: RegexpPattern! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 07:31:29'!
+testStringCopyWithRegexMatchesReplacedWith
+
+	| result |
+	result := 'aabbcc'
+		copyWithRegex: 'b+'
+		matchesReplacedWith: 'X'.
+	self
+		assert: result
+		equals: 'aaXcc'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 07:43:57'!
+testStringCopyWithRegexMatchesTranslatedUsing
+
+	| result |
+	result := 'aabbcc'
+		copyWithRegex: 'b+'
+		matchesTranslatedUsing: [ :each |
+			'X' ].
+	self
+		assert: result
+		equals: 'aaXcc'! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:36:07'!
+testStringMatchesRegex
+
+	self
+		deny: ('aabbcc' matchesRegex: 'a+');
+		deny: ('aabbcc' matchesRegex: 'b+c+');
+		assert: ('aabbcc' matchesRegex: 'a+b+c+')! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:42:03'!
+testStringMatchesRegexIgnoringCase
+
+	self
+		deny: ('AABBCC' matchesRegexIgnoringCase: 'a+');
+		deny: ('AABBCC' matchesRegexIgnoringCase: 'b+c+');
+		assert: ('AABBCC' matchesRegexIgnoringCase: 'a+b+c+')! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:36:20'!
+testStringPrefixMatchesRegex
+
+	self
+		assert: ('aabbcc' prefixMatchesRegex: 'a+');
+		deny: ('aabbcc' prefixMatchesRegex: 'b+')! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/30/2025 14:56:28'!
+testStringPrefixMatchesRegexIgnoringCase
+
+	self
+		assert: ('AABBCC' prefixMatchesRegexIgnoringCase: 'a+');
+		deny: ('AABBCC' prefixMatchesRegexIgnoringCase: 'b+')! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 07:47:14'!
+testStringRegexMatchesCollect
+
+	| result |
+	result := 'aabbcc'
+		regex: 'b+'
+		matchesCollect: [ :each |
+			each asUppercase ].
+	self
+		assert: result
+		equals: #('BB')! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 07:49:07'!
+testStringRegexMatchesDo
+
+	| result |
+	result := OrderedCollection new.
+	'aabbcc'
+		regex: 'b+'
+		matchesDo: [ :each |
+			result add: each ].
+	self
+		assert: result asArray
+		equals: #('bb')! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 07:53:01'!
+testSubexpressionCount
+
+	#(
+		('a' 1)
+		('a(b)' 2)
+		('a(b(c))' 3)
+		('(a)(b)' 3)
+		('(a(b))*' 3)
+	) do: [ :each |
+		self compile: each first.
+		self
+			assert: pattern slotsNeeded
+			equals: each second ]! !
+
+!RegexpPatternTests methodsFor: 'tests-regex' stamp: 'ess 5/31/2025 10:13:19'!
+testTranslatingMatchesUsing
+
+	| result |
+	result := 'now is the Time'
+		copyWithRegex: '\<[Tt]\w+'
+		matchesTranslatedUsing: [ :each |
+			each asUppercase ].
+	self
+		assert: result
+		equals: 'now is THE TIME'! !
+
+!RegexpPatternTests methodsFor: 'tests-spencer' stamp: 'ess 5/30/2025 10:03:09'!
+aboutTestsSpencer
+	"Tests in this category are from Henry Spencer's regexp.c library."
+	"See also #spencerTests."! !
+
+!RegexpPatternTests methodsFor: 'tests-spencer' stamp: 'ess 6/4/2025 12:43:41'!
+runSpencerTest: re match: string result: code substitute: source expect: result
+
+	| match substitution |
+
+	"Compile"
+	[ self compile: re ]
+		on: RegexpSyntaxError
+		do: [
+			code = 'c' ifFalse: [
+				^ self signalFailure: 'Compile failed when expected to succeed: ', re ].
+			"Expected compile failure."
+			^ self ].
+	code = 'c' ifTrue: [
+		^ self signalFailure: 'Compile succeeded when expected to fail: ', re ].
+
+	"Match"
+	string = '-' ifTrue: [
+		"No match test."
+		^ self ].
+	match := pattern findIn: string.
+	code = 'n' ifTrue: [
+		match ifNotNil: [
+			^ self signalFailure: 'Match succeeded when expected to fail: ', string ].
+		"Expected match failure."
+		^ self ].
+	match ifNil: [
+		^ self signalFailure: 'Match failed when expected to succeed: ', string ].
+
+	"Substitute"
+	source = '-' ifTrue: [
+		"No substitution test."
+		^ self ].
+	substitution := match expand: source.
+	self
+		assert: substitution
+		equals: result! !
+
+!RegexpPatternTests methodsFor: 'tests-spencer' stamp: 'ess 6/2/2025 09:58:42'!
+spencerTests
+	"Tests from Henry Spencer's classic regexp.c library described in Software Solutions in C."
+	"Archived at https://github.com/garyhouston/regexp.old/blob/master/tests"
+
+	"Fields are:
+		1. a regular expression to test,
+		2. a string to match it against,
+		3. a result code,
+			- 'c' for compile failure
+			- 'y' for match success
+			- 'n' for match failure
+		4. a source string for substition, and
+		5. the result of the substitution.
+	See also https://github.com/garyhouston/regexp.old/blob/master/try.c"
+	^ #(
+		'abc'							'abc'					'y'	'&'				'abc'
+		'abc'							'xbc'					'n'	'-'				'-'
+		'abc'							'axc'					'n'	'-'				'-'
+		'abc'							'abx'					'n'	'-'				'-'
+		'abc'							'xabcy'					'y'	'&'				'abc'
+		'abc'							'ababc'					'y'	'&'				'abc'
+		'ab*c'							'abc'					'y'	'&'				'abc'
+		'ab*bc'							'abc'					'y'	'&'				'abc'
+		'ab*bc'							'abbc'					'y'	'&'				'abbc'
+		'ab*bc'							'abbbbc'					'y'	'&'				'abbbbc'
+		'ab+bc'							'abbc'					'y'	'&'				'abbc'
+		'ab+bc'							'abc'					'n'	'-'				'-'
+		'ab+bc'							'abq'					'n'	'-'				'-'
+		'ab+bc'							'abbbbc'					'y'	'&'				'abbbbc'
+		'ab?bc'							'abbc'					'y'	'&'				'abbc'
+		'ab?bc'							'abc'					'y'	'&'				'abc'
+		'ab?bc'							'abbbbc'					'n'	'-'				'-'
+		'ab?c'							'abc'					'y'	'&'				'abc'
+		'^abc$'							'abc'					'y'	'&'				'abc'
+		'^abc$'							'abcc'					'n'	'-'				'-'
+		'^abc'							'abcc'					'y'	'&'				'abc'
+		'^abc$'							'aabc'					'n'	'-'				'-'
+		'abc$'							'aabc'					'y'	'&'				'abc'
+		'^'								'abc'					'y'	'&'				''
+"		'$'								'abc'					'y'	'&'				''				"
+		'a.c'								'abc'					'y'	'&'				'abc'
+		'a.c'								'axc'					'y'	'&'				'axc'
+		'a.*c'							'axyzc'					'y'	'&'				'axyzc'
+		'a.*c'							'axyzd'					'n'	'-'				'-'
+		'a[bc]d'							'abc'					'n'	'-'				'-'
+		'a[bc]d'							'abd'					'y'	'&'				'abd'
+		'a[b-d]e'						'abd'					'n'	'-'				'-'
+		'a[b-d]e'						'ace'					'y'	'&'				'ace'
+		'a[b-d]'							'aac'					'y'	'&'				'ac'
+		'a[-b]'							'a-'						'y'	'&'				'a-'
+		'a[b-]'							'a-'						'y'	'&'				'a-'
+		'[k]'								'ab'						'n'	'-'				'-'
+		'a[b-a]'							'ab'						'n'	'-'				'-'
+		'a[]b'							'-'						'c'	'-'				'-'
+		'a['								'-'						'c'	'-'				'-'
+		'a]'								'a]'						'y'	'&'				'a]'
+		'a[]]b'							'a]b'					'y'	'&'				'a]b'
+		'a[^bc]d'						'aed'					'y'	'&'				'aed'
+		'a[^bc]d'						'abd'					'n'	'-'				'-'
+		'a[^-b]c'						'adc'					'y'	'&'				'adc'
+		'a[^-b]c'						'a-c'					'n'	'-'				'-'
+		'a[^]b]c'							'a]c'						'n'	'-'				'-'
+		'a[^]b]c'							'adc'					'y'	'&'				'adc'
+		'ab|cd'							'abc'					'y'	'&'				'ab'
+		'ab|cd'							'abcd'					'y'	'&'				'ab'
+		'()ef'							'def'						'c'	'&-\1'			'ef-'
+		'()*'								'-'						'c'	'-'				'-'
+"		'*a'								'-'						'c'	'-'				'-'				"
+"		'^*'							'-'						'c'	'-'				'-'				"
+"		'$*'								'-'						'c'	'-'				'-'				"
+"		'(*)b'							'-'						'c'	'-'				'-'				"
+"		'$b'								'b'						'n'	'-'				'-'				"
+"		'a\'								'-'						'c'	'-'				'-'				"
+		'a\(b'							'a(b'					'y'	'&-\1'			'a(b-'
+		'a\(*b'							'ab'						'y'	'&'				'ab'
+		'a\(*b'							'a((b'					'y'	'&'				'a((b'
+		'a\\b'							'a\b'						'y'	'&'				'a\b'	
+		'abc)'							'-'						'y'	'-'				'-'
+		'(abc'							'-'						'c'	'-'				'-'
+		'((a))'							'abc'					'y'	'&-\1-\2'		'a-a-a'
+		'(a)b(c)'							'abc'					'y'	'&-\1-\2'		'abc-a-c'
+		'a+b+c'							'aabbabc'				'y'	'&'				'abc'
+		'a**'							'-'						'y'	'-'				'-'
+		'a*?'							'-'						'y'	'-'				'-'
+		'(a*)*'							'-'						'y'	'-'				'-'
+		'(a*)+'							'-'						'y'	'-'				'-'
+		'(a|)*'							'-'						'c'	'-'				'-'
+		'(a*|b)*'						'-'						'y'	'-'				'-'
+		'(a+|b)*'						'ab'						'y'	'&-\1'			'ab-b'
+		'(a+|b)+'						'ab'						'y'	'&-\1'			'ab-b'
+		'(a+|b)?'							'ab'						'y'	'&-\1'			'a-a'
+		'[^ab]*'							'cde'					'y'	'&'				'cde'
+"		'(^)*'							'-'						'c'	'-'				'-'				"
+		'(ab|)*'							'-'						'c'	'-'				'-'
+		')('								'-'						'c'	'-'				'-'
+"		''								'abc'					'y'	'&'				''				"
+		'abc'							''						'n'	'-'				'-'
+"		'a*'								''						'y'	'&'				''				"
+		'abcd'							'abcd'					'y'	'&-\&-\\&'		'abcd-&-\abcd'
+		'a(bc)d'							'abcd'					'y'	'\1-\\1-\\\1'		'bc-\1-\bc'
+		'([abc])*d'						'abbbcd'					'y'	'&-\1'			'abbbcd-c'
+		'([abc])*bcd'					'abcd'					'y'	'&-\1'			'abcd-a'
+		'a|b|c|d|e'						'e'						'y'	'&'				'e'
+		'(a|b|c|d|e)f'						'ef'						'y'	'&-\1'			'ef-e'
+		'((a*|b))*'						'-'						'y'	'-'				'-'
+		'abcd*efg'						'abcdefg'				'y'	'&'				'abcdefg'
+		'ab*'							'xabyabbbz'				'y'	'&'				'ab'
+		'ab*'							'xayabbbz'				'y'	'&'				'a'
+		'(ab|cd)e'						'abcde'					'y'	'&-\1'			'cde-cd'	
+		'[abhgefdc]ij'						'hij'						'y'	'&'				'hij'
+		'^(ab|cd)e'						'abcde'					'n'	'x\1y'			'xy'
+"		'(abc|)ef'						'abcdef'					'y'	'&-\1'			'ef-'			"
+		'(a|b)c*d'						'abcd'					'y'	'&-\1'			'bcd-b'
+		'(ab|ab*)bc'						'abc'					'y'	'&-\1'			'abc-a'
+		'a([bc]*)c*'						'abc'					'y'	'&-\1'			'abc-bc'
+		'a([bc]*)(c*d)'					'abcd'					'y'	'&-\1-\2'		'abcd-bc-d'
+		'a([bc]+)(c*d)'					'abcd'					'y'	'&-\1-\2'		'abcd-bc-d'
+		'a([bc]*)(c+d)'					'abcd'					'y'	'&-\1-\2'		'abcd-b-cd'
+		'a[bcd]*dcdcde'					'adcdcde'				'y'	'&'				'adcdcde'
+		'a[bcd]+dcdcde'					'adcdcde'				'n'	'-'				'-'
+		'(ab|a)b*c'						'abc'					'y'	'&-\1'			'abc-ab'
+		'((a)(b)c)(d)'						'abcd'					'y'	'\1-\2-\3-\4'	'abc-a-b-d'
+		'[\ -~]*'						'abc'					'y'	'&'				'abc'
+		'[\ -~\ -~]*'					'abc'					'y'	'&'				'abc'
+		'[\ -~\ -~\ -~]*'				'abc'					'y'	'&'				'abc'
+		'[\ -~\ -~\ -~\ -~]*'			'abc'					'y'	'&'				'abc'
+		'[\ -~\ -~\ -~\ -~\ -~]*'		'abc'					'y'	'&'				'abc'
+		'[\ -~\ -~\ -~\ -~\ -~\ -~]*'	'abc'					'y'	'&'				'abc'
+"		'[ -~ -~ -~ -~ -~ -~ -~]*'	'abc'					'y'	'&'				'abc'			"
+		'[a-zA-Z_][a-zA-Z0-9_]*'		'alpha'					'y'	'&'				'alpha'
+		'^a(bc+|b[eh])g|.h$'				'abh'					'y'	'&-\1'			'bh-'
+		'(bc+d$|ef*g.|h?i(j|k))'			'effgz'					'y'	'&-\1-\2'		'effgz-effgz-'
+		'(bc+d$|ef*g.|h?i(j|k))'			'ij'						'y'	'&-\1-\2'		'ij-ij-j'
+		'(bc+d$|ef*g.|h?i(j|k))'			'effg'					'n'	'-'				'-'
+		'(bc+d$|ef*g.|h?i(j|k))'			'bcdd'					'n'	'-'				'-'
+		'(bc+d$|ef*g.|h?i(j|k))'			'reffgz'					'y'	'&-\1-\2'		'effgz-effgz-'
+		'((((((((((a))))))))))'				'-'						'y'	'-'				'-'
+		'(((((((((a)))))))))'					'a'						'y'	'&'				'a'
+		'multiple\ words\ of\ text'			'uh-uh'					'n'	'-'				'-'
+		'multiple\ words'					'multiple words, yeah'	'y'	'&'				'multiple words'
+		'(.*)c(.*)'						'abcde'					'y'	'&-\1-\2'		'abcde-ab-de'
+		'\((.*),\ (.*)\)'					'(a, b)'					'y'	'(\2, \1)'			'(b, a)'
+	)! !
+
+!RegexpPatternTests methodsFor: 'tests-spencer' stamp: 'ess 5/30/2025 08:27:01'!
+testSpencer
+
+	| tests re string code source result |
+	tests := self spencerTests.
+	1
+		to: tests size
+		by: 5
+		do: [ :index |
+			re := tests at: index.
+			string := tests at: (index + 1).
+			code := tests at: (index + 2).
+			source := tests at: (index + 3).
+			result := tests at: (index + 4).
+			self
+				runSpencerTest: re
+				match: string
+				result: code
+				substitute: source
+				expect: result ]! !
+
+!CharacterSequence methodsFor: '*Regexp-evaluating' stamp: 'ess 5/31/2025 07:57:54'!
+allRangesOfRegexMatches: regexString
+	"Answer an array of ranges of the matched substrings."
+	"Each range is an array #(start end) with the inclusive bounds of the match."
+
+	| result |
+	result := regexString asRegex
+		allMatches: self.
+	^ result collect: [ :each |
+		each spanOfGroup: 0 ]! !
+
+!CharacterSequence methodsFor: '*Regexp-evaluating' stamp: 'ess 6/4/2025 09:07:43'!
+allRegexMatches: regexString
+	"Answer an array of matched substrings."
+	"
+	'Jack and Jill went up the hill' allRegexMatches: '\w+'
+	>>> an OrderedCollection('Jack' 'and' 'Jill' 'went' 'up' 'the' 'hill')
+	"
+
+	^ regexString asRegex
+		allMatchesAsStrings: self! !
+
+!CharacterSequence methodsFor: '*Regexp-converting' stamp: 'ess 5/31/2025 07:59:15'!
+asRegex
+	"Compile this string as a regular expression."
+	"May throw RegexpSyntaxError if string is not a valid regular expression."
+
+	^ RegexpPattern
+		fromString: self! !
+
+!CharacterSequence methodsFor: '*Regexp-converting' stamp: 'ess 5/31/2025 07:59:36'!
+asRegexIgnoringCase
+	"Compile this string as a case-insensitive regular expression."
+	"May throw RegexpSyntaxError if string is not a valid regular expression."
+
+	^ RegexpPattern
+		fromString: self
+		ignoreCase: true! !
+
+!CharacterSequence methodsFor: '*Regexp-copying' stamp: 'ess 5/31/2025 08:01:06'!
+copyWithRegex: regexString matchesReplacedWith: aTemplateString
+	"Answer a copy of this string with all matches of regexString replaced by an expansion of aTemplateString."
+
+	^ regexString asRegex
+		replaceAllIn: self
+		with: aTemplateString! !
+
+!CharacterSequence methodsFor: '*Regexp-copying' stamp: 'ess 5/31/2025 08:01:35'!
+copyWithRegex: regexString matchesTranslatedUsing: aUnaryBlock
+	"Answer a copy of this string with all matches of regexString replaced by an evaluation of aUnaryBlock."
+
+	^ regexString asRegex
+		replaceAllIn: self
+		using: [ :each |
+			aUnaryBlock value: (each groupAt: 0) ]! !
+
+!CharacterSequence methodsFor: '*Regexp-testing' stamp: 'ess 6/4/2025 09:01:09'!
+matchesRegex: regexString
+	"True if the pattern given by regexString matches the entirety of this string."
+	"
+	'abacus' matchesRegex: '(a|b)+'
+	>>> false
+	"
+
+	^ regexString asRegex
+		fullyMatches: self! !
+
+!CharacterSequence methodsFor: '*Regexp-testing' stamp: 'ess 6/4/2025 09:03:11'!
+matchesRegexIgnoringCase: regexString
+	"True if the case-insensitive pattern given by regexString matches the entirety of this string."
+	"
+	'ABBA' matchesRegexIgnoringCase: '(a|b)+'
+	>>> true
+	'Abacus' matchesRegexIgnoringCase: '(a|b)+'
+	>>> false
+	"
+
+	^ regexString asRegexIgnoringCase
+		fullyMatches: self! !
+
+!CharacterSequence methodsFor: '*Regexp-testing' stamp: 'ess 6/4/2025 09:01:58'!
+prefixMatchesRegex: regexString
+	"True if the pattern given by regexString matches any prefix of this string."
+	"
+	'abacus' prefixMatchesRegex: '(a|b)+'
+	>>> true
+	"
+
+	^ regexString asRegex
+		matches: self! !
+
+!CharacterSequence methodsFor: '*Regexp-testing' stamp: 'ess 6/4/2025 09:03:32'!
+prefixMatchesRegexIgnoringCase: regexString
+	"True if the case-insensitive pattern given by regexString matches any prefix of this string."
+	"
+	'Abacus' prefixMatchesRegexIgnoringCase: '(a|b)+'
+	>>> true
+	"
+
+	^ regexString asRegexIgnoringCase
+		matches: self! !
+
+!CharacterSequence methodsFor: '*Regexp-evaluating' stamp: 'ess 6/4/2025 09:06:53'!
+regex: regexString matchesCollect: aUnaryBlock
+	"Answer an array with the results of evaluating aUnaryBlock on all substring matches."
+	"
+	'Jack meet Jill'
+		regex: '\w+'
+		matchesCollect: [:word | word size]
+	>>> an OrderedCollection(4 4 4)
+	"
+
+	^ regexString asRegex
+		allMatches: self
+		asStringsCollect: aUnaryBlock! !
+
+!CharacterSequence methodsFor: '*Regexp-evaluating' stamp: 'ess 6/4/2025 09:06:36'!
+regex: regexString matchesDo: aUnaryBlock
+	"Evaluate aUnaryBlock on all substring matches."
+	"
+	| list |
+	list := OrderedCollection new.
+	'Jack meet Jill'
+		regex: '\w+'
+		matchesDo: [:word | list add: word].
+	list
+	>>> an OrderedCollection('Jack' 'meet' 'Jill')
+	"
+
+	regexString asRegex
+		allMatches: self
+		asStringsDo: aUnaryBlock! !
 
 !Character methodsFor: '*Regexp-testing' stamp: 'ess 11/18/2024 03:30:03'!
 isPosixAlnum
@@ -3285,12 +6414,12 @@ isPosixAlpha
 	^ `$a codePoint` <= cp
 		and: [ cp <= `$z codePoint` ]! !
 
-!Character methodsFor: '*Regexp-testing' stamp: 'ess 11/17/2024 18:00:13'!
+!Character methodsFor: '*Regexp-testing' stamp: 'ess 5/30/2025 15:30:18'!
 isPosixBlank
 	"Horizontal whitespace in the 7-bit ASCII character set"
 	
-	^ self == Character tab
-		or: [ self == Character space ]! !
+	^ self = `Character tab`
+		or: [ self = `Character space` ]! !
 
 !Character methodsFor: '*Regexp-testing' stamp: 'ess 11/18/2024 03:20:02'!
 isPosixCntrl
@@ -3360,17 +6489,16 @@ isPosixUpper
 	^ `$A codePoint` <= cp
 		and: [ cp <= `$Z codePoint` ]! !
 
-!Character methodsFor: '*Regexp-testing' stamp: 'ess 11/17/2024 19:22:20'!
+!Character methodsFor: '*Regexp-testing' stamp: 'ess 5/30/2025 15:31:20'!
 isPosixWord
 
-	^ self == $_
+	^ self = $_
 		or: [ self isPosixAlnum ]! !
 
-!Character methodsFor: '*Regexp-testing' stamp: 'ess 11/18/2024 03:32:21'!
+!Character methodsFor: '*Regexp-testing' stamp: 'ess 5/30/2025 15:31:43'!
 isPosixXDigit
-	"Hexadecimal digit in the 7-bit ASCII character set
-
-	N.B., The awkward name is not just for compatibily with the old POSIX [:xdigit:], but also to leave #isHexDigit free to support Unicode hex digits."
+	"Hexadecimal digit in the 7-bit ASCII character set"
+	"N.B., The awkward name is not just for compatibily with the old POSIX [:xdigit:], but also to leave #isHexDigit free to support Unicode hex digits."
 
 	| cp |
 	cp := self codePoint.
@@ -3381,18 +6509,17 @@ isPosixXDigit
 	^ `$a codePoint` <= cp
 		and: [ cp <= `$f codePoint` ]! !
 
-!Character methodsFor: '*Regexp-accessing' stamp: 'ess 11/18/2024 03:08:35'!
+!Character methodsFor: '*Regexp-accessing' stamp: 'ess 5/30/2025 15:29:20'!
 xDigitValue
-	"Posix(-ish) digitValue
-
-	digittoint(3): Always returns an integer from the range of 0 to 15.  If the given character was not a digit as defined by isxdigit(3), the function will return 0."
+	"Posix(-ish) digitValue"
+	"digittoint(3): Always returns an integer from the range of 0 to 15.  If the given character was not a digit as defined by isxdigit(3), the function will return 0."
 
 	| cp |
 	cp := self codePoint.
 	cp < `$0 codePoint` ifTrue: [ ^ 0 ].
 	cp <= `$9 codePoint` ifTrue: [ ^ cp - `$0 codePoint` ].
 	cp < `$A codePoint` ifTrue: [ ^ 0 ].
-	cp <= `$F codePoint` ifTrue: [ ^ cp - (`$A codePoint - 10`) ].
+	cp <= `$F codePoint` ifTrue: [ ^ cp - `$A codePoint - 10` ].
 	cp < `$a codePoint` ifTrue: [ ^ 0 ].
-	cp <= `$f codePoint` ifTrue: [ ^ cp - (`$a codePoint - 10`) ].
+	cp <= `$f codePoint` ifTrue: [ ^ cp - `$a codePoint - 10` ].
 	^ 0! !
