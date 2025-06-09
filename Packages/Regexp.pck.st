@@ -1,8 +1,8 @@
-'From Cuis7.5 [latest update: #7262] on 6 June 2025 at 4:04:48 pm'!
+'From Cuis7.5 [latest update: #7263] on 9 June 2025 at 11:27:52 am'!
 'Description '!
-!provides: 'Regexp' 1 2!
+!provides: 'Regexp' 1 3!
 !requires: 'Cuis-Base' 75 7259 nil!
-!requires: 'Unicode' 1 1 nil!
+!requires: 'Unicode' 1 2 nil!
 SystemOrganization addCategory: #Regexp!
 SystemOrganization addCategory: #'Regexp-Private'!
 SystemOrganization addCategory: #'Regexp-Public'!
@@ -38,26 +38,6 @@ Object subclass: #ReAnchor
 !classDefinition: 'ReAnchor class' category: #'Regexp-Private'!
 ReAnchor class
 	instanceVariableNames: 'beginningOfInput beginningOfLine beginningOfWord endOfInput endOfLine endOfWord notWordBoundary wordBoundary'!
-
-!classDefinition: #ReBaseParser category: #'Regexp-Private'!
-Object subclass: #ReBaseParser
-	instanceVariableNames: 'input lookahead shift'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Regexp-Private'!
-!classDefinition: 'ReBaseParser class' category: #'Regexp-Private'!
-ReBaseParser class
-	instanceVariableNames: ''!
-
-!classDefinition: #ReCompiler category: #'Regexp-Private'!
-ReBaseParser subclass: #ReCompiler
-	instanceVariableNames: 'flags slotsUsed'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Regexp-Private'!
-!classDefinition: 'ReCompiler class' category: #'Regexp-Private'!
-ReCompiler class
-	instanceVariableNames: ''!
 
 !classDefinition: #ReCharacterClass category: #'Regexp-Private'!
 Object subclass: #ReCharacterClass
@@ -429,6 +409,16 @@ TestCase subclass: #RegexpPatternTests
 RegexpPatternTests class
 	instanceVariableNames: ''!
 
+!classDefinition: #ReCompiler category: #'Regexp-Private'!
+RecursiveDescentParser subclass: #ReCompiler
+	instanceVariableNames: 'flags slotsUsed'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Regexp-Private'!
+!classDefinition: 'ReCompiler class' category: #'Regexp-Private'!
+ReCompiler class
+	instanceVariableNames: ''!
+
 
 !ReInstruction commentStamp: '<historical>' prior: 0!
 An "opcode", of sorts, for the regular expression matching virtual machine.!
@@ -734,924 +724,6 @@ wordBoundary
 		wordBoundary := self
 			predicate: [ :thread | thread isWordBoundary ]
 			debugString: '\b' ]! !
-
-!ReBaseParser methodsFor: 'accessing' stamp: 'ess 6/6/2025 07:30:20'!
-input: aStringOrStream
-
-	input := aStringOrStream readStream.
-	self step! !
-
-!ReBaseParser methodsFor: 'as yet unclassified' stamp: 'ess 6/6/2025 07:36:22'!
-syntaxError: aMessageString
-
-	^ self syntaxErrorClass
-		signal: aMessageString! !
-
-!ReBaseParser methodsFor: 'as yet unclassified' stamp: 'ess 6/6/2025 07:35:59'!
-syntaxErrorClass
-
-	^ Error! !
-
-!ReBaseParser methodsFor: 'backtracking' stamp: 'ess 6/6/2025 07:34:17'!
-restore
-
-	| saved |
-	saved := self unsave.
-	input position: saved first.
-	lookahead := saved second! !
-
-!ReBaseParser methodsFor: 'backtracking' stamp: 'ess 6/6/2025 07:34:25'!
-save
-
-	shift addLast: { input position . lookahead }! !
-
-!ReBaseParser methodsFor: 'backtracking' stamp: 'ess 6/6/2025 07:35:06'!
-unsave
-
-	shift isEmpty ifTrue: [
-		^ self error: self class name, ' internal error: restore without save' ].
-	^ shift removeLast! !
-
-!ReBaseParser methodsFor: 'backtracking' stamp: 'ess 6/6/2025 07:35:13'!
-withSaveDo: aUnaryBlock
-
-	| didRestore restore |
-	didRestore := false.
-	restore := [
-		self restore.
-		didRestore := true ].
-	self save.
-	^ [ aUnaryBlock value: restore ]
-		ensure: [
-			didRestore ifFalse: [
-				self unsave ] ]! !
-
-!ReBaseParser methodsFor: 'initialization' stamp: 'ess 6/6/2025 07:29:53'!
-initialize
-
-	super initialize.
-	shift := OrderedCollection new! !
-
-!ReBaseParser methodsFor: 'parsing' stamp: 'ess 6/6/2025 07:29:17'!
-consume
-	"Update lookahead to the next character of the input, or nil.  Answer the old value of the lookahead."
-
-	| la |
-	la := lookahead ifNil: [
-		^ self syntaxError: 'Unexpected end of input' ].
-	self step.
-	^ la! !
-
-!ReBaseParser methodsFor: 'parsing' stamp: 'ess 6/6/2025 07:29:25'!
-consumeDigit
-
-	self isDigit ifFalse: [
-		^ self syntaxError: 'Expected decimal digit' ].
-	^ self consume xDigitValue! !
-
-!ReBaseParser methodsFor: 'parsing' stamp: 'ess 6/6/2025 07:29:30'!
-consumeXDigit
-
-	self isXDigit ifFalse: [
-		^ self syntaxError: 'Expected hexadecimal digit' ].
-	^ self consume xDigitValue! !
-
-!ReBaseParser methodsFor: 'parsing' stamp: 'ess 6/6/2025 07:29:36'!
-expect: aCharacter
-
-	(self match: aCharacter) ifFalse: [
-		^ self syntaxError: 'Expected ', aCharacter asString ]! !
-
-!ReBaseParser methodsFor: 'parsing' stamp: 'ess 6/6/2025 07:29:42'!
-expectAll: aSequence
-
-	(self matchAll: aSequence) ifFalse: [
-		^ self syntaxError: 'Expected ', aSequence asString ]! !
-
-!ReBaseParser methodsFor: 'parsing' stamp: 'ess 6/6/2025 07:31:31'!
-lookahead
-
-	^ lookahead! !
-
-!ReBaseParser methodsFor: 'parsing' stamp: 'ess 6/6/2025 07:31:35'!
-match: aCharacter
-	"Consume the next character only if it matches aCharacter.  Answer true if the match succeeded."
-
-	| isMatch |
-	isMatch := lookahead = aCharacter.
-	isMatch ifTrue: [
-		self consume ].
-	^ isMatch! !
-
-!ReBaseParser methodsFor: 'parsing' stamp: 'ess 6/6/2025 07:31:42'!
-matchAll: aSequence
-
-	| isMatch |
-	^ self withSaveDo: [ :restore |
-		isMatch := aSequence
-			inject: true
-			into: [ :sum :each |
-				sum and: [ self match: each ] ].
-		isMatch ifFalse: [
-			restore value ].
-		isMatch ]! !
-
-!ReBaseParser methodsFor: 'parsing' stamp: 'ess 6/6/2025 07:31:54'!
-matchAllIgnoringCase: aSequence
-
-	| isMatch |
-	^ self withSaveDo: [ :restore  |
-		isMatch := aSequence
-			inject: true
-			into: [ :sum :each |
-				sum and: [ self matchIgnoringCase: each ] ].
-		isMatch ifFalse: [
-			restore value ].
-		isMatch ]! !
-
-!ReBaseParser methodsFor: 'parsing' stamp: 'ess 6/6/2025 07:31:58'!
-matchIgnoringCase: aCharacter
-	"Consume the next character only if it matches aCharacter.  Answer true if the match succeeded."
-
-	| isMatch |
-	isMatch := lookahead asLowercase = aCharacter asLowercase.
-	isMatch ifTrue: [
-		self consume ].
-	^ isMatch! !
-
-!ReBaseParser methodsFor: 'parsing' stamp: 'ess 6/6/2025 07:32:04'!
-next
-
-	^ input next! !
-
-!ReBaseParser methodsFor: 'parsing' stamp: 'ess 6/6/2025 07:32:25'!
-parse
-
-	^ self subclassResponsibility! !
-
-!ReBaseParser methodsFor: 'parsing' stamp: 'ess 6/6/2025 07:32:15'!
-parse: aStringOrStream
-
-	self input: aStringOrStream.
-	^ self parse! !
-
-!ReBaseParser methodsFor: 'parsing' stamp: 'ess 6/6/2025 07:34:35'!
-skipBlanks
-
-	[ self isBlank ] whileTrue: [
-		self consume ]! !
-
-!ReBaseParser methodsFor: 'parsing' stamp: 'ess 6/6/2025 07:34:43'!
-skipSpaces
-
-	[ self isSpace ] whileTrue: [
-		self consume ]! !
-
-!ReBaseParser methodsFor: 'parsing' stamp: 'ess 6/6/2025 07:34:55'!
-step
-	"Move to next character of input."
-
-	lookahead := input atEnd
-		ifFalse: [ self next ]
-		ifTrue: [ nil ]! !
-
-!ReBaseParser methodsFor: 'parsing-characters' stamp: 'ess 6/6/2025 07:32:54'!
-readDigits
-
-	| result |
-	self isDigit ifFalse: [
-		^ self syntaxError: 'Expected decimal number' ].
-	result := 0.
-	[ self isDigit ] whileTrue: [
-		result := result * 10 + self consumeDigit ].
-	^ result! !
-
-!ReBaseParser methodsFor: 'parsing-characters' stamp: 'ess 6/6/2025 07:33:05'!
-readDigits: expectedCount
-
-	^ self
-		readDigitsFrom: expectedCount
-		to: expectedCount! !
-
-!ReBaseParser methodsFor: 'parsing-characters' stamp: 'ess 6/6/2025 07:33:09'!
-readDigitsFrom: minCount to: maxCount
-
-	| result count |
-	result := 0.
-	count := 0.
-	[ count < maxCount and: [ self isDigit ] ]
-		whileTrue: [
-			result := result * 10 + self consumeDigit.
-			count := count + 1 ].
-	count < minCount ifTrue: [
-		^ self syntaxError: 'Expected decimal number' ].
-	^ result! !
-
-!ReBaseParser methodsFor: 'parsing-characters' stamp: 'ess 6/6/2025 07:33:49'!
-readXDigits
-
-	| result |
-	self isXDigit ifFalse: [
-		^ self syntaxError: 'Expected hexadecimal number' ].
-	result := 0.
-	[ self isXDigit ] whileTrue: [
-		result := result * 16 + self consumeXDigit ].
-	^ result! !
-
-!ReBaseParser methodsFor: 'parsing-characters' stamp: 'ess 6/6/2025 07:33:55'!
-readXDigits: expectedCount
-
-	^ self
-		readXDigitsFrom: expectedCount
-		to: expectedCount! !
-
-!ReBaseParser methodsFor: 'parsing-characters' stamp: 'ess 6/6/2025 07:34:12'!
-readXDigitsFrom: minCount to: maxCount
-
-	| result count |
-	result := 0.
-	count := 0.
-	[ count < maxCount and: [ self isXDigit ] ]
-		whileTrue: [
-			result := result * 16 + self consumeXDigit.
-			count := count + 1 ].
-	count < minCount ifTrue: [
-		^ self syntaxError: 'Expected hexadecimal number' ].
-	^ result! !
-
-!ReBaseParser methodsFor: 'testing' stamp: 'ess 6/6/2025 07:28:42'!
-atEnd
-
-	^ lookahead isNil! !
-
-!ReBaseParser methodsFor: 'testing' stamp: 'ess 6/6/2025 07:30:25'!
-isAlnum
-	"Alphanumeric in the 7-bit ASCII character set"
-
-	^ lookahead notNil
-		and: [ lookahead isPosixAlnum ]! !
-
-!ReBaseParser methodsFor: 'testing' stamp: 'ess 6/6/2025 07:30:30'!
-isAlpha
-	"Alphabetic in the 7-bit ASCII character set"
-
-	^ lookahead notNil
-		and: [ lookahead isPosixAlpha ]! !
-
-!ReBaseParser methodsFor: 'testing' stamp: 'ess 6/6/2025 07:30:35'!
-isBlank
-	"Horizontal whitespace in the 7-bit ASCII character set"
-
-	^ lookahead notNil
-		and: [ lookahead isPosixBlank ]! !
-
-!ReBaseParser methodsFor: 'testing' stamp: 'ess 6/6/2025 07:30:40'!
-isCntrl
-	"Control in the 7-bit ASCII character set"
-
-	^ lookahead notNil
-		and: [ lookahead isPosixCntrl ]! !
-
-!ReBaseParser methodsFor: 'testing' stamp: 'ess 6/6/2025 07:30:45'!
-isDigit
-	"Decimal digit in the 7-bit ASCII character set"
-
-	^ lookahead notNil
-		and: [ lookahead isPosixDigit ]! !
-
-!ReBaseParser methodsFor: 'testing' stamp: 'ess 6/6/2025 07:30:49'!
-isGraph
-	"Graphic--has a printed representation--in the 7-bit ASCII character set"
-
-	^ lookahead notNil
-		and: [ lookahead isPosixGraph ]! !
-
-!ReBaseParser methodsFor: 'testing' stamp: 'ess 6/6/2025 07:30:55'!
-isLower
-	"Lowercase letter in the 7-bit ASCII character set."
-
-	^ lookahead notNil
-		and: [ lookahead isPosixLower ]! !
-
-!ReBaseParser methodsFor: 'testing' stamp: 'ess 6/6/2025 07:31:01'!
-isPrint
-	"Printable--takes up space when displayed--in the 7-bit ASCII character set"
-
-	^ lookahead notNil
-		and: [ lookahead isPosixPrint ]! !
-
-!ReBaseParser methodsFor: 'testing' stamp: 'ess 6/6/2025 07:31:04'!
-isPunct
-	"Punctuation in the 7-bit ASCII character set"
-
-	^ lookahead notNil
-		and: [ lookahead isPosixPunct ]! !
-
-!ReBaseParser methodsFor: 'testing' stamp: 'ess 6/6/2025 07:31:11'!
-isSpace
-	"Horizontal or vertical whitespace in the 7-bit ASCII character set"
-
-	^ lookahead notNil
-		and: [ lookahead isPosixSpace ]! !
-
-!ReBaseParser methodsFor: 'testing' stamp: 'ess 6/6/2025 07:31:16'!
-isUpper
-	"Uppercase letter in the 7-bit ASCII character set"
-
-	^ lookahead notNil
-		and: [ lookahead isPosixUpper ]! !
-
-!ReBaseParser methodsFor: 'testing' stamp: 'ess 6/6/2025 07:31:20'!
-isWord
-
-	^ lookahead notNil
-		and: [ lookahead isPosixWord ]! !
-
-!ReBaseParser methodsFor: 'testing' stamp: 'ess 6/6/2025 07:31:26'!
-isXDigit
-	"Hexadecimal digit in the 7-bit ASCII character set"
-
-	^ lookahead notNil
-		and: [ lookahead isPosixXDigit ]! !
-
-!ReBaseParser class methodsFor: 'as yet unclassified' stamp: 'ess 6/6/2025 16:04:29'!
-parse: aStringOrStream
-
-	^ self new
-		parse: aStringOrStream! !
-
-!ReCompiler methodsFor: 'accessing' stamp: 'ess 5/30/2025 15:38:11'!
-nextSlot
-
-	| result |
-	result := slotsUsed.
-	slotsUsed := slotsUsed + 1.
-	^ result! !
-
-!ReCompiler methodsFor: 'as yet unclassified' stamp: 'ess 6/6/2025 07:36:11'!
-syntaxErrorClass
-
-	^ RegexpSyntaxError! !
-
-!ReCompiler methodsFor: 'constants' stamp: 'ess 5/31/2025 08:34:48'!
-anchorEscapes
-
-	^ {
-		$A	-> [ ReAnchorNode beginningOfInput ] .
-		$Z	-> [ ReAnchorNode endOfInput ] .
-		$b	-> [ ReAnchorNode wordBoundary ] .
-		$B	-> [ ReAnchorNode notWordBoundary ] .
-		$<	-> [ ReAnchorNode beginningOfWord ] .
-		$>	-> [ ReAnchorNode endOfWord ]
-	} asDictionary! !
-
-!ReCompiler methodsFor: 'constants' stamp: 'ess 5/29/2025 10:16:24'!
-characterEscapes
-
-	^ `{
-		$0	-> (Character codePoint: 0)		.  "NUL"
-		$a	-> (Character codePoint: 7)		.  "BEL (alarm)"
-		$e	-> (Character codePoint: 27)	.  "ESC"
-		$f	-> (Character codePoint: 12)	.  "FF"
-		$n	-> (Character codePoint: 10)	.  "LF"
-		$r	-> (Character codePoint: 13)	.  "CR"
-		$t	-> (Character codePoint: 9)		.  "TAB"
-		$v	-> (Character codePoint: 11)	"VT"
-	} asDictionary`! !
-
-!ReCompiler methodsFor: 'initialization' stamp: 'ess 6/6/2025 07:29:57'!
-initialize
-
-	super initialize.
-	slotsUsed := 0! !
-
-!ReCompiler methodsFor: 'parsing' stamp: 'ess 6/3/2025 14:56:22'!
-compile: aStringOrStream
-	"May throw RegexpSyntaxError."
-
-	| node |
-	node := self parse: aStringOrStream.
-	^ RegexpPattern
-		compileProgram: node
-		slotsNeeded: slotsUsed! !
-
-!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 18:27:32'!
-maybeCompile: aStringOrStream
-	"Answer nil instead of throwing an error when presented with an invalid regular expression."
-
-	^ [ self compile: aStringOrStream ]
-		on: RegexpSyntaxError
-		do: [
-			^ nil ]! !
-
-!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:04:06'!
-parse
-
-	| slot node |
-	slot := self nextSlot.
-	node := self readExpression.
-	^ ReGroupNode
-		with: node
-		slot: slot! !
-
-!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:04:22'!
-readAlternatives
-
-	| result |
-	result := self readConcatenation.
-	self skipWhitespace.
-	[ self match: $| ] whileTrue: [
-		result := result or: self readConcatenation.
-		self skipWhitespace ].	
-	^ result! !
-
-!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/29/2025 10:17:33'!
-readConcatenation
-
-	| result |
-	result := self readRepetition..
-	self skipWhitespace.
-	[ lookahead notNil and: [ ('|)' includes: lookahead) not ] ]
-		whileTrue: [
-			result := result and: self readRepetition.
-			self skipWhitespace ].
-	^ result! !
-
-!ReCompiler methodsFor: 'parsing' stamp: 'ess 11/6/2024 06:07:21'!
-readExpression
-
-	^ self readAlternatives! !
-
-!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 11:25:09'!
-readGroup
-
-	| capturing slot node |
-	capturing := true.
-	(self match: $?) ifTrue: [
-		(self match: $#) ifTrue: [
-			self skipBlockComment.
-			^ ReNullNode new ].
-		(self match: $:) ifTrue: [
-			capturing := false ] ].
-	capturing ifTrue: [
-		slot := self nextSlot ].
-	node := self readExpression.
-	self expect: $).
-	^ ReGroupNode
-		with: node
-		slot: slot! !
-
-!ReCompiler methodsFor: 'parsing' stamp: 'ess 6/6/2025 07:34:06'!
-readInteger
-
-	^ self readDigits! !
-
-!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:05:12'!
-readRepetition
-
-	| node char repeat |
-	node := self readCharacter.
-	(node isKindOf: ReAnchorNode) ifTrue: [
-		^ node ].
-	('*+?{' includes: lookahead) ifTrue: [
-		char := self consume.
-		char = $* ifTrue: [
-			node := node repeatMin: 0 ].
-		char = $+ ifTrue: [
-			node := node repeatMin: 1 ].
-		char = $? ifTrue: [
-			node := node
-				repeatMin: 0
-				max: 1 ].
-		char = ${ ifTrue: [
-			repeat := self readRepetitionCount.
-			repeat node: node.
-			node := repeat ].
-		(self match: $+) ifTrue: [
-			node bePossessive ].
-		(self match: $?) ifTrue: [
-			node beNotGreedy ] ].
-	^ node! !
-
-!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:05:37'!
-readRepetitionCount
-
-	| min max |	
-	min := nil.
-	max := nil.	
-	self isDigit ifTrue: [
-		min := self readInteger ].
-	(self match: $}) ifTrue: [  "{n}"
-		min ifNil: [  "Exclude {}"
-			^ self syntaxError: 'Expected repetition count' ].
-		^ ReRepetitionNode
-			min: min
-			max: min ].
-	"{n,m} or {,m}"
-	min := min ifNil: [ 0 ].
-	self expect: $,.
-	self isDigit ifTrue: [
-		max := self readInteger ].
-	self expect: $}.
-	^ ReRepetitionNode
-		min: min
-		max: max! !
-
-!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 11:39:14'!
-skipBlockComment
-
-	[ lookahead notNil ] whileTrue: [
-		(self match: $\)
-			ifTrue: [
-				self consume ]
-			ifFalse: [
-				(self match: $)) ifTrue: [
-					^ self ].
-				(self matchAll: '(?#')
-					ifTrue: [
-						self skipBlockComment ]
-					ifFalse: [
-						self consume ] ] ]! !
-
-!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:06:37'!
-skipLineComment
-
-	| endOfLine |
-	endOfLine := `{ nil . Character lf . Character cr }`.
-	[ endOfLine statePointsTo: lookahead ] whileFalse: [
-		self consume ].
-	self match: `Character cr`.
-	self match: `Character lf`! !
-
-!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:07:17'!
-skipWhitespace
-
-	[ lookahead = $# or: [ self isSpace ] ]
-		whileTrue: [
-			(self match: $#) ifTrue: [
-				self skipLineComment ].
-			self skipBlanks ]! !
-
-!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 6/2/2025 08:04:17'!
-readCharacter
-
-	| character |
-	self skipSpaces.
-	(self match: $() ifTrue: [
-		^ self readGroup ].
-	character := self consume.
-	character = $\ ifTrue: [
-		^ self readCharacterEscape ].
-	character = $$ ifTrue: [
-		^ ReAnchorNode endOfLine ].
-	character = $. ifTrue: [
-		^ ReCharacterNode wildcard: flags ].
-	character = $[ ifTrue: [
-		^ self readCharacterClass ].
-	character = $^ ifTrue: [
-		^ ReAnchorNode beginningOfLine ].
-	^ ReCharacterNode
-		character: character
-		flags: flags! !
-
-!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 6/2/2025 08:11:21'!
-readCharacterEscape
-
-	| escape |
-
-	"\0 \a \e \f \n \r \t \v"
-	escape := self characterEscapes
-		at: lookahead
-		ifAbsent: [ nil ].
-	escape ifNotNil: [
-		self consume.
-		^ ReCharacterNode
-			character: escape ].
-
-	"\< \> \A \B \Z \b"
-	escape := self anchorEscapes
-		at: lookahead
-		ifAbsent: [ nil ].
-	escape ifNotNil: [
-		self consume.
-		^ escape value ].
-
-	"\D \S \W \d \s \w"
-	(ReCharacterClass
-		namedClass: lookahead
-		flags: flags)
-			ifNotNil: [ :namedClass |
-				self consume.
-				^ ReCharacterNode
-					characterClass: namedClass ].
-
-	"\cX control character"
-	(self match: $c) ifTrue: [
-		| control character |
-		control := self consume codePoint \\ 32.
-		character := Character codePoint: control.
-		^ ReCharacterNode
-			character: character ].
-			
-	"\p{ unicode property name or value}"
-	((lookahead = $P)  or: [ lookahead = $p ]) ifTrue: [
-		| p class |
-		p := self consume.
-		(self match: ${) ifFalse: [
-			^ ReCharacterNode
-				character: p
-				flags: flags ].
-		class := self readPropertyEscape.
-		p = $P ifTrue: [
-			class := class complement ].
-			^ ReCharacterNode
-				characterClass: class ].
-
-	"\uXXXX or \u{X[1-6]} unicode escape"
-	(self match: $u) ifTrue: [
-		^ ReCharacterNode
-			character: self readUnicodeEscape ].
-			
-	"\xXX \x{X[1-2]} hexadecimal escape"
-	(self match: $x) ifTrue: [
-		^ ReCharacterNode
-			character: self readHexEscape ].
-
-	"Handles \\ along with unnecessary escapes"
-	^ ReCharacterNode
-		character: self consume
-		flags: flags! !
-
-!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 5/30/2025 15:53:41'!
-readHexEscape
-
-	| codepoint |
-	(self match: ${)
-		ifFalse: [
-			codepoint := self readXDigits: 2 ]
-		ifTrue: [
-			codepoint := self
-				readXDigitsFrom: 1
-				to: 2.
-			self expect: $} ].
-	^ Character codePoint: codepoint! !
-
-!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 5/30/2025 15:18:41'!
-readPropertyEscape
-
-	| name |
-	name := self readWord.
-	name isEmptyOrNil ifTrue: [
-		^ self syntaxError: 'Expected Unicode property name or value' ].
-	self skipWhitespace.
-	self expect: $}.
-	^ ReCharacterClass
-		unicodeProperty: name
-		flags: flags! !
-
-!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 5/30/2025 15:54:20'!
-readUnicodeEscape
-
-	| codepoint |
-	(self match: ${)
-		ifFalse: [
-			codepoint := self readXDigits: 4 ]
-		ifTrue: [
-			codepoint := self
-				readXDigitsFrom: 1
-				to: 6.
-			self expect: $} ].
-	^ Character codePoint: codepoint! !
-
-!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 5/30/2025 15:54:47'!
-readWord
-
-	self skipSpaces.
-	^ String streamContents: [ :stream |
-		[ self isWord ] whileTrue: [
-			stream nextPut: self consume ] ]! !
-
-!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 6/2/2025 08:13:02'!
-readCharacterClass
-
-	^ ReCharacterNode
-		characterClass: self readClassExpression! !
-
-!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 6/2/2025 09:35:31'!
-readClassCharacter
-
-	| character1 character2 |
-	self skipWhitespace.
-	character1 := self consume.
-	character1 = $- ifTrue: [
-		^ ReCharacterClass
-			with: $- ].
-	character1 = $\ ifTrue: [
-		character1 := self readClassEscape ].
-	character1 isCharacter ifFalse: [
-		^ character1 ].
-	self skipWhitespace.
-	lookahead = $- ifFalse: [
-		^ character1 ].
-	self withSaveDo: [ :restore |
-		self consume.
-		lookahead = $] ifTrue: [
-			^ ReCharacterClass
-				with: character1
-				with: $-
-				flags: flags ].
-		lookahead = $- ifTrue: [
-			restore value.
-			^ ReCharacterClass
-				with: character1
-				flags: flags ].
-		character2 := self readClassCharacter.
-		character2 isCharacter ifFalse: [
-			restore value.
-			^ ReCharacterClass
-				with: character1
-				flags: flags ].
-		^ ReCharacterClass
-			from: character1
-			to: character2
-			flags: flags ]! !
-
-!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 5/29/2025 13:15:41'!
-readClassEscape
-
-	| escape |
-
-	"\0 \a \e \f \n \r \t \v"
-	escape := self characterEscapes
-		at: lookahead
-		ifAbsent: [ nil ].
-	escape ifNotNil: [
-		^ escape ].
-
-	"\D \S \W \d \s \w"
-	(ReCharacterClass
-		namedClass: lookahead
-		flags: flags)
-			ifNotNil: [ :namedClass |
-				self consume.
-				^ namedClass ].
-
-	"\cX control character"
-	(self match: $c) ifTrue: [
-		| control |
-		control := self consume codePoint \\ 32.
-		^ Character codePoint: control ].
-
-	"\p{ unicode property name or value}"
-	(lookahead = $P  or: [ lookahead = $p ]) ifTrue: [
-		| p class |
-		p := self consume.
-		(self match: ${) ifFalse: [
-			^ p ].
-		class := self readPropertyEscape.
-		p = $P ifTrue: [
-			class := class complement ].
-		^ class ].
-
-	"\uXXXX or \u{X[1-6]} unicode escape"
-	(self match: $u) ifTrue: [
-		^ self readUnicodeEscape ].
-			
-	"\xXX \x{X[1-2]} hexadecimal escape"
-	(self match: $x) ifTrue: [
-		^ self readHexEscape ].
-
-	"Handles \\ along with unnecessary escapes"
-	^ self consume! !
-
-!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 6/2/2025 09:18:11'!
-readClassExpression
-
-	| isComplement class |
-	self skipWhitespace.
-	isComplement := self match: $^.
-	self skipWhitespace.
-	class := lookahead = $]
-		ifTrue: [ self readClassUnion ]
-		ifFalse: [ self readClassSubtraction ].
-	self skipWhitespace.
-	self expect: $].
-	^ isComplement
-		ifTrue: [ class complement ]
-		ifFalse: [ class ]! !
-
-!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 5/30/2025 15:58:19'!
-readClassIntersection
-
-	| result operand |
-	result := self readClassUnion.
-	self skipWhitespace.
-	[ self match: $$ ] whileTrue: [
-		self expect: $$.
-		operand := self readClassUnion.
-		result := result & operand.
-		self skipWhitespace ].
-	^ result! !
-
-!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 5/30/2025 15:59:00'!
-readClassName
-
-	self isAlpha ifFalse: [
-		^ self syntaxError: 'Expected character class' ].
-	^ String streamContents: [ :stream |
-		[ self isAlpha ] whileTrue: [
-			stream nextPut: self consume ] ]! !
-
-!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 5/30/2025 15:59:16'!
-readClassSubtraction
-
-	| result operand |
-	result := self readClassIntersection.
-	self skipWhitespace.
-	[ self match: $- ] whileTrue: [
-		self expect: $-.
-		operand := self readClassIntersection.
-		result := result - operand.
-		self skipWhitespace ].
-	^ result! !
-
-!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 6/2/2025 09:19:20'!
-readClassUnion
-
-	| result done operand c |
-	result := ReCharacterClass empty: flags.
-	done := false.
-	self skipWhitespace.
-	(self match: $]) ifTrue: [
-		result add: $] ].
-	[ done or: [ lookahead = $] ] ]
-		whileFalse: [
-			done := (self matchAll: '&&') or: [ self matchAll: '--' ].
-			done ifFalse: [
-				operand := (self match: $[)
-					ifTrue: [ self readNestedClass ]
-					ifFalse: [
-						c := self readClassCharacter.
-						c isCharacter
-							ifFalse: [ c ]
-							ifTrue: [
-								ReCharacterClass
-									with: c
-									flags: flags ] ].
-				result := result | operand.
-				self skipWhitespace ] ].
-	^ result! !
-
-!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 5/30/2025 16:00:30'!
-readNestedClass
-
-	self skipWhitespace.
-	^ (self match: $:)
-		ifTrue: [ self readPosixClass ]
-		ifFalse: [ self readClassExpression ]! !
-
-!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 5/29/2025 13:17:20'!
-readPosixClass
-
-	| name |
-	self skipWhitespace.
-	name := self readClassName.
-	self skipWhitespace.
-	self expect: $:.
-	self skipWhitespace.
-	self expect: $].
-	^ ReCharacterClass
-		posixClass: name
-		flags: flags! !
-
-!ReCompiler methodsFor: 'private' stamp: 'ess 5/30/2025 15:22:47'!
-setIgnoreCase: ignoreCase multiLine: multiLine
-
-	flags := ReFlags
-		ignoreCase: ignoreCase
-		multiLine: multiLine.
-	^ self! !
-
-!ReCompiler class methodsFor: 'instance creation' stamp: 'ess 5/30/2025 15:22:11'!
-ignoreCase: ignoreCase
-
-	^ self
-		ignoreCase: ignoreCase
-		multiLine: nil! !
-
-!ReCompiler class methodsFor: 'instance creation' stamp: 'ess 5/30/2025 14:49:24'!
-ignoreCase: ignoreCase multiLine: multiLine
-
-	^ self new
-		setIgnoreCase: ignoreCase
-		multiLine: multiLine! !
-
-!ReCompiler class methodsFor: 'instance creation' stamp: 'ess 5/30/2025 15:22:15'!
-multiLine: multiLine
-
-	^ self
-		ignoreCase: nil
-		multiLine: multiLine! !
 
 !ReCharacterClass methodsFor: 'as yet unclassified' stamp: 'ess 6/2/2025 07:46:00'!
 & anotherClass
@@ -6294,6 +5366,579 @@ testSpencer
 				substitute: source
 				expect: result ]! !
 
+!ReCompiler methodsFor: 'accessing' stamp: 'ess 5/30/2025 15:38:11'!
+nextSlot
+
+	| result |
+	result := slotsUsed.
+	slotsUsed := slotsUsed + 1.
+	^ result! !
+
+!ReCompiler methodsFor: 'as yet unclassified' stamp: 'ess 6/6/2025 07:36:11'!
+syntaxErrorClass
+
+	^ RegexpSyntaxError! !
+
+!ReCompiler methodsFor: 'constants' stamp: 'ess 5/31/2025 08:34:48'!
+anchorEscapes
+
+	^ {
+		$A	-> [ ReAnchorNode beginningOfInput ] .
+		$Z	-> [ ReAnchorNode endOfInput ] .
+		$b	-> [ ReAnchorNode wordBoundary ] .
+		$B	-> [ ReAnchorNode notWordBoundary ] .
+		$<	-> [ ReAnchorNode beginningOfWord ] .
+		$>	-> [ ReAnchorNode endOfWord ]
+	} asDictionary! !
+
+!ReCompiler methodsFor: 'constants' stamp: 'ess 5/29/2025 10:16:24'!
+characterEscapes
+
+	^ `{
+		$0	-> (Character codePoint: 0)		.  "NUL"
+		$a	-> (Character codePoint: 7)		.  "BEL (alarm)"
+		$e	-> (Character codePoint: 27)	.  "ESC"
+		$f	-> (Character codePoint: 12)	.  "FF"
+		$n	-> (Character codePoint: 10)	.  "LF"
+		$r	-> (Character codePoint: 13)	.  "CR"
+		$t	-> (Character codePoint: 9)		.  "TAB"
+		$v	-> (Character codePoint: 11)	"VT"
+	} asDictionary`! !
+
+!ReCompiler methodsFor: 'initialization' stamp: 'ess 6/6/2025 07:29:57'!
+initialize
+
+	super initialize.
+	slotsUsed := 0! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 6/3/2025 14:56:22'!
+compile: aStringOrStream
+	"May throw RegexpSyntaxError."
+
+	| node |
+	node := self parse: aStringOrStream.
+	^ RegexpPattern
+		compileProgram: node
+		slotsNeeded: slotsUsed! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 18:27:32'!
+maybeCompile: aStringOrStream
+	"Answer nil instead of throwing an error when presented with an invalid regular expression."
+
+	^ [ self compile: aStringOrStream ]
+		on: RegexpSyntaxError
+		do: [
+			^ nil ]! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:04:06'!
+parse
+
+	| slot node |
+	slot := self nextSlot.
+	node := self readExpression.
+	^ ReGroupNode
+		with: node
+		slot: slot! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:04:22'!
+readAlternatives
+
+	| result |
+	result := self readConcatenation.
+	self skipWhitespace.
+	[ self match: $| ] whileTrue: [
+		result := result or: self readConcatenation.
+		self skipWhitespace ].	
+	^ result! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/29/2025 10:17:33'!
+readConcatenation
+
+	| result |
+	result := self readRepetition..
+	self skipWhitespace.
+	[ lookahead notNil and: [ ('|)' includes: lookahead) not ] ]
+		whileTrue: [
+			result := result and: self readRepetition.
+			self skipWhitespace ].
+	^ result! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 11/6/2024 06:07:21'!
+readExpression
+
+	^ self readAlternatives! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 11:25:09'!
+readGroup
+
+	| capturing slot node |
+	capturing := true.
+	(self match: $?) ifTrue: [
+		(self match: $#) ifTrue: [
+			self skipBlockComment.
+			^ ReNullNode new ].
+		(self match: $:) ifTrue: [
+			capturing := false ] ].
+	capturing ifTrue: [
+		slot := self nextSlot ].
+	node := self readExpression.
+	self expect: $).
+	^ ReGroupNode
+		with: node
+		slot: slot! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 6/6/2025 07:34:06'!
+readInteger
+
+	^ self readDigits! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:05:12'!
+readRepetition
+
+	| node char repeat |
+	node := self readCharacter.
+	(node isKindOf: ReAnchorNode) ifTrue: [
+		^ node ].
+	('*+?{' includes: lookahead) ifTrue: [
+		char := self consume.
+		char = $* ifTrue: [
+			node := node repeatMin: 0 ].
+		char = $+ ifTrue: [
+			node := node repeatMin: 1 ].
+		char = $? ifTrue: [
+			node := node
+				repeatMin: 0
+				max: 1 ].
+		char = ${ ifTrue: [
+			repeat := self readRepetitionCount.
+			repeat node: node.
+			node := repeat ].
+		(self match: $+) ifTrue: [
+			node bePossessive ].
+		(self match: $?) ifTrue: [
+			node beNotGreedy ] ].
+	^ node! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:05:37'!
+readRepetitionCount
+
+	| min max |	
+	min := nil.
+	max := nil.	
+	self isDigit ifTrue: [
+		min := self readInteger ].
+	(self match: $}) ifTrue: [  "{n}"
+		min ifNil: [  "Exclude {}"
+			^ self syntaxError: 'Expected repetition count' ].
+		^ ReRepetitionNode
+			min: min
+			max: min ].
+	"{n,m} or {,m}"
+	min := min ifNil: [ 0 ].
+	self expect: $,.
+	self isDigit ifTrue: [
+		max := self readInteger ].
+	self expect: $}.
+	^ ReRepetitionNode
+		min: min
+		max: max! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 11:39:14'!
+skipBlockComment
+
+	[ lookahead notNil ] whileTrue: [
+		(self match: $\)
+			ifTrue: [
+				self consume ]
+			ifFalse: [
+				(self match: $)) ifTrue: [
+					^ self ].
+				(self matchAll: '(?#')
+					ifTrue: [
+						self skipBlockComment ]
+					ifFalse: [
+						self consume ] ] ]! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:06:37'!
+skipLineComment
+
+	| endOfLine |
+	endOfLine := `{ nil . Character lf . Character cr }`.
+	[ endOfLine statePointsTo: lookahead ] whileFalse: [
+		self consume ].
+	self match: `Character cr`.
+	self match: `Character lf`! !
+
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:07:17'!
+skipWhitespace
+
+	[ lookahead = $# or: [ self isSpace ] ]
+		whileTrue: [
+			(self match: $#) ifTrue: [
+				self skipLineComment ].
+			self skipBlanks ]! !
+
+!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 6/2/2025 08:04:17'!
+readCharacter
+
+	| character |
+	self skipSpaces.
+	(self match: $() ifTrue: [
+		^ self readGroup ].
+	character := self consume.
+	character = $\ ifTrue: [
+		^ self readCharacterEscape ].
+	character = $$ ifTrue: [
+		^ ReAnchorNode endOfLine ].
+	character = $. ifTrue: [
+		^ ReCharacterNode wildcard: flags ].
+	character = $[ ifTrue: [
+		^ self readCharacterClass ].
+	character = $^ ifTrue: [
+		^ ReAnchorNode beginningOfLine ].
+	^ ReCharacterNode
+		character: character
+		flags: flags! !
+
+!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 6/2/2025 08:11:21'!
+readCharacterEscape
+
+	| escape |
+
+	"\0 \a \e \f \n \r \t \v"
+	escape := self characterEscapes
+		at: lookahead
+		ifAbsent: [ nil ].
+	escape ifNotNil: [
+		self consume.
+		^ ReCharacterNode
+			character: escape ].
+
+	"\< \> \A \B \Z \b"
+	escape := self anchorEscapes
+		at: lookahead
+		ifAbsent: [ nil ].
+	escape ifNotNil: [
+		self consume.
+		^ escape value ].
+
+	"\D \S \W \d \s \w"
+	(ReCharacterClass
+		namedClass: lookahead
+		flags: flags)
+			ifNotNil: [ :namedClass |
+				self consume.
+				^ ReCharacterNode
+					characterClass: namedClass ].
+
+	"\cX control character"
+	(self match: $c) ifTrue: [
+		| control character |
+		control := self consume codePoint \\ 32.
+		character := Character codePoint: control.
+		^ ReCharacterNode
+			character: character ].
+			
+	"\p{ unicode property name or value}"
+	((lookahead = $P)  or: [ lookahead = $p ]) ifTrue: [
+		| p class |
+		p := self consume.
+		(self match: ${) ifFalse: [
+			^ ReCharacterNode
+				character: p
+				flags: flags ].
+		class := self readPropertyEscape.
+		p = $P ifTrue: [
+			class := class complement ].
+			^ ReCharacterNode
+				characterClass: class ].
+
+	"\uXXXX or \u{X[1-6]} unicode escape"
+	(self match: $u) ifTrue: [
+		^ ReCharacterNode
+			character: self readUnicodeEscape ].
+			
+	"\xXX \x{X[1-2]} hexadecimal escape"
+	(self match: $x) ifTrue: [
+		^ ReCharacterNode
+			character: self readHexEscape ].
+
+	"Handles \\ along with unnecessary escapes"
+	^ ReCharacterNode
+		character: self consume
+		flags: flags! !
+
+!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 5/30/2025 15:53:41'!
+readHexEscape
+
+	| codepoint |
+	(self match: ${)
+		ifFalse: [
+			codepoint := self readXDigits: 2 ]
+		ifTrue: [
+			codepoint := self
+				readXDigitsFrom: 1
+				to: 2.
+			self expect: $} ].
+	^ Character codePoint: codepoint! !
+
+!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 5/30/2025 15:18:41'!
+readPropertyEscape
+
+	| name |
+	name := self readWord.
+	name isEmptyOrNil ifTrue: [
+		^ self syntaxError: 'Expected Unicode property name or value' ].
+	self skipWhitespace.
+	self expect: $}.
+	^ ReCharacterClass
+		unicodeProperty: name
+		flags: flags! !
+
+!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 5/30/2025 15:54:20'!
+readUnicodeEscape
+
+	| codepoint |
+	(self match: ${)
+		ifFalse: [
+			codepoint := self readXDigits: 4 ]
+		ifTrue: [
+			codepoint := self
+				readXDigitsFrom: 1
+				to: 6.
+			self expect: $} ].
+	^ Character codePoint: codepoint! !
+
+!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 5/30/2025 15:54:47'!
+readWord
+
+	self skipSpaces.
+	^ String streamContents: [ :stream |
+		[ self isWord ] whileTrue: [
+			stream nextPut: self consume ] ]! !
+
+!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 6/2/2025 08:13:02'!
+readCharacterClass
+
+	^ ReCharacterNode
+		characterClass: self readClassExpression! !
+
+!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 6/2/2025 09:35:31'!
+readClassCharacter
+
+	| character1 character2 |
+	self skipWhitespace.
+	character1 := self consume.
+	character1 = $- ifTrue: [
+		^ ReCharacterClass
+			with: $- ].
+	character1 = $\ ifTrue: [
+		character1 := self readClassEscape ].
+	character1 isCharacter ifFalse: [
+		^ character1 ].
+	self skipWhitespace.
+	lookahead = $- ifFalse: [
+		^ character1 ].
+	self withSaveDo: [ :restore |
+		self consume.
+		lookahead = $] ifTrue: [
+			^ ReCharacterClass
+				with: character1
+				with: $-
+				flags: flags ].
+		lookahead = $- ifTrue: [
+			restore value.
+			^ ReCharacterClass
+				with: character1
+				flags: flags ].
+		character2 := self readClassCharacter.
+		character2 isCharacter ifFalse: [
+			restore value.
+			^ ReCharacterClass
+				with: character1
+				flags: flags ].
+		^ ReCharacterClass
+			from: character1
+			to: character2
+			flags: flags ]! !
+
+!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 5/29/2025 13:15:41'!
+readClassEscape
+
+	| escape |
+
+	"\0 \a \e \f \n \r \t \v"
+	escape := self characterEscapes
+		at: lookahead
+		ifAbsent: [ nil ].
+	escape ifNotNil: [
+		^ escape ].
+
+	"\D \S \W \d \s \w"
+	(ReCharacterClass
+		namedClass: lookahead
+		flags: flags)
+			ifNotNil: [ :namedClass |
+				self consume.
+				^ namedClass ].
+
+	"\cX control character"
+	(self match: $c) ifTrue: [
+		| control |
+		control := self consume codePoint \\ 32.
+		^ Character codePoint: control ].
+
+	"\p{ unicode property name or value}"
+	(lookahead = $P  or: [ lookahead = $p ]) ifTrue: [
+		| p class |
+		p := self consume.
+		(self match: ${) ifFalse: [
+			^ p ].
+		class := self readPropertyEscape.
+		p = $P ifTrue: [
+			class := class complement ].
+		^ class ].
+
+	"\uXXXX or \u{X[1-6]} unicode escape"
+	(self match: $u) ifTrue: [
+		^ self readUnicodeEscape ].
+			
+	"\xXX \x{X[1-2]} hexadecimal escape"
+	(self match: $x) ifTrue: [
+		^ self readHexEscape ].
+
+	"Handles \\ along with unnecessary escapes"
+	^ self consume! !
+
+!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 6/2/2025 09:18:11'!
+readClassExpression
+
+	| isComplement class |
+	self skipWhitespace.
+	isComplement := self match: $^.
+	self skipWhitespace.
+	class := lookahead = $]
+		ifTrue: [ self readClassUnion ]
+		ifFalse: [ self readClassSubtraction ].
+	self skipWhitespace.
+	self expect: $].
+	^ isComplement
+		ifTrue: [ class complement ]
+		ifFalse: [ class ]! !
+
+!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 5/30/2025 15:58:19'!
+readClassIntersection
+
+	| result operand |
+	result := self readClassUnion.
+	self skipWhitespace.
+	[ self match: $$ ] whileTrue: [
+		self expect: $$.
+		operand := self readClassUnion.
+		result := result & operand.
+		self skipWhitespace ].
+	^ result! !
+
+!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 5/30/2025 15:59:00'!
+readClassName
+
+	self isAlpha ifFalse: [
+		^ self syntaxError: 'Expected character class' ].
+	^ String streamContents: [ :stream |
+		[ self isAlpha ] whileTrue: [
+			stream nextPut: self consume ] ]! !
+
+!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 5/30/2025 15:59:16'!
+readClassSubtraction
+
+	| result operand |
+	result := self readClassIntersection.
+	self skipWhitespace.
+	[ self match: $- ] whileTrue: [
+		self expect: $-.
+		operand := self readClassIntersection.
+		result := result - operand.
+		self skipWhitespace ].
+	^ result! !
+
+!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 6/2/2025 09:19:20'!
+readClassUnion
+
+	| result done operand c |
+	result := ReCharacterClass empty: flags.
+	done := false.
+	self skipWhitespace.
+	(self match: $]) ifTrue: [
+		result add: $] ].
+	[ done or: [ lookahead = $] ] ]
+		whileFalse: [
+			done := (self matchAll: '&&') or: [ self matchAll: '--' ].
+			done ifFalse: [
+				operand := (self match: $[)
+					ifTrue: [ self readNestedClass ]
+					ifFalse: [
+						c := self readClassCharacter.
+						c isCharacter
+							ifFalse: [ c ]
+							ifTrue: [
+								ReCharacterClass
+									with: c
+									flags: flags ] ].
+				result := result | operand.
+				self skipWhitespace ] ].
+	^ result! !
+
+!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 5/30/2025 16:00:30'!
+readNestedClass
+
+	self skipWhitespace.
+	^ (self match: $:)
+		ifTrue: [ self readPosixClass ]
+		ifFalse: [ self readClassExpression ]! !
+
+!ReCompiler methodsFor: 'parsing-classes' stamp: 'ess 5/29/2025 13:17:20'!
+readPosixClass
+
+	| name |
+	self skipWhitespace.
+	name := self readClassName.
+	self skipWhitespace.
+	self expect: $:.
+	self skipWhitespace.
+	self expect: $].
+	^ ReCharacterClass
+		posixClass: name
+		flags: flags! !
+
+!ReCompiler methodsFor: 'private' stamp: 'ess 5/30/2025 15:22:47'!
+setIgnoreCase: ignoreCase multiLine: multiLine
+
+	flags := ReFlags
+		ignoreCase: ignoreCase
+		multiLine: multiLine.
+	^ self! !
+
+!ReCompiler class methodsFor: 'instance creation' stamp: 'ess 5/30/2025 15:22:11'!
+ignoreCase: ignoreCase
+
+	^ self
+		ignoreCase: ignoreCase
+		multiLine: nil! !
+
+!ReCompiler class methodsFor: 'instance creation' stamp: 'ess 5/30/2025 14:49:24'!
+ignoreCase: ignoreCase multiLine: multiLine
+
+	^ self new
+		setIgnoreCase: ignoreCase
+		multiLine: multiLine! !
+
+!ReCompiler class methodsFor: 'instance creation' stamp: 'ess 5/30/2025 15:22:15'!
+multiLine: multiLine
+
+	^ self
+		ignoreCase: nil
+		multiLine: multiLine! !
+
 !CharacterSequence methodsFor: '*Regexp-evaluating' stamp: 'ess 5/31/2025 07:57:54'!
 allRangesOfRegexMatches: regexString
 	"Answer an array of ranges of the matched substrings."
@@ -6426,137 +6071,3 @@ regex: regexString matchesDo: aUnaryBlock
 	regexString asRegex
 		allMatches: self
 		asStringsDo: aUnaryBlock! !
-
-!Character methodsFor: '*Regexp-testing' stamp: 'ess 11/18/2024 03:30:03'!
-isPosixAlnum
-	"Alphanumeric in the 7-bit ASCII character set"
-
-	| cp |
-	cp := self codePoint.
-	cp < `$0 codePoint` ifTrue: [ ^ false ].
-	cp <= `$9 codePoint` ifTrue: [ ^ true ].
-	cp < `$A codePoint` ifTrue: [ ^ false ].
-	cp <= `$Z codePoint` ifTrue: [ ^ true ].
-	^ `$a codePoint` <= cp
-		and: [ cp <= `$z codePoint` ]! !
-
-!Character methodsFor: '*Regexp-testing' stamp: 'ess 11/18/2024 03:30:13'!
-isPosixAlpha
-	"Alphabetic in the 7-bit ASCII character set"
-
-	| cp |
-	cp := self codePoint.
-	cp < `$A codePoint` ifTrue: [ ^ false ].
-	cp <= `$Z codePoint` ifTrue: [ ^ true ].
-	^ `$a codePoint` <= cp
-		and: [ cp <= `$z codePoint` ]! !
-
-!Character methodsFor: '*Regexp-testing' stamp: 'ess 5/30/2025 15:30:18'!
-isPosixBlank
-	"Horizontal whitespace in the 7-bit ASCII character set"
-	
-	^ self = `Character tab`
-		or: [ self = `Character space` ]! !
-
-!Character methodsFor: '*Regexp-testing' stamp: 'ess 11/18/2024 03:20:02'!
-isPosixCntrl
-	"Control in the 7-bit ASCII character set"
-
-	| cp |
-	cp := self codePoint.
-	^ cp <= 31
-		or: [ cp = 127 ]! !
-
-!Character methodsFor: '*Regexp-testing' stamp: 'ess 11/18/2024 03:29:28'!
-isPosixDigit
-	"Decimal digit in the 7-bit ASCII character set"
-
-	| cp |
-	cp := self codePoint.
- 	^ `$0 codePoint` <= cp
-		and: [ cp <= `$9 codePoint` ]! !
-
-!Character methodsFor: '*Regexp-testing' stamp: 'ess 11/18/2024 03:31:18'!
-isPosixGraph
-	"Graphic--has a printed representation--in the 7-bit ASCII character set"
-
-	| cp |
-	cp := self codePoint.
-	^ 33 <= cp  "Excludes space, see #isPosixPrint"
-		and: [ cp <= 126 ]! !
-
-!Character methodsFor: '*Regexp-testing' stamp: 'ess 11/18/2024 03:30:55'!
-isPosixLower
-	"Lowercase letter in the 7-bit ASCII character set."
-
-	| cp |
-	cp := self codePoint.
-	^ `$a codePoint` <= cp
-		and: [ cp <= `$z codePoint` ]! !
-
-!Character methodsFor: '*Regexp-testing' stamp: 'ess 11/18/2024 03:31:28'!
-isPosixPrint
-	"Printable--takes up space when displayed--in the 7-bit ASCII character set"
-
-	| cp |
-	cp := self codePoint.
-	^ 32 <= cp  "Includes space, see #isPosixGraph"
-		and: [ cp <= 126 ]! !
-
-!Character methodsFor: '*Regexp-testing' stamp: 'ess 11/17/2024 18:39:08'!
-isPosixPunct
-	"Punctuation in the 7-bit ASCII character set"
-	
-	^ self isPosixGraph
-		and: [ self isPosixAlnum not ]! !
-
-!Character methodsFor: '*Regexp-testing' stamp: 'ess 11/17/2024 17:57:58'!
-isPosixSpace
-	"Horizontal or vertical whitespace in the 7-bit ASCII character set"
-	
-	"TAB, LF, VT, FF, CR, or Space"
-	^ #(9 10 11 12 13 32) statePointsTo: self codePoint! !
-
-!Character methodsFor: '*Regexp-testing' stamp: 'ess 11/18/2024 03:32:04'!
-isPosixUpper
-	"Uppercase letter in the 7-bit ASCII character set"
-
-	| cp |
-	cp := self codePoint.
-	^ `$A codePoint` <= cp
-		and: [ cp <= `$Z codePoint` ]! !
-
-!Character methodsFor: '*Regexp-testing' stamp: 'ess 5/30/2025 15:31:20'!
-isPosixWord
-
-	^ self = $_
-		or: [ self isPosixAlnum ]! !
-
-!Character methodsFor: '*Regexp-testing' stamp: 'ess 5/30/2025 15:31:43'!
-isPosixXDigit
-	"Hexadecimal digit in the 7-bit ASCII character set"
-	"N.B., The awkward name is not just for compatibily with the old POSIX [:xdigit:], but also to leave #isHexDigit free to support Unicode hex digits."
-
-	| cp |
-	cp := self codePoint.
-	cp < `$0 codePoint` ifTrue: [ ^ false ].
-	cp <= `$9 codePoint` ifTrue: [ ^ true ].
-	cp < `$A codePoint` ifTrue: [ ^ false ].
-	cp <= `$F codePoint` ifTrue: [ ^ true ].
-	^ `$a codePoint` <= cp
-		and: [ cp <= `$f codePoint` ]! !
-
-!Character methodsFor: '*Regexp-accessing' stamp: 'ess 5/30/2025 15:29:20'!
-xDigitValue
-	"Posix(-ish) digitValue"
-	"digittoint(3): Always returns an integer from the range of 0 to 15.  If the given character was not a digit as defined by isxdigit(3), the function will return 0."
-
-	| cp |
-	cp := self codePoint.
-	cp < `$0 codePoint` ifTrue: [ ^ 0 ].
-	cp <= `$9 codePoint` ifTrue: [ ^ cp - `$0 codePoint` ].
-	cp < `$A codePoint` ifTrue: [ ^ 0 ].
-	cp <= `$F codePoint` ifTrue: [ ^ cp - `$A codePoint - 10` ].
-	cp < `$a codePoint` ifTrue: [ ^ 0 ].
-	cp <= `$f codePoint` ifTrue: [ ^ cp - `$a codePoint - 10` ].
-	^ 0! !
