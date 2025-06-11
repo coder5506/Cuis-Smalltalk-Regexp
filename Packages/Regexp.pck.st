@@ -1,8 +1,8 @@
-'From Cuis7.5 [latest update: #7263] on 9 June 2025 at 11:27:52 am'!
+'From Cuis7.5 [latest update: #7263] on 11 June 2025 at 2:22:18 pm'!
 'Description '!
-!provides: 'Regexp' 1 3!
+!provides: 'Regexp' 1 4!
 !requires: 'Cuis-Base' 75 7259 nil!
-!requires: 'Unicode' 1 2 nil!
+!requires: 'Unicode' 1 3 nil!
 SystemOrganization addCategory: #Regexp!
 SystemOrganization addCategory: #'Regexp-Private'!
 SystemOrganization addCategory: #'Regexp-Public'!
@@ -1838,9 +1838,11 @@ wildcard: regexpFlags
 	^ self characterClass:
 		(ReCharacterClass wildcard: regexpFlags)! !
 
-!ReGroupNode methodsFor: 'as yet unclassified' stamp: 'ess 11/6/2024 12:07:17'!
+!ReGroupNode methodsFor: 'as yet unclassified' stamp: 'ess 6/10/2025 14:08:12'!
 compileTo: aProgram
 
+	slot ifNil: [
+		^ aProgram compileNode: node ].
 	aProgram
 		saveStart: slot;
 		compileNode: node;
@@ -2136,16 +2138,19 @@ result
 	^ result ifNotNil: [
 		result on: input ]! !
 
-!ReProcess methodsFor: 'accessing' stamp: 'ess 6/4/2025 11:37:02'!
+!ReProcess methodsFor: 'accessing' stamp: 'ess 6/11/2025 11:37:45'!
 result: aMatchResult
 	"Set the latest match result."
 	"Threads have priority and execute in priority order.  At each process step (i.e., each input character), the first thread to set a match result will be the highest-priority running thread, meaning that any other running threads will not impact the final match and can be terminated.
 	Another thread can set a new result at a later process step to yield a longer match."	
 
-	(result notNil and: [ aMatchResult size <= result size ]) ifTrue: [
+	(result notNil
+		and: [ result start < aMatchResult start
+				or: [ aMatchResult end <= result end ] ])
+		ifTrue: [
 		^ self ].
-	result := aMatchResult.
-	running := OrderedCollection new! !
+	result := aMatchResult".
+	running := OrderedCollection new"! !
 
 !ReProcess methodsFor: 'accessing' stamp: 'ess 5/30/2025 16:57:54'!
 size
@@ -2764,10 +2769,10 @@ pattern: aCompiledPattern
 
 	pattern := aCompiledPattern! !
 
-!RegexpMatch methodsFor: 'accessing' stamp: 'ess 6/3/2025 18:02:47'!
+!RegexpMatch methodsFor: 'accessing' stamp: 'ess 6/11/2025 11:36:39'!
 size
 
-	^ (self endOfGroup: 0) - (self startOfGroup: 0) + 1! !
+	^ self end - self start + 1! !
 
 !RegexpMatch methodsFor: 'accessing' stamp: 'ess 5/31/2025 07:10:32'!
 spanOfGroup: anIndex
@@ -2834,6 +2839,11 @@ expand: aTemplateString
 			stream nextPut: $\ ] ]
 ! !
 
+!RegexpMatch methodsFor: 'private' stamp: 'ess 6/11/2025 11:36:27'!
+end
+
+	^ register0 end! !
+
 !RegexpMatch methodsFor: 'private' stamp: 'ess 12/3/2024 09:05:20'!
 endSlot: slotIndex at: matchPosition
 
@@ -2860,6 +2870,11 @@ setSlots: totalSlots
 
 	totalSlots > 1
 		ifTrue: [ registers := Array new: totalSlots - 1 ]! !
+
+!RegexpMatch methodsFor: 'private' stamp: 'ess 6/11/2025 11:36:21'!
+start
+
+	^ register0 start! !
 
 !RegexpMatch methodsFor: 'private' stamp: 'ess 6/4/2025 10:42:54'!
 startSlot: slotIndex at: matchPosition
@@ -2934,6 +2949,18 @@ allMatches: aString startingAt: startIndex endingAt: endIndex asStringsDo: aUnar
 			aUnaryBlock
 				value: (each groupAt: 0) ]! !
 
+!RegexpPattern methodsFor: 'evaluating' stamp: 'ess 6/10/2025 09:49:26'!
+allMatches: aString startingAt: startIndex endingAt: endIndex asStringsDo: matchBlock surroundedBy: unmatchedBlock
+	"Evaluate matchBlock with each consecutive, non-overlapping substring match from aString.  Evaluate unmatchedBlock with each possibly-empty unmatched string before the first match, between each successive match, and after the last match."
+
+	self
+		allMatches: aString
+		startingAt: startIndex
+		endingAt: endIndex
+		do: [ :each |
+			matchBlock value: (each groupAt: 0) ]
+		surroundedBy: unmatchedBlock! !
+
 !RegexpPattern methodsFor: 'evaluating' stamp: 'ess 5/31/2025 05:14:59'!
 allMatches: aString startingAt: startIndex endingAt: endIndex collect: aUnaryBlock
 	"Answer an array of the results of evaluating aUnaryBlock on all non-overlapping matches from aString."
@@ -2965,6 +2992,30 @@ allMatches: aString startingAt: startIndex endingAt: endIndex do: aUnaryBlock
 			ifNotNil: [
 				aUnaryBlock value: match.
 				((match endOfGroup: 0) max: nextStart) + 1 ] ]! !
+
+!RegexpPattern methodsFor: 'evaluating' stamp: 'ess 6/10/2025 09:44:10'!
+allMatches: aString startingAt: startIndex endingAt: endIndex do: matchBlock surroundedBy: unmatchedBlock
+	"Evaluate matchBlock with each consecutive, non-overlapping match from aString.  Evaluate unmatchedBlock with each possibly-empty unmatched string before the first match, between each successive match, and after the last match."
+
+	| start end unmatchedStart |
+	start := (startIndex ifNil: [ 1 ]) max: 1.
+	end := (endIndex ifNil: [ aString size ]) min: aString size.
+	unmatchedStart := start.
+	self
+		allMatches: aString
+		startingAt: start
+		endingAt: end
+		do: [ :each |
+			unmatchedBlock value:
+				(aString
+					copyFrom: unmatchedStart
+					to: (each startOfGroup: 0) - 1).
+			matchBlock value: each.
+			unmatchedStart := (each endOfGroup: 0) + 1 ].
+	unmatchedBlock value:
+		(aString
+			copyFrom: unmatchedStart
+			to: aString size)! !
 
 !RegexpPattern methodsFor: 'evaluating' stamp: 'ess 5/31/2025 05:15:59'!
 allMatchesAsStrings: aString startingAt: startIndex endingAt: endIndex
@@ -3047,32 +3098,22 @@ matchAsString: aString startingAt: startIndex endingAt: endIndex
 	^ match ifNotNil: [
 		match groupAt: 0 ]! !
 
-!RegexpPattern methodsFor: 'evaluating' stamp: 'ess 6/3/2025 17:44:27'!
+!RegexpPattern methodsFor: 'evaluating' stamp: 'ess 6/10/2025 09:42:09'!
 replaceAllIn: aString startingAt: startIndex endingAt: endIndex using: aUnaryBlock
 	"Answer the result of substituting the value of aUnaryBlock for all matches found in aString."
 	"Note that the startIndex and endIndex parameters only constrain the search for the match.  The answer will use the whole of aString."
 
-	| start end nextStart |
-	start := (startIndex ifNil: [ 1 ]) max: 1.
-	end := (endIndex ifNil: [ aString size ]) min: aString size.
-	nextStart := start.
 	^ String streamContents: [ :stream |
 		self
 			allMatches: aString
-			startingAt: start
-			endingAt: end
-			do: [ :each |
-				stream nextPutAll:
-					(aString
-						copyFrom: nextStart
-						to: (each startOfGroup: 0) - 1).
-				stream nextPutAll:
-					(aUnaryBlock value: each).
-				nextStart := (each endOfGroup: 0) + 1 ].
-		stream nextPutAll:
-			(aString
-				copyFrom: nextStart
-				to: aString size) ]! !
+			startingAt: startIndex
+			endingAt: endIndex
+			do: [ :eachMatch |
+				stream
+					nextPutAll: (aUnaryBlock value: eachMatch) ]
+			surroundedBy: [ :eachString |
+				stream
+					nextPutAll: eachString ] ]! !
 
 !RegexpPattern methodsFor: 'evaluating' stamp: 'ess 5/31/2025 07:41:28'!
 replaceAllIn: aString startingAt: startIndex endingAt: endIndex with: aTemplateString
@@ -3163,6 +3204,13 @@ copy: aString translatingMatchesUsing: aUnaryBlock
 		using: [ :each |
 			aUnaryBlock value: (each groupAt: 0) ]! !
 
+!RegexpPattern methodsFor: 'evaluating-compatibility' stamp: 'ess 6/10/2025 07:05:27'!
+matchesIn: aString do: aUnaryBlock
+
+	self
+		allMatches: aString
+		asStringsDo: aUnaryBlock! !
+
 !RegexpPattern methodsFor: 'evaluating-compatibility' stamp: 'ess 6/2/2025 09:09:09'!
 matchingRangesIn: aString
 
@@ -3200,6 +3248,17 @@ allMatches: aString asStringsDo: aUnaryBlock
 		endingAt: nil
 		asStringsDo: aUnaryBlock! !
 
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 6/10/2025 09:50:28'!
+allMatches: aString asStringsDo: matchBlock surroundedBy: unmatchedBlock
+	"Evaluate matchBlock with each consecutive, non-overlapping substring match from aString.  Evaluate unmatchedBlock with each possibly-empty unmatched string before the first match, between each successive match, and after the last match."
+
+	self
+		allMatches: aString
+		startingAt: nil
+		endingAt: nil
+		asStringsDo: matchBlock
+		surroundedBy: unmatchedBlock! !
+
 !RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:19:33'!
 allMatches: aString collect: aUnaryBlock
 	"Answer an array of the results of evaluating aUnaryBlock on all non-overlapping matches from aString."
@@ -3219,6 +3278,17 @@ allMatches: aString do: aUnaryBlock
 		startingAt: nil
 		endingAt: nil
 		do: aUnaryBlock! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 6/10/2025 09:46:08'!
+allMatches: aString do: matchBlock surroundedBy: unmatchedBlock
+	"Evaluate matchBlock with each consecutive, non-overlapping match from aString.  Evaluate unmatchedBlock with each possibly-empty unmatched string before the first match, between each successive match, and after the last match."
+
+	self
+		allMatches: aString
+		startingAt: nil
+		endingAt: nil
+		do: matchBlock
+		surroundedBy: unmatchedBlock! !
 
 !RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:17:35'!
 allMatches: aString endingAt: endIndex
@@ -3249,6 +3319,17 @@ allMatches: aString endingAt: endIndex asStringsDo: aUnaryBlock
 		endingAt: endIndex
 		asStringsDo: aUnaryBlock! !
 
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 6/10/2025 09:50:21'!
+allMatches: aString endingAt: endIndex asStringsDo: matchBlock surroundedBy: unmatchedBlock
+	"Evaluate matchBlock with each consecutive, non-overlapping substring match from aString.  Evaluate unmatchedBlock with each possibly-empty unmatched string before the first match, between each successive match, and after the last match."
+
+	self
+		allMatches: aString
+		startingAt: nil
+		endingAt: endIndex
+		asStringsDo: matchBlock
+		surroundedBy: unmatchedBlock! !
+
 !RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:19:40'!
 allMatches: aString endingAt: endIndex collect: aUnaryBlock
 	"Answer an array of the results of evaluating aUnaryBlock on all non-overlapping matches from aString."
@@ -3268,6 +3349,17 @@ allMatches: aString endingAt: endIndex do: aUnaryBlock
 		startingAt: nil
 		endingAt: endIndex
 		do: aUnaryBlock! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 6/10/2025 09:46:01'!
+allMatches: aString endingAt: endIndex do: matchBlock surroundedBy: unmatchedBlock
+	"Evaluate matchBlock with each consecutive, non-overlapping match from aString.  Evaluate unmatchedBlock with each possibly-empty unmatched string before the first match, between each successive match, and after the last match."
+
+	self
+		allMatches: aString
+		startingAt: nil
+		endingAt: endIndex
+		do: matchBlock
+		surroundedBy: unmatchedBlock! !
 
 !RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:17:42'!
 allMatches: aString startingAt: startIndex
@@ -3298,6 +3390,17 @@ allMatches: aString startingAt: startIndex asStringsDo: aUnaryBlock
 		endingAt: nil
 		asStringsDo: aUnaryBlock! !
 
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 6/10/2025 09:49:54'!
+allMatches: aString startingAt: startIndex asStringsDo: matchBlock surroundedBy: unmatchedBlock
+	"Evaluate matchBlock with each consecutive, non-overlapping substring match from aString.  Evaluate unmatchedBlock with each possibly-empty unmatched string before the first match, between each successive match, and after the last match."
+
+	self
+		allMatches: aString
+		startingAt: startIndex
+		endingAt: nil
+		asStringsDo: matchBlock
+		surroundedBy: unmatchedBlock! !
+
 !RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:19:45'!
 allMatches: aString startingAt: startIndex collect: aUnaryBlock
 	"Answer an array of the results of evaluating aUnaryBlock on all non-overlapping matches from aString."
@@ -3317,6 +3420,17 @@ allMatches: aString startingAt: startIndex do: aUnaryBlock
 		startingAt: startIndex
 		endingAt: nil
 		do: aUnaryBlock! !
+
+!RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 6/10/2025 09:45:29'!
+allMatches: aString startingAt: startIndex do: matchBlock surroundedBy: unmatchedBlock
+	"Evaluate matchBlock with each consecutive, non-overlapping match from aString.  Evaluate unmatchedBlock with each possibly-empty unmatched string before the first match, between each successive match, and after the last match."
+
+	self
+		allMatches: aString
+		startingAt: startIndex
+		endingAt: nil
+		do: matchBlock
+		surroundedBy: unmatchedBlock! !
 
 !RegexpPattern methodsFor: 'evaluating-shortcuts' stamp: 'ess 5/31/2025 05:22:39'!
 allMatchesAsStrings: aString
@@ -3839,6 +3953,23 @@ compileProgram: aNode slotsNeeded: totalSlots
 		slotsNeeded: totalSlots;
 		compileProgram: aNode;
 		match! !
+
+!RegexpPattern class methodsFor: 'constants' stamp: 'ess 6/11/2025 11:56:28'!
+escape: aString
+
+	^ String streamContents: [ :stream |
+		self
+			escape: aString
+			on: stream ]! !
+
+!RegexpPattern class methodsFor: 'constants' stamp: 'ess 6/11/2025 11:56:48'!
+escape: aString on: aStream
+
+	aString do: [ :each |
+		(each isAscii and: [ each isPosixAlnum not ])
+			ifTrue: [
+				aStream nextPut: $\ ].
+		aStream nextPut: each ]! !
 
 !RegexpPattern class methodsFor: 'instance creation' stamp: 'ess 6/3/2025 14:56:16'!
 compileProgram: aNode slotsNeeded: totalSlots
@@ -5569,20 +5700,20 @@ skipLineComment
 	self match: `Character cr`.
 	self match: `Character lf`! !
 
-!ReCompiler methodsFor: 'parsing' stamp: 'ess 5/30/2025 16:07:17'!
+!ReCompiler methodsFor: 'parsing' stamp: 'ess 6/10/2025 14:17:59'!
 skipWhitespace
 
 	[ lookahead = $# or: [ self isSpace ] ]
 		whileTrue: [
 			(self match: $#) ifTrue: [
 				self skipLineComment ].
-			self skipBlanks ]! !
+			self skipSpaces ]! !
 
-!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 6/2/2025 08:04:17'!
+!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 6/10/2025 14:17:02'!
 readCharacter
 
 	| character |
-	self skipSpaces.
+	self skipWhitespace.
 	(self match: $() ifTrue: [
 		^ self readGroup ].
 	character := self consume.
@@ -5709,10 +5840,10 @@ readUnicodeEscape
 			self expect: $} ].
 	^ Character codePoint: codepoint! !
 
-!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 5/30/2025 15:54:47'!
+!ReCompiler methodsFor: 'parsing-characters' stamp: 'ess 6/10/2025 14:17:08'!
 readWord
 
-	self skipSpaces.
+	self skipWhitespace.
 	^ String streamContents: [ :stream |
 		[ self isWord ] whileTrue: [
 			stream nextPut: self consume ] ]! !
