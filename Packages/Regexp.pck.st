@@ -1,8 +1,8 @@
-'From Cuis7.5 [latest update: #7263] on 11 June 2025 at 2:22:18 pm'!
+'From Cuis7.5 [latest update: #7279] on 28 June 2025 at 11:09:32 am'!
 'Description '!
-!provides: 'Regexp' 1 4!
-!requires: 'Cuis-Base' 75 7259 nil!
-!requires: 'Unicode' 1 3 nil!
+!provides: 'Regexp' 1 5!
+!requires: 'Cuis-Base' 75 7279 nil!
+!requires: 'Unicode' 1 6 nil!
 SystemOrganization addCategory: #Regexp!
 SystemOrganization addCategory: #'Regexp-Private'!
 SystemOrganization addCategory: #'Regexp-Public'!
@@ -5505,8 +5505,8 @@ nextSlot
 	slotsUsed := slotsUsed + 1.
 	^ result! !
 
-!ReCompiler methodsFor: 'as yet unclassified' stamp: 'ess 6/6/2025 07:36:11'!
-syntaxErrorClass
+!ReCompiler methodsFor: 'as yet unclassified' stamp: 'ess 6/28/2025 11:08:32'!
+parseErrorClass
 
 	^ RegexpSyntaxError! !
 
